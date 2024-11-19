@@ -1,5 +1,6 @@
 import os
 import tkinter as tk
+from tkinter import ttk
 import pyperclip
 from cerebras.cloud.sdk import Cerebras
 
@@ -11,7 +12,7 @@ def get_latest_file(directory):
     latest_file = max(files, key=os.path.getmtime)
     return latest_file
 
-def fetch_model_response(prompt, output_label):
+def fetch_model_response(prompt, output_label, model_name, temperature):
     """使用 Cerebras API 调用模型并显示响应"""
     try:
         client = Cerebras(api_key=os.environ.get("CEREBRAS_API_KEY"))
@@ -22,10 +23,10 @@ def fetch_model_response(prompt, output_label):
                 {"role": "user", "content": prompt},
                 {"role": "assistant", "content": ""}
             ],
-            model="llama3.1-70b",
+            model=model_name,
             stream=True,
             max_completion_tokens=8192,
-            temperature=1,
+            temperature=float(temperature),
             top_p=1
         )
         # 实时更新响应到窗口
@@ -38,7 +39,7 @@ def fetch_model_response(prompt, output_label):
     except Exception as e:
         output_label.config(text=f"调用模型失败: {e}", fg="red")
 
-def copy_latest_file_content(label, output_label):
+def copy_latest_file_content(label, output_label, model_var, temperature_var):
     """复制最新文件的内容到剪贴板，并在窗口中显示确认信息和模型回答"""
     directory = r"C:\Users\Lingyun Chen\OneDrive\文档\TMSpeechLogs"  # 指定路径
     latest_file = get_latest_file(directory)
@@ -92,7 +93,7 @@ def copy_latest_file_content(label, output_label):
             label.config(text=f"已复制最新文件内容！\n文件路径: {latest_file}", fg="green")
 
             # 调用模型获取回答
-            fetch_model_response(combined_content, output_label)
+            fetch_model_response(combined_content, output_label, model_var.get(), temperature_var.get())
 
         except Exception as e:
             label.config(text=f"读取文件失败: {e}", fg="red")
@@ -107,6 +108,23 @@ def create_gui():
     window.geometry("600x500")
     window.resizable(False, False)
     window.configure(bg="#F0F0F0")  # Windows 10 默认浅灰背景
+
+    # 模型选择
+    model_var = tk.StringVar(value="llama3.1-70b")  # 默认模型
+    model_label = ttk.Label(window, text="选择模型:")
+    model_label.pack(pady=5)
+    model_combo = ttk.Combobox(
+        window, textvariable=model_var, values=["llama3.1-70b", "llama3.1-8b"], state="readonly" # Add more models as needed
+    )
+    model_combo.pack(pady=5)
+    model_combo.pack(pady=5)
+
+    # 温度设置
+    temperature_var = tk.StringVar(value="1.0")
+    temperature_label = ttk.Label(window, text="设置温度 (0.0-1.5):")
+    temperature_label.pack(pady=5)
+    temperature_entry = ttk.Entry(window, textvariable=temperature_var, width=10)
+    temperature_entry.pack(pady=5)
 
     # 标签
     label = tk.Label(window, text="点击按钮复制最新记事本的内容", bg="#F0F0F0", fg="#000000", font=("Segoe UI", 12))
@@ -124,7 +142,7 @@ def create_gui():
     copy_button = tk.Button(
         window, text="复制并获取回答", bg="#0078D7", fg="white", font=("Segoe UI", 12),
         activebackground="#005A9E", activeforeground="white",
-        command=lambda: copy_latest_file_content(confirmation_label, output_label)
+        command=lambda: copy_latest_file_content(confirmation_label, output_label, model_var, temperature_var)
     )
     copy_button.pack(pady=20, ipadx=10, ipady=5)
 
