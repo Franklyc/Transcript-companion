@@ -25,7 +25,7 @@ def fetch_model_response(prompt, output_label):
             model="llama3.1-70b",
             stream=True,
             max_completion_tokens=8192,
-            temperature=0.2,
+            temperature=1,
             top_p=1
         )
         # 实时更新响应到窗口
