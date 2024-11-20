@@ -58,7 +58,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
                 delta = chunk.choices[0].delta.content or ""
                 output_textbox.insert(tk.END, delta)
                 # output_textbox.see(tk.END)  # 滚动到最后
-                output_textbox.update_idletasks()  # 强制更新GUI
+                output_textbox.update()  # 强制更新GUI
             return
 
         params["model"] = model_name
@@ -70,7 +70,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             delta = chunk.choices[0].delta.content or ""
             output_textbox.insert(tk.END, delta)
             # output_textbox.see(tk.END)  # 滚动到最后
-            output_textbox.update_idletasks()  # 强制更新GUI
+            output_textbox.update()  # 强制更新GUI
 
     except Exception as e:
         output_textbox.delete(1.0, tk.END)
