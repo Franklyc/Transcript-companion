@@ -20,7 +20,6 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             "messages": [
                 {"role": "system", "content": ""},
                 {"role": "user", "content": prompt},
-                {"role": "assistant", "content": ""}
             ],
             "stream": True,
             "temperature": float(temperature),
@@ -42,8 +41,24 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
                 api_key=os.environ.get("GROQ_API_KEY")
             )
             model_name = model_name.replace("[Groq] ", "")
-            # 为 mixtral-8x7b-32768 设置特殊的 max_tokens 值
             params["max_tokens"] = 32768 if model_name == "mixtral-8x7b-32768" else 8000
+
+        elif model_name.startswith("[Gemini]"):
+            client = openai.OpenAI(
+                base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+                api_key=os.environ.get("GEMINI_API_KEY")
+            )
+            model_name = model_name.replace("[Gemini] ", "")
+            params["model"] = model_name
+            response = client.chat.completions.create(**params)
+
+            # 实时更新响应到文本框
+            output_textbox.delete(1.0, tk.END)  # 清空现有内容
+            for chunk in response:
+                delta = chunk.choices[0].delta.content or ""
+                output_textbox.insert(tk.END, delta)
+                output_textbox.see(tk.END)  # 滚动到最后
+            return
 
         params["model"] = model_name
         stream = client.chat.completions.create(**params)
@@ -167,7 +182,8 @@ def create_gui():
             "[Groq] mixtral-8x7b-32768",
             "[Groq] llama-3.1-70b-versatile",
             "[Groq] llama-3.1-8b-instant",
-            "[Groq] llama-3.2-90b-vision-preview"
+            "[Groq] llama-3.2-90b-vision-preview",
+            "[Gemini] gemini-1.5-flash"
         ], 
         state="readonly"
     )
