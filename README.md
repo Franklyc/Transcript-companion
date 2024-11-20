@@ -31,7 +31,7 @@ pip install openai pyperclip
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-username/TMSpeech-companion.git
+   git clone https://github.com/Franklyc/TMSpeech-companion.git
    ```
 2. **Configuration:**
    - **Rename Example Files:** Copy and rename the following files:
