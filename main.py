@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter import ttk, filedialog
 import pyperclip
-from cerebras.cloud.sdk import Cerebras
+import openai
 
 def get_latest_file(directory):
     """获取指定目录下最新修改的文件"""
@@ -13,9 +13,12 @@ def get_latest_file(directory):
     return latest_file
 
 def fetch_model_response(prompt, output_textbox, model_name, temperature):
-    """使用 Cerebras API 调用模型并显示响应"""
+    """使用 OpenAI API 调用模型并显示响应"""
     try:
-        client = Cerebras(api_key=os.environ.get("CEREBRAS_API_KEY"))
+        client = openai.OpenAI(
+            base_url="https://api.cerebras.ai/v1",
+            api_key=os.environ.get("CEREBRAS_API_KEY")
+        )
 
         stream = client.chat.completions.create(
             messages=[
