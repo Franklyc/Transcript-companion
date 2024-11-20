@@ -57,7 +57,8 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             for chunk in response:
                 delta = chunk.choices[0].delta.content or ""
                 output_textbox.insert(tk.END, delta)
-                output_textbox.see(tk.END)  # 滚动到最后
+                # output_textbox.see(tk.END)  # 滚动到最后
+                output_textbox.update_idletasks()  # 强制更新GUI
             return
 
         params["model"] = model_name
@@ -68,7 +69,9 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         for chunk in stream:
             delta = chunk.choices[0].delta.content or ""
             output_textbox.insert(tk.END, delta)
-            output_textbox.see(tk.END)  # 滚动到最后
+            # output_textbox.see(tk.END)  # 滚动到最后
+            output_textbox.update_idletasks()  # 强制更新GUI
+
     except Exception as e:
         output_textbox.delete(1.0, tk.END)
         output_textbox.insert(tk.END, f"调用模型失败: {e}")
