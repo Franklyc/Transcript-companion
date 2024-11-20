@@ -4,50 +4,13 @@ import config
 import utils
 import api
 import pyperclip
+import prefix
 
 def copy_latest_file_content(label, output_textbox, model_var, temperature_var, folder_var, custom_prefix_textbox, custom_suffix_textbox):
     directory = folder_var.get() or config.DEFAULT_FOLDER_PATH
     latest_file = utils.get_latest_file(directory)
 
-    original_prefix = (
-        "以下是我的会议转录文字（可能因识别而存在部分错误），请你结合上下文，精准的判断出对方最新的要求或提问，并给出回答的详实可行的范例。只要回答对方最新的要求或提问即可。\n\n"
-        "此外，我的简历信息如下，可能与对方的提问有关，如果判定为相关，请结合简历内容进行回答：\n\n"
-        "- **教育背景**:\n"
-        "  - New York University, Tandon School of Engineering, M.S. Computer Engineering (GPA: 3.56/4.0, 2023-2025预计)\n"
-        "  - University of Kentucky, Study Abroad, Electronic Engineering (GPA: 3.56/4.0, Dean's List Spring 2022)\n"
-        "  - Beijing University of Technology, B.S. Electronic Science and Technology (GPA: 3.26/4.0)\n\n"
-        "- **工作经历**:\n"
-        "  - AdaSeco, Customer Support Chatbot Development, AI Engineer (Jul 2024 – Sep 2024)\n"
-        "    • Developed a chatbot using LLMs to deliver real-time, context-aware responses for customer support.\n"
-        "    • Optimized chatbot response time, reducing latency by 30% during peak traffic, ensuring fast inference and seamless user interactions.\n"
-        "    • Collaborated with cross-functional teams to align chatbot capabilities with business goals and user needs.\n"
-        "  - Wissee Inc, Graphic Generation Project, AI Engineer (May 2024 – Aug 2024)\n"
-        "    • Developed and implemented AIGC models (Text-to-Image and Image-to-Image) to generate over 1,000 unique clothing patterns based on "
-        "50+ trending social media topics and top 100 e-commerce products.\n"
-        "    • Created a comprehensive pattern database using MySQL with an efficient tagging system, improving search accuracy by 85%, and built a "
-        "user-friendly interface in React with an intelligent Q&A system powered by Elasticsearch that reduced query response time by 40%.\n"
-        "    • Conducted data analysis on 10,000+ social media posts and 500 e-commerce platforms using Python (Pandas, NumPy).\n"
-        "  - Zhongguancun IC Design Park, Arduino IoT Project, Software Developer (Jun 2022 – Jul 2022)\n"
-        "    • Spearheaded the design and implementation of an intelligent Arduino-based trolley equipped with line-tracking and ultrasonic obstacle "
-        "avoidance capabilities, enhancing its navigational efficiency in dynamic environments.\n"
-        "    • Utilized infrared sensors to enable precise line-tracking functionality, allowing the trolley to follow predetermined paths with high accuracy.\n"
-        "    • Integrated ultrasonic sensors to implement real-time obstacle detection and avoidance, ensuring smooth and uninterrupted operation of the trolley.\n\n"
-        "- **项目经历**:\n"
-        "  - Audio Transcription and LLM Response Application Development (July 2024 – Aug 2024)\n"
-        "    • Developed a PyQt5 GUI application for recording, transcribing audio (using Groq Whisper models), and generating LLM responses (Google "
-        "Gemini API), with custom Text-to-Speech and multithreading for seamless operation.\n"
-        "    • Built user authentication, session management (Spring Security), and RESTful APIs, integrating React components for dynamic front-end interaction, deployed to AWS with RDS and App Runner.\n"
-        "    • Optimized performance with caching, Docker containerization, conducted API testing with Postman and implemented unit testing for code reliability.\n"
-        "  - Automatic Localization of Labyrinth Structure Using YOLOv7 and Python (Dec 2022 – May 2023)\n"
-        "    • Adopted the YOLOv7 deep learning model to localize the labyrinth structure from temporal bone CT scans and proved its effectiveness in precise anatomical localization.\n"
-        "    • Developed a Python algorithm to automatically generate localization labels from image segmentation results, streamlining model training.\n"
-        "    • Conducted comprehensive experiments to validate the effectiveness of the model in achieving precise localization of the labyrinth.\n"
-        "  - Detection of Marine Chemical Pollution Based on Machine Learning and Image Processing (Jun 2022 – Aug 2022)\n"
-        "    • Assembled a diverse dataset of 800 aerial ocean images, classified into normal and polluted categories for model training.\n"
-        "    • Performed image pre-processing in MATLAB, including histogram equalization, contrast enhancement, and dynamic range expansion on RGB/HSV channels to improve image features.\n"
-        "    • Developed and tested neural network models in Python, using VGG16 pre-trained model and data augmentation techniques like rotation and flipping.\n"
-        "    • Achieved improved accuracy in detecting oil spills by applying dynamic range expansion on the V channel of HSV images.\n\n"
-    )
+    original_prefix = prefix.get_original_prefix() # Call the function to get the prefix
 
     custom_prefix = custom_prefix_textbox.get("1.0", "end").strip()
     custom_suffix = custom_suffix_textbox.get("1.0", "end").strip()
