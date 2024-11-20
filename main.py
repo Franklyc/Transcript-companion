@@ -15,23 +15,39 @@ def get_latest_file(directory):
 def fetch_model_response(prompt, output_textbox, model_name, temperature):
     """使用 OpenAI API 调用模型并显示响应"""
     try:
-        client = openai.OpenAI(
-            base_url="https://api.cerebras.ai/v1",
-            api_key=os.environ.get("CEREBRAS_API_KEY")
-        )
-
-        stream = client.chat.completions.create(
-            messages=[
+        # 基础参数
+        params = {
+            "messages": [
                 {"role": "system", "content": ""},
                 {"role": "user", "content": prompt},
                 {"role": "assistant", "content": ""}
             ],
-            model=model_name,
-            stream=True,
-            max_completion_tokens=8192,
-            temperature=float(temperature),
-            top_p=1
-        )
+            "stream": True,
+            "temperature": float(temperature),
+            "top_p": 1
+        }
+
+        # 根据模型名称确定使用哪个供应商
+        if model_name.startswith("[Cerebras]"):
+            client = openai.OpenAI(
+                base_url="https://api.cerebras.ai/v1",
+                api_key=os.environ.get("CEREBRAS_API_KEY")
+            )
+            model_name = model_name.replace("[Cerebras] ", "")
+            params["max_completion_tokens"] = 8192
+            
+        elif model_name.startswith("[Groq]"):
+            client = openai.OpenAI(
+                base_url="https://api.groq.com/openai/v1",
+                api_key=os.environ.get("GROQ_API_KEY")
+            )
+            model_name = model_name.replace("[Groq] ", "")
+            # 为 mixtral-8x7b-32768 设置特殊的 max_tokens 值
+            params["max_tokens"] = 32768 if model_name == "mixtral-8x7b-32768" else 8000
+
+        params["model"] = model_name
+        stream = client.chat.completions.create(**params)
+
         # 实时更新响应到文本框
         output_textbox.delete(1.0, tk.END)  # 清空现有内容
         for chunk in stream:
@@ -140,11 +156,20 @@ def create_gui():
     select_button.grid(row=0, column=2, pady=5, padx=5)
 
     # 模型选择
-    model_var = tk.StringVar(value="llama3.1-70b")  # 默认模型
+    model_var = tk.StringVar(value="[Cerebras] llama3.1-70b")  # 默认模型
     model_label = ttk.Label(frame, text="选择模型:")
     model_label.grid(row=1, column=0, sticky="w", pady=5)
     model_combo = ttk.Combobox(
-        frame, textvariable=model_var, values=["llama3.1-70b", "llama3.1-8b"], state="readonly"
+        frame, textvariable=model_var, 
+        values=[
+            "[Cerebras] llama3.1-70b",
+            "[Cerebras] llama3.1-8b",
+            "[Groq] mixtral-8x7b-32768",
+            "[Groq] llama-3.1-70b-versatile",
+            "[Groq] llama-3.1-8b-instant",
+            "[Groq] llama-3.2-90b-vision-preview"
+        ], 
+        state="readonly"
     )
     model_combo.grid(row=1, column=1, pady=5, padx=5)
 
