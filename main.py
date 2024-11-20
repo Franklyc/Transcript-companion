@@ -164,7 +164,7 @@ def create_gui():
     window.title("TMSpeech Companion")
     window.geometry("800x800")
     window.resizable(False, False)
-    window.configure(bg="#F0F0F0")  # Windows 10 默认浅灰背景
+    window.configure(bg="#F0F0F0")  
 
     # 主框架
     frame = ttk.Frame(window)
