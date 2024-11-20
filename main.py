@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import pyperclip
 from cerebras.cloud.sdk import Cerebras
 
@@ -12,7 +12,7 @@ def get_latest_file(directory):
     latest_file = max(files, key=os.path.getmtime)
     return latest_file
 
-def fetch_model_response(prompt, output_label, model_name, temperature):
+def fetch_model_response(prompt, output_textbox, model_name, temperature):
     """使用 Cerebras API 调用模型并显示响应"""
     try:
         client = Cerebras(api_key=os.environ.get("CEREBRAS_API_KEY"))
@@ -29,23 +29,23 @@ def fetch_model_response(prompt, output_label, model_name, temperature):
             temperature=float(temperature),
             top_p=1
         )
-        # 实时更新响应到窗口
-        response = ""
+        # 实时更新响应到文本框
+        output_textbox.delete(1.0, tk.END)  # 清空现有内容
         for chunk in stream:
             delta = chunk.choices[0].delta.content or ""
-            response += delta
-            output_label.config(text=response)
-            output_label.update()
+            output_textbox.insert(tk.END, delta)
+            output_textbox.see(tk.END)  # 滚动到最后
     except Exception as e:
-        output_label.config(text=f"调用模型失败: {e}", fg="red")
+        output_textbox.delete(1.0, tk.END)
+        output_textbox.insert(tk.END, f"调用模型失败: {e}")
 
-def copy_latest_file_content(label, output_label, model_var, temperature_var):
+def copy_latest_file_content(label, output_textbox, model_var, temperature_var, folder_var, custom_prefix_textbox, custom_suffix_textbox):
     """复制最新文件的内容到剪贴板，并在窗口中显示确认信息和模型回答"""
-    directory = r"C:\Users\Lingyun Chen\OneDrive\文档\TMSpeechLogs"  # 指定路径
+    directory = folder_var.get() or r"C:\Users\Lingyun Chen\OneDrive\文档\TMSpeechLogs"  # 指定路径
     latest_file = get_latest_file(directory)
 
-    prefix = (
-        "以下是我的会议转录文字（可能因识别而存在部分错误），请你结合上下文，精准的判断出对方最新的要求或提问，并给出回答的范例。只要回答对方最新的要求或提问即可。\n\n"
+    original_prefix = (
+        "以下是我的会议转录文字（可能因识别而存在部分错误），请你结合上下文，精准的判断出对方最新的要求或提问，并给出回答的详实可行的范例。只要回答对方最新的要求或提问即可。\n\n"
         "此外，我的简历信息如下，可能与对方的提问有关，如果判定为相关，请结合简历内容进行回答：\n\n"
         "- **教育背景**:\n"
         "  - New York University, Tandon School of Engineering, M.S. Computer Engineering (GPA: 3.56/4.0, 2023-2025预计)\n"
@@ -84,67 +84,110 @@ def copy_latest_file_content(label, output_label, model_var, temperature_var):
         "    • Achieved improved accuracy in detecting oil spills by applying dynamic range expansion on the V channel of HSV images.\n\n"
     )
 
+    # 自定义前缀和后缀
+    custom_prefix = custom_prefix_textbox.get("1.0", "end").strip()
+    custom_suffix = custom_suffix_textbox.get("1.0", "end").strip()
+
     if latest_file:
         try:
             with open(latest_file, 'r', encoding='utf-8') as file:
                 content = file.read()
-            combined_content = prefix + content
-            pyperclip.copy(combined_content)
+            
+            # 组合文本内容
+            combined_content = f"{original_prefix}\n{custom_prefix}\n{content}\n{custom_suffix}"
+            pyperclip.copy(combined_content)  # 复制到剪贴板
+
+            # 更新标签
             label.config(text=f"已复制最新文件内容！\n文件路径: {latest_file}", fg="green")
 
             # 调用模型获取回答
-            fetch_model_response(combined_content, output_label, model_var.get(), temperature_var.get())
+            fetch_model_response(combined_content, output_textbox, model_var.get(), temperature_var.get())
 
         except Exception as e:
             label.config(text=f"读取文件失败: {e}", fg="red")
     else:
         label.config(text="目录中没有可用的文件！", fg="red")
 
+def select_folder(folder_var):
+    """选择文件夹"""
+    folder_path = filedialog.askdirectory()
+    if folder_path:
+        folder_var.set(folder_path)
+
 # 创建 GUI 界面
 def create_gui():
     """创建 GUI 界面"""
     window = tk.Tk()
     window.title("TMSpeech Companion")
-    window.geometry("600x500")
+    window.geometry("800x800")
     window.resizable(False, False)
     window.configure(bg="#F0F0F0")  # Windows 10 默认浅灰背景
 
+    # 主框架
+    frame = ttk.Frame(window)
+    frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    # 路径选择
+    folder_var = tk.StringVar(value=r"C:\Users\Lingyun Chen\OneDrive\文档\TMSpeechLogs")  # 默认路径
+    folder_label = ttk.Label(frame, text="当前文件夹:")
+    folder_label.grid(row=0, column=0, sticky="w", pady=5)
+    folder_display = ttk.Entry(frame, textvariable=folder_var, width=50, state="readonly")
+    folder_display.grid(row=0, column=1, pady=5, padx=5)
+    select_button = ttk.Button(frame, text="选择文件夹", command=lambda: select_folder(folder_var))
+    select_button.grid(row=0, column=2, pady=5, padx=5)
+
     # 模型选择
     model_var = tk.StringVar(value="llama3.1-70b")  # 默认模型
-    model_label = ttk.Label(window, text="选择模型:")
-    model_label.pack(pady=5)
+    model_label = ttk.Label(frame, text="选择模型:")
+    model_label.grid(row=1, column=0, sticky="w", pady=5)
     model_combo = ttk.Combobox(
-        window, textvariable=model_var, values=["llama3.1-70b", "llama3.1-8b"], state="readonly" # Add more models as needed
+        frame, textvariable=model_var, values=["llama3.1-70b", "llama3.1-8b"], state="readonly"
     )
-    model_combo.pack(pady=5)
-    model_combo.pack(pady=5)
+    model_combo.grid(row=1, column=1, pady=5, padx=5)
 
     # 温度设置
     temperature_var = tk.StringVar(value="1.0")
-    temperature_label = ttk.Label(window, text="设置温度 (0.0-1.5):")
-    temperature_label.pack(pady=5)
-    temperature_entry = ttk.Entry(window, textvariable=temperature_var, width=10)
-    temperature_entry.pack(pady=5)
+    temperature_label = ttk.Label(frame, text="设置温度 (0.0-1.5):")
+    temperature_label.grid(row=2, column=0, sticky="w", pady=5)
+    temperature_entry = ttk.Entry(frame, textvariable=temperature_var, width=10)
+    temperature_entry.grid(row=2, column=1, pady=5, padx=5)
 
-    # 标签
-    label = tk.Label(window, text="点击按钮复制最新记事本的内容", bg="#F0F0F0", fg="#000000", font=("Segoe UI", 12))
-    label.pack(pady=10)
+    # 自定义前缀
+    custom_prefix_label = ttk.Label(frame, text="自定义前缀:")
+    custom_prefix_label.grid(row=3, column=0, sticky="nw", pady=5)
+    custom_prefix_textbox = tk.Text(frame, height=5, wrap=tk.WORD, font=("Microsoft YaHei", 10))
+    custom_prefix_textbox.grid(row=3, column=1, columnspan=2, pady=5, sticky="nsew")
+
+    # 自定义后缀
+    custom_suffix_label = ttk.Label(frame, text="自定义后缀:")
+    custom_suffix_label.grid(row=4, column=0, sticky="nw", pady=5)
+    custom_suffix_textbox = tk.Text(frame, height=5, wrap=tk.WORD, font=("Microsoft YaHei", 10))
+    custom_suffix_textbox.grid(row=4, column=1, columnspan=2, pady=5, sticky="nsew")
 
     # 确认信息标签
-    confirmation_label = tk.Label(window, text="", bg="#F0F0F0", fg="green", font=("Segoe UI", 10), wraplength=550)
-    confirmation_label.pack(pady=10)
+    confirmation_label = tk.Label(frame, text="", fg="green", bg="#F0F0F0", font=("Microsoft YaHei", 10))
+    confirmation_label.grid(row=5, column=0, columnspan=3, sticky="w", pady=5)
 
-    # 模型输出标签
-    output_label = tk.Label(window, text="模型回答将在这里显示...", bg="#F0F0F0", fg="#000000", font=("Segoe UI", 10), wraplength=550, justify="left")
-    output_label.pack(pady=10)
+    # 文本框
+    output_textbox = tk.Text(frame, wrap=tk.WORD, font=("Microsoft YaHei", 10), height=20)
+    output_textbox.grid(row=6, column=0, columnspan=3, pady=5, padx=5, sticky="nsew")
+
+    # 滚动条绑定到文本框
+    scrollbar = ttk.Scrollbar(frame, command=output_textbox.yview)
+    scrollbar.grid(row=6, column=3, sticky="ns")
+    output_textbox.config(yscrollcommand=scrollbar.set)
 
     # 按钮
     copy_button = tk.Button(
-        window, text="复制并获取回答", bg="#0078D7", fg="white", font=("Segoe UI", 12),
+        frame, text="复制并获取回答", bg="#0078D7", fg="white", font=("Segoe UI", 12),
         activebackground="#005A9E", activeforeground="white",
-        command=lambda: copy_latest_file_content(confirmation_label, output_label, model_var, temperature_var)
+        command=lambda: copy_latest_file_content(confirmation_label, output_textbox, model_var, temperature_var, folder_var, custom_prefix_textbox, custom_suffix_textbox)
     )
-    copy_button.pack(pady=20, ipadx=10, ipady=5)
+    copy_button.grid(row=7, column=0, columnspan=3, pady=10)
+
+    # 调整列和行的布局比例
+    frame.columnconfigure(1, weight=1)
+    frame.rowconfigure(6, weight=1)
 
     # 运行窗口
     window.mainloop()
