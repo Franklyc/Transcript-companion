@@ -205,13 +205,13 @@ def create_gui():
     # 自定义前缀
     custom_prefix_label = ttk.Label(frame, text="自定义前缀:")
     custom_prefix_label.grid(row=3, column=0, sticky="nw", pady=5)
-    custom_prefix_textbox = tk.Text(frame, height=5, wrap=tk.WORD, font=("Microsoft YaHei", 10))
+    custom_prefix_textbox = tk.Text(frame, height=3, wrap=tk.WORD, font=("Microsoft YaHei", 10))
     custom_prefix_textbox.grid(row=3, column=1, columnspan=2, pady=5, sticky="nsew")
 
     # 自定义后缀
     custom_suffix_label = ttk.Label(frame, text="自定义后缀:")
     custom_suffix_label.grid(row=4, column=0, sticky="nw", pady=5)
-    custom_suffix_textbox = tk.Text(frame, height=5, wrap=tk.WORD, font=("Microsoft YaHei", 10))
+    custom_suffix_textbox = tk.Text(frame, height=3, wrap=tk.WORD, font=("Microsoft YaHei", 10))
     custom_suffix_textbox.grid(row=4, column=1, columnspan=2, pady=5, sticky="nsew")
 
     # 确认信息标签
