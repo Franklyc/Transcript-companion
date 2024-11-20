@@ -154,6 +154,12 @@ def select_folder(folder_var):
 # 创建 GUI 界面
 def create_gui():
     """创建 GUI 界面"""
+    # Fix DPI awareness for Windows
+    try:
+        from ctypes import windll
+        windll.shcore.SetProcessDpiAwareness(1)
+    except:
+        pass
     window = tk.Tk()
     window.title("TMSpeech Companion")
     window.geometry("800x800")
