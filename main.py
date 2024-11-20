@@ -183,9 +183,12 @@ def create_gui():
             "[Groq] llama-3.1-70b-versatile",
             "[Groq] llama-3.1-8b-instant",
             "[Groq] llama-3.2-90b-vision-preview",
-            "[Gemini] gemini-1.5-flash"
+            "[Gemini] gemini-1.5-flash",
+            "[Gemini] gemini-1.5-flash-002",
+            "[Gemini] gemini-1.5-flash-8b"
         ], 
-        state="readonly"
+        state="readonly",
+        width=30  # 调整宽度
     )
     model_combo.grid(row=1, column=1, pady=5, padx=5)
 
