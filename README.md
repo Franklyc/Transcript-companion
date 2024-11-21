@@ -8,9 +8,11 @@ A GUI application built with Python/Tkinter that processes speech transcripts us
 
 - **Folder Selection:**  Choose the directory containing your speech transcription files (e.g., .txt, .md).
 - **Multi-LLM Support:** Seamlessly integrate with various LLM providers:
-    - Cerebras (llama3.1-70b, llama3.1-8b) - Fastest response time
+    - Cerebras (llama3.1-70b, llama3.1-8b) 
+      ✨ **FASTEST**: Best choice for quick response times
     - Groq (mixtral-8x7b-32768, llama-3.1 models)
-    - Google Gemini (gemini-1.5-flash models) - Largest context window
+    - Google Gemini (gemini-1.5-flash models) 
+      📚 **LARGEST CONTEXT**: Ideal for long transcripts
     - Sambanova (llama-3.1 models, including llama3.1-405B)
 - **Temperature Control:** Adjust the temperature parameter (0.0-1.5) to fine-tune the creativity and randomness of the LLM's responses. Lower values result in more focused and deterministic outputs, while higher values encourage more diverse and unexpected generation.
 - **Customizable Prefix/Suffix:** Add custom prefix and suffix text to your transcripts before sending them to the LLM. This allows you to provide additional context or instructions to the model, shaping its output to better suit your needs.
