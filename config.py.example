@@ -37,23 +37,25 @@ DEFAULT_THEME = "light"
 # Theme colors
 THEMES = {
     "light": {
-        "window_bg": "#F0F0F0",
+        "window_bg": "#F5F5F5",   # 主窗口略微灰色
         "text": "#000000",
         "input_bg": "#FFFFFF",
         "input_border": "#CCCCCC",
         "button_bg": "#0078D7",
         "button_hover": "#005A9E",
         "button_text": "#FFFFFF",
-        "title_button_hover": "#E81123"
+        "title_button_hover": "#E81123",
+        "sidebar_bg": "#EBEBEB"  # 更改为浅灰色，比window_bg更浅
     },
     "dark": {
-        "window_bg": "#2D2D2D",
+        "window_bg": "#2D2D2D",   # 保持原来的深色
         "text": "#FFFFFF",
         "input_bg": "#3D3D3D",
         "input_border": "#555555",
         "button_bg": "#0078D7",
         "button_hover": "#005A9E",
         "button_text": "#FFFFFF",
-        "title_button_hover": "#E81123"
+        "title_button_hover": "#E81123",
+        "sidebar_bg": "#252525"  # 更改为比window_bg稍深的颜色
     }
 }

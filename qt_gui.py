@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                            QPushButton, QLabel, QComboBox, QLineEdit, QTextEdit, QFileDialog,
-                           QRadioButton, QButtonGroup, QScrollBar)
+                           QRadioButton, QButtonGroup, QScrollBar, QMessageBox)
 from PyQt6.QtCore import Qt, QPoint
 import config
 import utils
@@ -18,14 +18,66 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
-        self.setFixedSize(600, 700)
+        self.setFixedSize(650, 700)  # Increased width to accommodate sidebar
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget)
+        horizontal_layout = QHBoxLayout(central_widget)
+        horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        horizontal_layout.setSpacing(0)
+
+        # Sidebar
+        sidebar = QWidget()
+        sidebar.setFixedWidth(50)
+        sidebar.setObjectName("sidebar")  # 添加这行来设置ObjectName
+        sidebar_layout = QVBoxLayout(sidebar)
+        sidebar_layout.setContentsMargins(5, 5, 5, 5)
+        sidebar_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        # Language button (replacing radio buttons)
+        self.lang_button = QPushButton("🀄" if self.current_lang == 'zh' else "🔤")
+        self.lang_button.setFixedSize(40, 40)
+        self.lang_button.setObjectName("langButton")
+        self.lang_button.clicked.connect(self.toggle_language)
+        sidebar_layout.addWidget(self.lang_button)
+
+        # Theme button
+        self.theme_button = QPushButton("🌙" if self.current_theme == "light" else "☀️")
+        self.theme_button.setFixedSize(40, 40)
+        self.theme_button.setObjectName("themeButton")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        sidebar_layout.addWidget(self.theme_button)
+
+        # Add help button
+        self.help_button = QPushButton("❓")
+        self.help_button.setFixedSize(40, 40)
+        self.help_button.setObjectName("sidebarButton")
+        self.help_button.clicked.connect(self.show_help)
+        sidebar_layout.addWidget(self.help_button)
+
+        # Add settings button
+        self.settings_button = QPushButton("⚙️")
+        self.settings_button.setFixedSize(40, 40)
+        self.settings_button.setObjectName("sidebarButton")
+        self.settings_button.clicked.connect(self.show_settings)
+        sidebar_layout.addWidget(self.settings_button)
+
+        # Add clear button
+        self.clear_button = QPushButton("🗑️")
+        self.clear_button.setFixedSize(40, 40)
+        self.clear_button.setObjectName("sidebarButton")
+        self.clear_button.clicked.connect(self.clear_content)
+        sidebar_layout.addWidget(self.clear_button)
+
+        sidebar_layout.addStretch()
+        horizontal_layout.addWidget(sidebar)
+
+        # Main content area
+        main_container = QWidget()
+        main_layout = QVBoxLayout(main_container)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # 自定义标题栏
+        # Title bar
         title_bar = QWidget()
         title_layout = QHBoxLayout(title_bar)
         title_layout.setContentsMargins(10, 5, 10, 5)
@@ -53,26 +105,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(content_widget)
         main_layout.addWidget(content_widget)
 
-        # Language selection
-        lang_layout = QHBoxLayout()
-        self.lang_group = QButtonGroup(self)
-        zh_radio = QRadioButton("中文")
-        en_radio = QRadioButton("English")
-        zh_radio.setChecked(True)
-        self.lang_group.addButton(zh_radio, 1)
-        self.lang_group.addButton(en_radio, 2)
-        lang_layout.addWidget(zh_radio)
-        lang_layout.addWidget(en_radio)
-        lang_layout.addStretch()
-
-        # Add theme toggle
-        self.theme_button = QPushButton("🌙" if self.current_theme == "light" else "☀️")
-        self.theme_button.setFixedSize(30, 30)
-        self.theme_button.setObjectName("themeButton")  # 添加Object名称以便应用特定样式
-        self.theme_button.clicked.connect(self.toggle_theme)
-        lang_layout.addWidget(self.theme_button)
-
-        layout.addLayout(lang_layout)
+        horizontal_layout.addWidget(main_container)
 
         # Folder selection
         folder_layout = QHBoxLayout()
@@ -142,7 +175,6 @@ class MainWindow(QMainWindow):
         # Connect signals
         self.folder_button.clicked.connect(self.select_folder)
         self.copy_button.clicked.connect(self.copy_and_get_answer)
-        self.lang_group.buttonClicked.connect(self.change_language)
 
         self.setStyleSheet("""
             QMainWindow {
@@ -212,6 +244,40 @@ class MainWindow(QMainWindow):
             #themeButton:hover {{
                 background-color: {theme['input_border']};
             }}
+            QWidget#sidebar {{
+                background-color: {theme['sidebar_bg']};
+                border-right: 1px solid {theme['input_border']};
+            }}
+            QRadioButton {{
+                color: {theme['text']};
+                padding: 5px;
+                margin: 2px;
+            }}
+            QRadioButton:hover {{
+                background-color: {theme['input_border']};
+                border-radius: 4px;
+            }}
+            #langButton {{
+                background-color: transparent;
+                border: none;
+                color: {theme['text']};
+                font-size: 16px;
+                padding: 4px;
+            }}
+            #langButton:hover {{
+                background-color: {theme['input_border']};
+            }}
+            #sidebarButton {{
+                background-color: transparent;
+                border: none;
+                color: {theme['text']};
+                font-size: 16px;
+                padding: 4px;
+            }}
+            #sidebarButton:hover {{
+                background-color: {theme['input_border']};
+                border-radius: 4px;
+            }}
         """)
 
     def toggle_theme(self):
@@ -251,8 +317,9 @@ class MainWindow(QMainWindow):
             self.status_label.setText(STRINGS[self.current_lang]['no_files_available'])
             self.status_label.setStyleSheet("color: red")
 
-    def change_language(self, button):
-        self.current_lang = 'en' if button.text() == "English" else 'zh'
+    def toggle_language(self):
+        self.current_lang = 'en' if self.current_lang == 'zh' else 'zh'
+        self.lang_button.setText("🀄" if self.current_lang == 'zh' else "🔤")
         self.update_texts()
 
     def mousePressEvent(self, event):
@@ -279,3 +346,18 @@ class MainWindow(QMainWindow):
         self.prefix_label.setText(STRINGS[self.current_lang]['custom_prefix'])
         self.suffix_label.setText(STRINGS[self.current_lang]['custom_suffix'])
         self.copy_button.setText(STRINGS[self.current_lang]['copy_and_get_answer'])
+
+    # Add new methods for the new buttons
+    def show_help(self):
+        help_text = STRINGS[self.current_lang]['help_text']
+        QMessageBox.information(self, STRINGS[self.current_lang]['help_title'], help_text)
+
+    def show_settings(self):
+        # 这里可以添加设置对话框的实现
+        pass
+
+    def clear_content(self):
+        self.output_text.clear()
+        self.prefix_text.clear()
+        self.suffix_text.clear()
+        self.status_label.clear()

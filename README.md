@@ -7,6 +7,12 @@
 
 ## Features
 
+* **Modern UI with Sidebar:** A clean, modern interface with a convenient sidebar for quick access to common functions:
+    * Language Toggle (🀄/🔤)
+    * Theme Toggle (🌙/☀️)
+    * Help (❓)
+    * Settings (⚙️)
+    * Quick Clear (🗑️)
 * **Folder Selection:** Choose the directory containing your speech transcription files (e.g., `.txt`, `.md`).
 * **Multi-LLM Support:** Seamlessly integrate with various LLM providers:
     * **Cerebras** (llama3.1-70b, llama3.1-8b) :sparkles: **FASTEST:** Best choice for quick response times
@@ -60,10 +66,17 @@ pip install PyQt6 openai pyperclip
 
 ## Usage
 
-1. **Select Folder:** Click "Select Folder" and navigate to the directory containing your transcript files.
-2. **Choose Model:** Select your desired LLM model from the dropdown menu.
-3. **Set Temperature:** Adjust the temperature value as needed.
-4. **Add Custom Text:** Enter any custom prefix or suffix text in the provided text boxes.
-5. **Process Transcript:** Click "Copy and Get Answer" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
+1. **Understand the Interface:**
+    * Use the sidebar buttons for quick access to common functions
+    * Language toggle (🀄/🔤) switches between Chinese and English
+    * Theme toggle (🌙/☀️) switches between light and dark modes
+    * Help button (❓) shows usage instructions
+    * Settings button (⚙️) for additional options
+    * Clear button (🗑️) quickly clears all input/output fields
+2. **Select Folder:** Click "Select Folder" and navigate to the directory containing your transcript files.
+3. **Choose Model:** Select your desired LLM model from the dropdown menu.
+4. **Set Temperature:** Adjust the temperature value as needed.
+5. **Add Custom Text:** Enter any custom prefix or suffix text in the provided text boxes.
+6. **Process Transcript:** Click "Copy and Get Answer" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
 
 <img src="gui_en.png" width="400">
