@@ -79,3 +79,11 @@ pip install PyQt6 openai pyperclip
 6. **处理转录：** 单击“复制并获取回答”以将最新的转录发送到所选的 LLM。响应将显示在输出文本框中。
 
 <img src="gui_zh.png" width="400">
+
+## 界面预览
+
+### 浅色主题
+<img src="qt_gui_zh_light.png" width="400">
+
+### 深色主题
+<img src="qt_gui_zh_dark.png" width="400">

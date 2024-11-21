@@ -79,4 +79,10 @@ pip install PyQt6 openai pyperclip
 5. **Add Custom Text:** Enter any custom prefix or suffix text in the provided text boxes.
 6. **Process Transcript:** Click "Copy and Get Answer" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
 
-<img src="gui_en.png" width="400">
+## Interface Preview
+
+### Light Theme
+<img src="qt_gui_en_light.png" width="400">
+
+### Dark Theme
+<img src="qt_gui_en_dark.png" width="400">
