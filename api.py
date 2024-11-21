@@ -45,6 +45,14 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
                 output_textbox.insert(tk.END, delta)
                 output_textbox.update()
             return
+            
+        elif model_name.startswith("[SambaNova]"):
+            client = openai.OpenAI(
+                base_url="https://api.sambanova.ai/v1",
+                api_key=config.SAMBANOVA_API_KEY
+            )
+            model_name = model_name.replace("[SambaNova] ", "")
+            params["model"] = model_name
 
         params["model"] = model_name
         stream = client.chat.completions.create(**params)
