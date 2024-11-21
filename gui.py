@@ -1,3 +1,4 @@
+#deprecated in favor of qt_gui
 import tkinter as tk
 from tkinter import ttk, filedialog
 import config
