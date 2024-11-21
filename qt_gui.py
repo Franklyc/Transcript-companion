@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                            QPushButton, QLabel, QComboBox, QLineEdit, QTextEdit, QFileDialog,
                            QRadioButton, QButtonGroup, QScrollBar)
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QPoint
 import config
 import utils
 import api
@@ -10,7 +10,8 @@ import prefix
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        super().__init__()
+        super().__init__(flags=Qt.WindowType.FramelessWindowHint)  # 无边框窗口
+        self.old_pos = None  # 用于窗口拖动
         self.current_lang = 'zh'
         self.current_theme = config.DEFAULT_THEME
         self.init_ui()
@@ -21,7 +22,35 @@ class MainWindow(QMainWindow):
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
+        # 自定义标题栏
+        title_bar = QWidget()
+        title_layout = QHBoxLayout(title_bar)
+        title_layout.setContentsMargins(10, 5, 10, 5)
+
+        # 标题文本
+        self.title_label = QLabel(STRINGS[self.current_lang]['window_title'])
+        title_layout.addWidget(self.title_label)
+        title_layout.addStretch()
+
+        # 控制按钮
+        min_button = QPushButton("－")
+        close_button = QPushButton("✕")
+        for btn in (min_button, close_button):
+            btn.setFixedSize(30, 30)
+            title_layout.addWidget(btn)
+
+        min_button.clicked.connect(self.showMinimized)
+        close_button.clicked.connect(self.close)
+
+        main_layout.addWidget(title_bar)
+
+        # 内容区域
+        content_widget = QWidget()
+        layout = QVBoxLayout(content_widget)
+        main_layout.addWidget(content_widget)
 
         # Language selection
         lang_layout = QHBoxLayout()
@@ -135,6 +164,7 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(f"""
             QMainWindow {{
                 background-color: {theme['window_bg']};
+                border: 1px solid {theme['input_border']};
             }}
             QLabel {{
                 font-size: 10pt;
@@ -159,6 +189,18 @@ class MainWindow(QMainWindow):
             }}
             QRadioButton {{
                 color: {theme['text']};
+            }}
+            #title_bar {{
+                background-color: {theme['window_bg']};
+            }}
+            #title_bar QPushButton {{
+                background-color: transparent;
+                border: none;
+                color: {theme['text']};
+                font-size: 16px;
+            }}
+            #title_bar QPushButton:hover {{
+                background-color: {theme['button_hover']};
             }}
         """)
 
@@ -203,7 +245,22 @@ class MainWindow(QMainWindow):
         self.current_lang = 'en' if button.text() == "English" else 'zh'
         self.update_texts()
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.old_pos = event.globalPosition().toPoint()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.old_pos = None
+
+    def mouseMoveEvent(self, event):
+        if self.old_pos is not None:
+            delta = event.globalPosition().toPoint() - self.old_pos
+            self.move(self.pos() + delta)
+            self.old_pos = event.globalPosition().toPoint()
+
     def update_texts(self):
+        self.title_label.setText(STRINGS[self.current_lang]['window_title'])
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
         self.folder_label.setText(STRINGS[self.current_lang]['current_folder'])
         self.folder_button.setText(STRINGS[self.current_lang]['select_folder'])

@@ -43,7 +43,8 @@ THEMES = {
         "input_border": "#CCCCCC",
         "button_bg": "#0078D7",
         "button_hover": "#005A9E",
-        "button_text": "#FFFFFF"
+        "button_text": "#FFFFFF",
+        "title_button_hover": "#E81123"
     },
     "dark": {
         "window_bg": "#2D2D2D",
@@ -52,6 +53,7 @@ THEMES = {
         "input_border": "#555555",
         "button_bg": "#0078D7",
         "button_hover": "#005A9E",
-        "button_text": "#FFFFFF"
+        "button_text": "#FFFFFF",
+        "title_button_hover": "#E81123"
     }
 }
