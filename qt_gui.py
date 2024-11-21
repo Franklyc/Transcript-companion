@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                            QPushButton, QLabel, QComboBox, QLineEdit, QTextEdit, QFileDialog,
-                           QRadioButton, QButtonGroup)
+                           QRadioButton, QButtonGroup, QScrollBar)
 from PyQt6.QtCore import Qt
 import config
 import utils

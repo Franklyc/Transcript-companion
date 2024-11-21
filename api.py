@@ -44,8 +44,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             for chunk in response:
                 delta = chunk.choices[0].delta.content or ""
                 output_textbox.insertPlainText(delta)
-                output_textbox.ensureCursorVisible()
-                QApplication.processEvents()  # Process Qt events
+                QApplication.processEvents()  # 保留事件处理
             return
             
         elif model_name.startswith("[SambaNova]"):
@@ -63,10 +62,9 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         for chunk in stream:
             delta = chunk.choices[0].delta.content or ""
             output_textbox.insertPlainText(delta)
-            output_textbox.ensureCursorVisible()
-            QApplication.processEvents()  # Process Qt events
+            QApplication.processEvents()  # 保留事件处理
 
     except Exception as e:
         output_textbox.clear()
         output_textbox.insertPlainText(f"调用模型失败: {e}")
-        QApplication.processEvents()  # Process Qt events
+        QApplication.processEvents()
