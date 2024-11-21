@@ -2,6 +2,8 @@
 
 A GUI application built with Python/Tkinter that processes speech transcripts using LLM APIs. This tool simplifies the workflow of analyzing and summarizing meeting recordings by leveraging the power of large language models.
 
+> **Important Note:** This companion tool was specifically created to work with [TMSpeech](https://github.com/jxlpzqc/TMSpeech) v0.0.1-rc3. Due to changes in how transcript history is stored in TMSpeech v0.4.0 and above, this tool is currently not compatible with newer versions.
+
 ## Features
 
 - **Folder Selection:**  Choose the directory containing your speech transcription files (e.g., .txt, .md).
@@ -52,3 +54,5 @@ pip install openai pyperclip
 3. **Set Temperature:** Adjust the temperature value as needed.
 4. **Add Custom Text:**  Enter any custom prefix or suffix text in the provided text boxes.
 5. **Process Transcript:** Click "复制并获取回答" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
+
+
