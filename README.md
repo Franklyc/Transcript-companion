@@ -19,6 +19,7 @@ A GUI application built with Python/Tkinter that processes speech transcripts us
 - **Customizable Prefix/Suffix:** Add custom prefix and suffix text to your transcripts before sending them to the LLM. This allows you to provide additional context or instructions to the model, shaping its output to better suit your needs.
 - **Real-time Streaming:** View LLM responses in real-time as they are generated, providing immediate feedback and a dynamic interaction with the model.
 - **Clipboard Integration:** Easily copy the processed transcript content to the clipboard for use in other applications.
+- **Bilingual Support (Chinese/English):** The GUI now supports both Chinese and English. You can switch between languages within the application.
 
 ## Requirements
 
@@ -53,10 +54,10 @@ pip install openai pyperclip
 
 ## Usage
 
-1. **Select Folder:** Click "选择文件夹" and navigate to the directory containing your transcript files.
+1. **Select Folder:** Click "Select Folder" and navigate to the directory containing your transcript files.
 2. **Choose Model:** Select your desired LLM model from the dropdown menu.
 3. **Set Temperature:** Adjust the temperature value as needed.
 4. **Add Custom Text:**  Enter any custom prefix or suffix text in the provided text boxes.
-5. **Process Transcript:** Click "复制并获取回答" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
+5. **Process Transcript:** Click "Copy and Get Answer" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
 
-
+![GUI English Version](gui_en.png)
