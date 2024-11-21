@@ -1,5 +1,5 @@
 # TMSpeech-companion
-[中文版README](README_zh.md)
+[英文版README](README.md)
 
 **一款使用 Python/PyQt6 构建的 GUI 应用程序，它使用 LLM API 处理语音转录本。此工具利用大型语言模型的强大功能，简化了分析和总结会议记录的工作流程。**
 
