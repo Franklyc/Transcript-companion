@@ -1,7 +1,7 @@
 # TMSpeech-companion
 [中文版README](README_zh.md)
 
-**A GUI application built with Python/Tkinter that processes speech transcripts using LLM APIs. This tool simplifies the workflow of analyzing and summarizing meeting recordings by leveraging the power of large language models.**
+**A GUI application built with Python/PyQt6 that processes speech transcripts using LLM APIs. This tool simplifies the workflow of analyzing and summarizing meeting recordings by leveraging the power of large language models.**
 
 > **Important Note:** This companion tool was specifically created to work with [TMSpeech](https://github.com/jxlpzqc/TMSpeech) v0.0.1-rc3. Due to changes in how transcript history is stored in TMSpeech v0.4.0 and above, this tool is currently not compatible with newer versions.
 
@@ -22,15 +22,15 @@
 ## Requirements
 
 * **Python 3.x**
+* **PyQt6**
 * The following Python packages:
-    * ``tkinter`` (usually included with Python)
     * ``openai``
     * ``pyperclip``
 
 You can install these packages using pip:
 
 ```bash
-pip install openai pyperclip
+pip install PyQt6 openai pyperclip
 ```
 
 ## Setup

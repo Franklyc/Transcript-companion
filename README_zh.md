@@ -1,8 +1,9 @@
 # TMSpeech-companion
+[中文版README](README_zh.md)
 
-**一款使用 Python/Tkinter 构建的 GUI 应用程序，它使用 LLM API 处理语音转录本。此工具利用大型语言模型的强大功能，简化了分析和总结会议记录的工作流程。**
+**一款使用 Python/PyQt6 构建的 GUI 应用程序，它使用 LLM API 处理语音转录本。此工具利用大型语言模型的强大功能，简化了分析和总结会议记录的工作流程。**
 
-> **重要提示：**此配套工具专为与 [TMSpeech](https://github.com/jxlpzqc/TMSpeech) v0.0.1-rc3 配合使用而创建。由于 TMSpeech v0.4.0 及更高版本中转录历史记录存储方式的更改，此工具目前与较新版本不兼容。
+> **重要提示：** 此配套工具专为与 [TMSpeech](https://github.com/jxlpzqc/TMSpeech) v0.0.1-rc3 配合使用而创建。由于 TMSpeech v0.4.0 及更高版本中转录历史记录存储方式的更改，此工具目前与较新版本不兼容。
 
 ## 功能
 
@@ -21,15 +22,15 @@
 ## 要求
 
 * **Python 3.x**
+* **PyQt6**
 * 以下 Python 包：
-    * ``tkinter`` （通常包含在 Python 中）
     * ``openai``
     * ``pyperclip``
 
 您可以使用 pip 安装这些包：
 
 ```bash
-pip install openai pyperclip
+pip install PyQt6 openai pyperclip
 ```
 
 ## 设置
