@@ -16,6 +16,31 @@ class MainWindow(QMainWindow):
         self.current_theme = config.DEFAULT_THEME
         self.init_ui()
 
+    def create_sidebar_button(self, text, object_name, size=(40, 40), callback=None):
+        """Create a sidebar button with common properties"""
+        button = QPushButton(text)
+        button.setFixedSize(*size)
+        button.setObjectName(object_name)
+        if callback:
+            button.clicked.connect(callback)
+        return button
+
+    def create_title_button(self, text, callback):
+        """Create a title bar button with common properties"""
+        button = QPushButton(text)
+        button.setFixedSize(30, 30)
+        button.setObjectName("titleButton")
+        button.clicked.connect(callback)
+        return button
+
+    def create_labeled_layout(self, label_text, widget):
+        """Create a horizontal layout with a label and widget"""
+        layout = QHBoxLayout()
+        label = QLabel(label_text)
+        layout.addWidget(label)
+        layout.addWidget(widget)
+        return layout, label
+
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
         self.setFixedSize(650, 700)  # Increased width to accommodate sidebar
@@ -34,47 +59,23 @@ class MainWindow(QMainWindow):
         sidebar_layout.setContentsMargins(5, 5, 5, 5)
         sidebar_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        # Language button (replacing radio buttons)
-        self.lang_button = QPushButton("🀄" if self.current_lang == 'zh' else "🔤")
-        self.lang_button.setFixedSize(40, 40)
-        self.lang_button.setObjectName("langButton")
-        self.lang_button.clicked.connect(self.toggle_language)
-        sidebar_layout.addWidget(self.lang_button)
+        # Sidebar buttons
+        sidebar_buttons = [
+            ("🀄" if self.current_lang == 'zh' else "🔤", "langButton", self.toggle_language),
+            ("🌙" if self.current_theme == "light" else "☀️", "themeButton", self.toggle_theme),
+            ("❓", "sidebarButton", self.show_help),
+            ("⚙️", "sidebarButton", self.show_settings),
+            ("🗑️", "sidebarButton", self.clear_content),
+            ("🔄", "sidebarButton", self.update_model_list),
+        ]
 
-        # Theme button
-        self.theme_button = QPushButton("🌙" if self.current_theme == "light" else "☀️")
-        self.theme_button.setFixedSize(40, 40)
-        self.theme_button.setObjectName("themeButton")
-        self.theme_button.clicked.connect(self.toggle_theme)
-        sidebar_layout.addWidget(self.theme_button)
-
-        # Add help button
-        self.help_button = QPushButton("❓")
-        self.help_button.setFixedSize(40, 40)
-        self.help_button.setObjectName("sidebarButton")
-        self.help_button.clicked.connect(self.show_help)
-        sidebar_layout.addWidget(self.help_button)
-
-        # Add settings button
-        self.settings_button = QPushButton("⚙️")
-        self.settings_button.setFixedSize(40, 40)
-        self.settings_button.setObjectName("sidebarButton")
-        self.settings_button.clicked.connect(self.show_settings)
-        sidebar_layout.addWidget(self.settings_button)
-
-        # Add clear button
-        self.clear_button = QPushButton("🗑️")
-        self.clear_button.setFixedSize(40, 40)
-        self.clear_button.setObjectName("sidebarButton")
-        self.clear_button.clicked.connect(self.clear_content)
-        sidebar_layout.addWidget(self.clear_button)
-
-        # Add refresh button to sidebar
-        self.refresh_button = QPushButton("🔄")
-        self.refresh_button.setFixedSize(40, 40)
-        self.refresh_button.setObjectName("sidebarButton")
-        self.refresh_button.clicked.connect(self.update_model_list)
-        sidebar_layout.addWidget(self.refresh_button)
+        for text, obj_name, callback in sidebar_buttons:
+            button = self.create_sidebar_button(text, obj_name, callback=callback)
+            sidebar_layout.addWidget(button)
+            if obj_name == "langButton":
+                self.lang_button = button
+            elif obj_name == "themeButton":
+                self.theme_button = button
 
         sidebar_layout.addStretch()
         horizontal_layout.addWidget(sidebar)
@@ -94,16 +95,11 @@ class MainWindow(QMainWindow):
         title_layout.addWidget(self.title_label)
         title_layout.addStretch()
 
-        # 控制按钮
-        min_button = QPushButton("－")
-        close_button = QPushButton("✕")
-        for btn in (min_button, close_button):
-            btn.setFixedSize(30, 30)
-            btn.setObjectName("titleButton")  # 添加Object名称以便应用特定样式
-            title_layout.addWidget(btn)
-
-        min_button.clicked.connect(self.showMinimized)
-        close_button.clicked.connect(self.close)
+        # Title bar buttons
+        min_button = self.create_title_button("－", self.showMinimized)
+        close_button = self.create_title_button("✕", self.close)
+        title_layout.addWidget(min_button)
+        title_layout.addWidget(close_button)
 
         main_layout.addWidget(title_bar)
 
@@ -115,31 +111,31 @@ class MainWindow(QMainWindow):
         horizontal_layout.addWidget(main_container)
 
         # Folder selection
-        folder_layout = QHBoxLayout()
-        self.folder_label = QLabel(STRINGS[self.current_lang]['current_folder'])
         self.folder_edit = QLineEdit(config.DEFAULT_FOLDER_PATH)
         self.folder_edit.setReadOnly(True)
         self.folder_button = QPushButton(STRINGS[self.current_lang]['select_folder'])
-        folder_layout.addWidget(self.folder_label)
-        folder_layout.addWidget(self.folder_edit)
+        folder_layout, self.folder_label = self.create_labeled_layout(
+            STRINGS[self.current_lang]['current_folder'], 
+            self.folder_edit
+        )
         folder_layout.addWidget(self.folder_button)
         layout.addLayout(folder_layout)
 
         # Model selection
-        model_layout = QHBoxLayout()
-        self.model_label = QLabel(STRINGS[self.current_lang]['select_model'])
         self.model_combo = QComboBox()
         self.update_model_list()
-        model_layout.addWidget(self.model_label)
-        model_layout.addWidget(self.model_combo)
+        model_layout, self.model_label = self.create_labeled_layout(
+            STRINGS[self.current_lang]['select_model'],
+            self.model_combo
+        )
         layout.addLayout(model_layout)
 
         # Temperature
-        temp_layout = QHBoxLayout()
-        self.temp_label = QLabel(STRINGS[self.current_lang]['set_temperature'])
         self.temp_edit = QLineEdit(config.DEFAULT_TEMPERATURE)
-        temp_layout.addWidget(self.temp_label)
-        temp_layout.addWidget(self.temp_edit)
+        temp_layout, self.temp_label = self.create_labeled_layout(
+            STRINGS[self.current_lang]['set_temperature'],
+            self.temp_edit
+        )
         layout.addLayout(temp_layout)
 
         # Custom prefix/suffix
