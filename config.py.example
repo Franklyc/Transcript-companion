@@ -4,6 +4,7 @@ import os
 CEREBRAS_API_KEY = os.environ.get("CEREBRAS_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+SAMBANOVA_API_KEY = os.environ.get("SAMBANOVA_API_KEY")
 
 # 默认文件夹路径 (使用占位符)
 DEFAULT_FOLDER_PATH = DEFAULT_FOLDER_PATH = os.path.dirname(__file__)
@@ -19,6 +20,9 @@ AVAILABLE_MODELS = [
     "[Gemini] gemini-1.5-flash",
     "[Gemini] gemini-1.5-flash-002",
     "[Gemini] gemini-1.5-flash-8b"
+    "[SambaNova] Meta-Llama-3.1-8B-Instruct",
+    "[SambaNova] Meta-Llama-3.1-70B-Instruct",
+    "[SambaNova] Meta-Llama-3.1-405B-Instruct"
 ]
 
 # 默认模型
