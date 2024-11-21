@@ -77,7 +77,7 @@ pip install PyQt6 openai pyperclip
     * Help button (❓) shows usage instructions
     * Settings button (⚙️) for additional options
     * Clear button (🗑️) quickly clears all input/output fields
-    * Refresh button (🔄) updates the list of available LMstudio models
+    * Refresh button (🔄) updates the list of available LMstudio/Kobold models
 2. **Select Folder:** Click "Select Folder" and navigate to the directory containing your transcript files.
 3. **Choose Model:** Select your desired LLM model from the dropdown menu.
 4. **Set Temperature:** Adjust the temperature value as needed.
