@@ -71,6 +71,14 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             model_name = model_name.replace("[Kobold] ", "")
             params["model"] = model_name
 
+        elif model_name.startswith("[Ollama]"):
+            client = openai.OpenAI(
+                base_url="http://localhost:11434/v1",
+                api_key=config.OLLAMA_API_KEY
+            )
+            model_name = model_name.replace("[Ollama] ", "")
+            params["model"] = model_name
+
         params["model"] = model_name
         stream = client.chat.completions.create(**params)
 

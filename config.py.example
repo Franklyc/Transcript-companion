@@ -11,6 +11,9 @@ LMSTUDIO_API_KEY = "not-needed"  # LMstudio doesn't require API key
 # Kobold API configuration 
 KOBOLD_BASE_URL = "http://localhost:5001/v1"
 KOBOLD_API_KEY = "not-needed"  # Kobold doesn't require API key
+# Ollama API configuration
+OLLAMA_BASE_URL = "http://localhost:11434/v1"
+OLLAMA_API_KEY = "ollama"  # required but unused
 
 # 可用模型列表
 AVAILABLE_MODELS = [
@@ -46,13 +49,23 @@ def get_kobold_models():
     except:
         return []
 
+def get_ollama_models():
+    try:
+        import requests
+        response = requests.get(f"{OLLAMA_BASE_URL}/models", timeout=1)
+        models_data = response.json()
+        return [f"[Ollama] {model['id']}" for model in models_data['data']]
+    except:
+        return []
+
 # Function to refresh available models
 def refresh_available_models():
     global AVAILABLE_MODELS
     lmstudio_models = get_lmstudio_models()
     kobold_models = get_kobold_models()
-    base_models = [m for m in AVAILABLE_MODELS if not m.startswith(("[LMstudio]", "[Kobold]"))]
-    AVAILABLE_MODELS = base_models + lmstudio_models + kobold_models
+    ollama_models = get_ollama_models()
+    base_models = [m for m in AVAILABLE_MODELS if not m.startswith(("[LMstudio]", "[Kobold]", "[Ollama]"))]
+    AVAILABLE_MODELS = base_models + lmstudio_models + kobold_models + ollama_models
 
 # 默认文件夹路径 (使用占位符)
 DEFAULT_FOLDER_PATH = DEFAULT_FOLDER_PATH = os.path.dirname(__file__)
