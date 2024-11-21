@@ -13,8 +13,6 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.current_lang = 'zh'
         self.current_theme = config.DEFAULT_THEME
-        self.setWindowFlags(Qt.WindowType.Window)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.init_ui()
 
     def init_ui(self):
@@ -22,6 +20,8 @@ class MainWindow(QMainWindow):
         self.setFixedSize(600, 700)
 
         central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
 
         # Language selection
         lang_layout = QHBoxLayout()
