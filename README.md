@@ -22,7 +22,7 @@
     * **Groq** (mixtral-8x7b-32768, llama-3.1 models) 
     * **Google Gemini** (gemini-1.5-flash models) :books: **LARGEST CONTEXT:** Ideal for long transcripts
     * **Sambanova** (llama-3.1 models, including llama3.1-405B)
-    * **LOCAL** (LMstudio/Kobold) :computer: **PRIVATE:** Best choice for data security
+    * **LOCAL** (LMstudio/Kobold/Ollama) :computer: **PRIVATE:** Best choice for data security
 * **Temperature Control:** Adjust the temperature parameter (0.0-1.5) to fine-tune the creativity and randomness of the LLM's responses. Lower values result in more focused and deterministic outputs, while higher values encourage more diverse and unexpected generation.
 * **Customizable Prefix/Suffix:** Add custom prefix and suffix text to your transcripts before sending them to the LLM. This allows you to provide additional context or instructions to the model, shaping its output to better suit your needs.
 * **Real-time Streaming:** View LLM responses in real-time as they are generated, providing immediate feedback and a dynamic interaction with the model.
@@ -77,7 +77,7 @@ pip install PyQt6 openai pyperclip
     * Help button (❓) shows usage instructions
     * Settings button (⚙️) for additional options
     * Clear button (🗑️) quickly clears all input/output fields
-    * Refresh button (🔄) updates the list of available LMstudio/Kobold models
+    * Refresh button (🔄) updates the list of available local models
 2. **Select Folder:** Click "Select Folder" and navigate to the directory containing your transcript files.
 3. **Choose Model:** Select your desired LLM model from the dropdown menu.
 4. **Set Temperature:** Adjust the temperature value as needed.
