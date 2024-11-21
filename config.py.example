@@ -31,32 +31,23 @@ AVAILABLE_MODELS = [
     "[SambaNova] Meta-Llama-3.1-405B-Instruct"
 ]
 
-def get_lmstudio_models():
+def get_api_models(base_url, prefix):
     try:
         import requests
-        response = requests.get(f"{LMSTUDIO_BASE_URL}/models", timeout=1)
+        response = requests.get(f"{base_url}/models", timeout=1)
         models_data = response.json()
-        return [f"[LMstudio] {model['id']}" for model in models_data['data']]
-    except:
-        return []
-    
-def get_kobold_models():
-    try:
-        import requests
-        response = requests.get(f"{KOBOLD_BASE_URL}/models", timeout=1)
-        models_data = response.json()
-        return [f"[Kobold] {model['id']}" for model in models_data['data']]
+        return [f"[{prefix}] {model['id']}" for model in models_data['data']]
     except:
         return []
 
+def get_lmstudio_models():
+    return get_api_models(LMSTUDIO_BASE_URL, "LMstudio")
+    
+def get_kobold_models():
+    return get_api_models(KOBOLD_BASE_URL, "Kobold")
+
 def get_ollama_models():
-    try:
-        import requests
-        response = requests.get(f"{OLLAMA_BASE_URL}/models", timeout=1)
-        models_data = response.json()
-        return [f"[Ollama] {model['id']}" for model in models_data['data']]
-    except:
-        return []
+    return get_api_models(OLLAMA_BASE_URL, "Ollama")
 
 # Function to refresh available models
 def refresh_available_models():
