@@ -55,6 +55,14 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             model_name = model_name.replace("[SambaNova] ", "")
             params["model"] = model_name
 
+        elif model_name.startswith("[LMstudio]"):
+            client = openai.OpenAI(
+                base_url="http://localhost:1234/v1",
+                api_key=config.LMSTUDIO_API_KEY
+            )
+            model_name = model_name.replace("[LMstudio] ", "")
+            params["model"] = model_name
+
         params["model"] = model_name
         stream = client.chat.completions.create(**params)
 

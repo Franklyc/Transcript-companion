@@ -5,9 +5,9 @@ CEREBRAS_API_KEY = os.environ.get("CEREBRAS_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 SAMBANOVA_API_KEY = os.environ.get("SAMBANOVA_API_KEY")
-
-# 默认文件夹路径 (使用占位符)
-DEFAULT_FOLDER_PATH = DEFAULT_FOLDER_PATH = os.path.dirname(__file__)
+# LMstudio API configuration
+LMSTUDIO_BASE_URL = "http://localhost:1234/v1"
+LMSTUDIO_API_KEY = "not-needed"  # LMstudio doesn't require API key
 
 # 可用模型列表
 AVAILABLE_MODELS = [
@@ -24,6 +24,25 @@ AVAILABLE_MODELS = [
     "[SambaNova] Meta-Llama-3.1-70B-Instruct",
     "[SambaNova] Meta-Llama-3.1-405B-Instruct"
 ]
+
+def get_lmstudio_models():
+    try:
+        import requests
+        response = requests.get(f"{LMSTUDIO_BASE_URL}/models", timeout=1)
+        models_data = response.json()
+        return [f"[LMstudio] {model['id']}" for model in models_data['data']]
+    except:
+        return []
+
+# Function to refresh available models
+def refresh_available_models():
+    global AVAILABLE_MODELS
+    lmstudio_models = get_lmstudio_models()
+    base_models = [m for m in AVAILABLE_MODELS if not m.startswith("[LMstudio]")]
+    AVAILABLE_MODELS = base_models + lmstudio_models
+
+# 默认文件夹路径 (使用占位符)
+DEFAULT_FOLDER_PATH = DEFAULT_FOLDER_PATH = os.path.dirname(__file__)
 
 # 默认模型
 DEFAULT_MODEL = AVAILABLE_MODELS[0]

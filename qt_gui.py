@@ -69,6 +69,13 @@ class MainWindow(QMainWindow):
         self.clear_button.clicked.connect(self.clear_content)
         sidebar_layout.addWidget(self.clear_button)
 
+        # Add refresh button to sidebar
+        self.refresh_button = QPushButton("🔄")
+        self.refresh_button.setFixedSize(40, 40)
+        self.refresh_button.setObjectName("sidebarButton")
+        self.refresh_button.clicked.connect(self.update_model_list)
+        sidebar_layout.addWidget(self.refresh_button)
+
         sidebar_layout.addStretch()
         horizontal_layout.addWidget(sidebar)
 
@@ -122,7 +129,7 @@ class MainWindow(QMainWindow):
         model_layout = QHBoxLayout()
         self.model_label = QLabel(STRINGS[self.current_lang]['select_model'])
         self.model_combo = QComboBox()
-        self.model_combo.addItems(config.AVAILABLE_MODELS)
+        self.update_model_list()
         model_layout.addWidget(self.model_label)
         model_layout.addWidget(self.model_combo)
         layout.addLayout(model_layout)
@@ -192,6 +199,15 @@ class MainWindow(QMainWindow):
         """)
 
         self.apply_theme()
+
+    def update_model_list(self):
+        current_model = self.model_combo.currentText()
+        config.refresh_available_models()
+        self.model_combo.clear()
+        self.model_combo.addItems(config.AVAILABLE_MODELS)
+        index = self.model_combo.findText(current_model)
+        if index >= 0:
+            self.model_combo.setCurrentIndex(index)
 
     def apply_theme(self):
         theme = config.THEMES[self.current_theme]
