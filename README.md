@@ -60,4 +60,4 @@ pip install openai pyperclip
 4. **Add Custom Text:**  Enter any custom prefix or suffix text in the provided text boxes.
 5. **Process Transcript:** Click "Copy and Get Answer" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
 
-![GUI English Version](gui_en.png)
+<img src="gui_en.png" width="400">
