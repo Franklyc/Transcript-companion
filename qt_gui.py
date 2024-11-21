@@ -12,15 +12,16 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.current_lang = 'zh'
+        self.current_theme = config.DEFAULT_THEME
+        self.setWindowFlags(Qt.WindowType.Window)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.init_ui()
 
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
-        self.setFixedSize(800, 800)
+        self.setFixedSize(600, 700)
 
         central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)
 
         # Language selection
         lang_layout = QHBoxLayout()
@@ -33,6 +34,13 @@ class MainWindow(QMainWindow):
         lang_layout.addWidget(zh_radio)
         lang_layout.addWidget(en_radio)
         lang_layout.addStretch()
+
+        # Add theme toggle
+        self.theme_button = QPushButton("🌙" if self.current_theme == "light" else "☀️")
+        self.theme_button.setFixedSize(30, 30)
+        self.theme_button.clicked.connect(self.toggle_theme)
+        lang_layout.addWidget(self.theme_button)
+
         layout.addLayout(lang_layout)
 
         # Folder selection
@@ -119,6 +127,45 @@ class MainWindow(QMainWindow):
                 border-radius: 4px;
             }
         """)
+
+        self.apply_theme()
+
+    def apply_theme(self):
+        theme = config.THEMES[self.current_theme]
+        self.setStyleSheet(f"""
+            QMainWindow {{
+                background-color: {theme['window_bg']};
+            }}
+            QLabel {{
+                font-size: 10pt;
+                color: {theme['text']};
+            }}
+            QTextEdit, QLineEdit, QComboBox {{
+                font-size: 10pt;
+                padding: 4px;
+                border: 1px solid {theme['input_border']};
+                border-radius: 4px;
+                background-color: {theme['input_bg']};
+                color: {theme['text']};
+            }}
+            QPushButton {{
+                background-color: {theme['button_bg']};
+                color: {theme['button_text']};
+                padding: 8px;
+                border-radius: 4px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme['button_hover']};
+            }}
+            QRadioButton {{
+                color: {theme['text']};
+            }}
+        """)
+
+    def toggle_theme(self):
+        self.current_theme = "dark" if self.current_theme == "light" else "light"
+        self.theme_button.setText("🌙" if self.current_theme == "light" else "☀️")
+        self.apply_theme()
 
     def select_folder(self):
         folder_path = QFileDialog.getExistingDirectory(self)
