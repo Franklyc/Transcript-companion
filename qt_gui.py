@@ -40,6 +40,7 @@ class MainWindow(QMainWindow):
         close_button = QPushButton("✕")
         for btn in (min_button, close_button):
             btn.setFixedSize(30, 30)
+            btn.setObjectName("titleButton")  # 添加Object名称以便应用特定样式
             title_layout.addWidget(btn)
 
         min_button.clicked.connect(self.showMinimized)
@@ -67,6 +68,7 @@ class MainWindow(QMainWindow):
         # Add theme toggle
         self.theme_button = QPushButton("🌙" if self.current_theme == "light" else "☀️")
         self.theme_button.setFixedSize(30, 30)
+        self.theme_button.setObjectName("themeButton")  # 添加Object名称以便应用特定样式
         self.theme_button.clicked.connect(self.toggle_theme)
         lang_layout.addWidget(self.theme_button)
 
@@ -190,17 +192,25 @@ class MainWindow(QMainWindow):
             QRadioButton {{
                 color: {theme['text']};
             }}
-            #title_bar {{
-                background-color: {theme['window_bg']};
-            }}
-            #title_bar QPushButton {{
+            #titleButton {{
                 background-color: transparent;
                 border: none;
                 color: {theme['text']};
                 font-size: 16px;
             }}
-            #title_bar QPushButton:hover {{
-                background-color: {theme['button_hover']};
+            #titleButton:hover {{
+                background-color: {theme['title_button_hover']};
+                color: white;
+            }}
+            #themeButton {{
+                background-color: transparent;
+                border: none;
+                color: {theme['text']};
+                font-size: 16px;
+                padding: 4px;
+            }}
+            #themeButton:hover {{
+                background-color: {theme['input_border']};
             }}
         """)
 
