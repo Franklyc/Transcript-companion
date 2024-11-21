@@ -1,5 +1,6 @@
 import openai
 import config
+from PyQt6.QtWidgets import QApplication
 import tkinter as tk
 
 def fetch_model_response(prompt, output_textbox, model_name, temperature):
@@ -39,11 +40,12 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             params["model"] = model_name
             response = client.chat.completions.create(**params)
 
-            output_textbox.delete(1.0, tk.END)
+            output_textbox.clear()
             for chunk in response:
                 delta = chunk.choices[0].delta.content or ""
-                output_textbox.insert(tk.END, delta)
-                output_textbox.update()
+                output_textbox.insertPlainText(delta)
+                output_textbox.ensureCursorVisible()
+                QApplication.processEvents()  # Process Qt events
             return
             
         elif model_name.startswith("[SambaNova]"):
@@ -57,12 +59,14 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         params["model"] = model_name
         stream = client.chat.completions.create(**params)
 
-        output_textbox.delete(1.0, tk.END)
+        output_textbox.clear()
         for chunk in stream:
             delta = chunk.choices[0].delta.content or ""
-            output_textbox.insert(tk.END, delta)
-            output_textbox.update()
+            output_textbox.insertPlainText(delta)
+            output_textbox.ensureCursorVisible()
+            QApplication.processEvents()  # Process Qt events
 
     except Exception as e:
-        output_textbox.delete(1.0, tk.END)
-        output_textbox.insert(tk.END, f"调用模型失败: {e}")
+        output_textbox.clear()
+        output_textbox.insertPlainText(f"调用模型失败: {e}")
+        QApplication.processEvents()  # Process Qt events
