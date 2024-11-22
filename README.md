@@ -28,7 +28,7 @@
 * **Real-time Streaming:** View LLM responses in real-time as they are generated, providing immediate feedback and a dynamic interaction with the model.
 * **Clipboard Integration:** Easily copy the processed transcript content to the clipboard for use in other applications.
 * **Bilingual Support (Chinese/English):** The GUI now supports both Chinese and English. You can switch between languages within the application.
-* **Dark Mode:** Toggle between light and dark themes for comfortable viewing in different lighting conditions. Use the moon/sun icon in the top-right corner to switch themes.
+* **Dark Mode:** Toggle between light and dark themes for comfortable viewing in different lighting conditions. Use the moon/sun icon in the sidebar to switch themes.
 
 ## Requirements
 
