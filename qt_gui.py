@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                            QPushButton, QLabel, QComboBox, QLineEdit, QTextEdit, QFileDialog,
-                           QRadioButton, QButtonGroup, QScrollBar, QMessageBox)
+                           QRadioButton, QButtonGroup, QScrollBar, QMessageBox, QDialog, QCheckBox)
 from PyQt6.QtCore import Qt, QPoint
 import config
 import utils
@@ -305,18 +305,20 @@ class MainWindow(QMainWindow):
     def copy_and_get_answer(self):
         directory = self.folder_edit.text()
         latest_file = utils.get_latest_file(directory)
-        original_prefix = prefix.get_original_prefix()
+        original_prefix = prefix.get_original_prefix() if config.USE_PREDEFINED_PREFIX else ""
 
         if latest_file:
             try:
-                with open(latest_file, 'r', encoding='utf-8') as file:
-                    content = file.read()
-                combined_content = f"{original_prefix}\n{self.prefix_text.toPlainText()}\n{content}\n{self.suffix_text.toPlainText()}"
+                transcript_content = ""
+                if config.USE_TRANSCRIPT_TEXT:
+                    with open(latest_file, 'r', encoding='utf-8') as file:
+                        transcript_content = file.read()
+
+                combined_content = f"{original_prefix}\n{self.prefix_text.toPlainText()}\n{transcript_content}\n{self.suffix_text.toPlainText()}"
                 utils.copy_to_clipboard(combined_content)
                 self.status_label.setText(f"{STRINGS[self.current_lang]['copied_success']}\n{STRINGS[self.current_lang]['file_path']}{latest_file}")
                 self.status_label.setStyleSheet("color: green")
                 
-                # Disable copy button during API call
                 self.copy_button.setEnabled(False)
                 api.fetch_model_response(combined_content, self.output_text, self.model_combo.currentText(), self.temp_edit.text())
                 self.copy_button.setEnabled(True)
@@ -365,11 +367,54 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self, STRINGS[self.current_lang]['help_title'], help_text)
 
     def show_settings(self):
-        # 这里可以添加设置对话框的实现
-        pass
+        dialog = SettingsDialog(self)
+        dialog.exec()
 
     def clear_content(self):
         self.output_text.clear()
         self.prefix_text.clear()
         self.suffix_text.clear()
         self.status_label.clear()
+
+class SettingsDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.setWindowTitle(STRINGS[self.parent.current_lang]['settings_title'])
+        self.setup_ui()
+        self.apply_theme()
+
+    def setup_ui(self):
+        layout = QVBoxLayout()
+
+        # Create checkboxes
+        self.prefix_checkbox = QCheckBox(STRINGS[self.parent.current_lang]['use_predefined_prefix'])
+        self.prefix_checkbox.setChecked(config.USE_PREDEFINED_PREFIX)
+        
+        self.transcript_checkbox = QCheckBox(STRINGS[self.parent.current_lang]['use_transcript_text'])
+        self.transcript_checkbox.setChecked(config.USE_TRANSCRIPT_TEXT)
+
+        # Add checkboxes to layout
+        layout.addWidget(self.prefix_checkbox)
+        layout.addWidget(self.transcript_checkbox)
+
+        self.setLayout(layout)
+
+        # Connect signals
+        self.prefix_checkbox.stateChanged.connect(self.update_settings)
+        self.transcript_checkbox.stateChanged.connect(self.update_settings)
+
+    def update_settings(self):
+        config.USE_PREDEFINED_PREFIX = self.prefix_checkbox.isChecked()
+        config.USE_TRANSCRIPT_TEXT = self.transcript_checkbox.isChecked()
+
+    def apply_theme(self):
+        theme = config.THEMES[self.parent.current_theme]
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {theme['dialog_bg']};
+            }}
+            QCheckBox {{
+                color: {theme['text']};
+            }}
+        """)

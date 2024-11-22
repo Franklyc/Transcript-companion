@@ -28,6 +28,9 @@ STRINGS = {
 ⚙️ - 设置
 🗑️ - 清除内容
 ''',
+        'settings_title': '设置',
+        'use_predefined_prefix': '使用预定义前缀',
+        'use_transcript_text': '使用转录文件内容',
     },
     'en': {
         'window_title': "TMSpeech Companion",
@@ -58,5 +61,8 @@ Sidebar Features:
 ⚙️ - Settings
 🗑️ - Clear Content
 ''',
+        'settings_title': 'Settings',
+        'use_predefined_prefix': 'Use Predefined Prefix',
+        'use_transcript_text': 'Use Transcript Text',
     }
 }
