@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
             ("❓", "sidebarButton", self.show_help),
             ("⚙️", "sidebarButton", self.show_settings),
             ("🗑️", "sidebarButton", self.clear_content),
-            ("🔄", "sidebarButton", self.update_model_list),
+            ("🔄", "sidebarButton", lambda: self.update_model_list(True)),
         ]
 
         for text, obj_name, callback in sidebar_buttons:
@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
 
         # Model selection
         self.model_combo = QComboBox()
-        self.update_model_list()
+        self.update_model_list(include_local=False)
         model_layout, self.model_label = self.create_labeled_layout(
             STRINGS[self.current_lang]['select_model'],
             self.model_combo
@@ -196,9 +196,9 @@ class MainWindow(QMainWindow):
 
         self.apply_theme()
 
-    def update_model_list(self):
+    def update_model_list(self, include_local=False):
         current_model = self.model_combo.currentText()
-        config.refresh_available_models()
+        config.refresh_available_models(include_local)
         self.model_combo.clear()
         self.model_combo.addItems(config.AVAILABLE_MODELS)
         index = self.model_combo.findText(current_model)
