@@ -23,12 +23,16 @@ AVAILABLE_MODELS = [
     "[Groq] llama-3.1-70b-versatile",
     "[Groq] llama-3.1-8b-instant",
     "[Groq] llama-3.2-90b-vision-preview",
-    "[Gemini] gemini-1.5-flash",
+    "[Groq] llama-3.3-70b-versatile",
+    "[Groq] llama-3.3-70b-specdec",
     "[Gemini] gemini-1.5-flash-002",
     "[Gemini] gemini-1.5-flash-8b",
+    "[Gemini] gemini-exp-1206",
     "[SambaNova] Meta-Llama-3.1-8B-Instruct",
     "[SambaNova] Meta-Llama-3.1-70B-Instruct",
-    "[SambaNova] Meta-Llama-3.1-405B-Instruct"
+    "[SambaNova] Meta-Llama-3.1-405B-Instruct",
+    "[SambaNova] Qwen2.5-72B-Instruct",
+    "[SambaNova] Qwen2.5-Coder-32B-Instruct"
 ]
 
 def get_api_models(base_url, prefix):
