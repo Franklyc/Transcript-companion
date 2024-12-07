@@ -1,6 +1,7 @@
 import os
 
-# API 密钥  (请替换成你的实际密钥)
+# API Keys / API 密钥
+# Please replace with your actual keys / 请替换成你的实际密钥
 CEREBRAS_API_KEY = os.environ.get("CEREBRAS_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -15,7 +16,7 @@ KOBOLD_API_KEY = "not-needed"  # Kobold doesn't require API key
 OLLAMA_BASE_URL = "http://localhost:11434/v1"
 OLLAMA_API_KEY = "ollama"  # required but unused
 
-# 可用模型列表
+# Available models list / 可用模型列表
 AVAILABLE_MODELS = [
     "[Cerebras] llama3.1-70b",
     "[Cerebras] llama3.1-8b",
@@ -74,16 +75,19 @@ def get_ollama_models():
 
 # Function to refresh available models
 def refresh_available_models(include_local=False):
-    """刷新可用模型列表
+    """
+    Refresh available models list
+    刷新可用模型列表
+    
     Args:
-        include_local (bool): 是否包含本地模型
+        include_local (bool): Whether to include local models / 是否包含本地模型
     """
     global AVAILABLE_MODELS
-    # 保留云端模型
+    # Keep cloud models / 保留云端模型
     base_models = [m for m in AVAILABLE_MODELS if not m.startswith(("[LMstudio]", "[Kobold]", "[Ollama]"))]
     
     if include_local:
-        # 获取本地模型
+        # Get local models / 获取本地模型
         lmstudio_models = get_lmstudio_models()
         kobold_models = get_kobold_models()
         ollama_models = get_ollama_models()
@@ -91,22 +95,19 @@ def refresh_available_models(include_local=False):
     else:
         AVAILABLE_MODELS = base_models
 
-# 默认文件夹路径 (使用占位符)
+# Default folder path (placeholder) / 默认文件夹路径 (使用占位符)
 DEFAULT_FOLDER_PATH = os.path.dirname(__file__)
 
-# 默认模型
 DEFAULT_MODEL = AVAILABLE_MODELS[0]
 
-# 默认温度
 DEFAULT_TEMPERATURE = "1.0"
 
-# Default theme
 DEFAULT_THEME = "light"
 
 # Theme colors
 THEMES = {
     "light": {
-        "window_bg": "#F5F5F5",   # 主窗口略微灰色
+        "window_bg": "#F5F5F5",   
         "text": "#000000",
         "input_bg": "#FFFFFF",
         "input_border": "#CCCCCC",
@@ -114,10 +115,10 @@ THEMES = {
         "button_hover": "#005A9E",
         "button_text": "#FFFFFF",
         "title_button_hover": "#E81123",
-        "sidebar_bg": "#EBEBEB"  # 更改为浅灰色，比window_bg更浅
+        "sidebar_bg": "#EBEBEB"  
     },
     "dark": {
-        "window_bg": "#2D2D2D",   # 保持原来的深色
+        "window_bg": "#2D2D2D",   
         "text": "#FFFFFF",
         "input_bg": "#3D3D3D",
         "input_border": "#555555",
@@ -125,6 +126,6 @@ THEMES = {
         "button_hover": "#005A9E",
         "button_text": "#FFFFFF",
         "title_button_hover": "#E81123",
-        "sidebar_bg": "#252525"  # 更改为比window_bg稍深的颜色
+        "sidebar_bg": "#252525"  
     }
 }
