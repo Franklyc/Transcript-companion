@@ -35,6 +35,25 @@ AVAILABLE_MODELS = [
     "[SambaNova] Qwen2.5-Coder-32B-Instruct"
 ]
 
+PROVIDERS = [
+    "All",
+    "Cerebras",
+    "Groq", 
+    "Gemini",
+    "SambaNova",
+    "LMstudio",
+    "Kobold",
+    "Ollama"
+]
+
+DEFAULT_PROVIDER = "All"
+
+def filter_models_by_provider(provider):
+    """Filter models list by provider"""
+    if provider == "All":
+        return AVAILABLE_MODELS
+    return [m for m in AVAILABLE_MODELS if m.startswith(f"[{provider}]")]
+
 def get_api_models(base_url, prefix):
     try:
         import requests

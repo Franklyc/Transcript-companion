@@ -380,6 +380,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
         self.folder_label.setText(STRINGS[self.current_lang]['current_folder'])
         self.folder_button.setText(STRINGS[self.current_lang]['select_folder'])
+        self.provider_label.setText(STRINGS[self.current_lang]['select_provider'])
         self.model_label.setText(STRINGS[self.current_lang]['select_model'])
         self.temp_label.setText(STRINGS[self.current_lang]['set_temperature'])
         self.prefix_label.setText(STRINGS[self.current_lang]['custom_prefix'])
@@ -389,7 +390,35 @@ class MainWindow(QMainWindow):
     # Add new methods for the new buttons
     def show_help(self):
         help_text = STRINGS[self.current_lang]['help_text']
-        QMessageBox.information(self, STRINGS[self.current_lang]['help_title'], help_text)
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle(STRINGS[self.current_lang]['help_title'])
+        msg_box.setText(help_text)
+        msg_box.setIcon(QMessageBox.Icon.Information)
+    
+        # Apply theme to message box
+        theme = config.THEMES[self.current_theme]
+        msg_box.setStyleSheet(f"""
+            QMessageBox {{
+                background-color: {theme['dialog_bg']};
+                color: {theme['text']};
+            }}
+            QLabel {{
+                color: {theme['text']};
+                background-color: {theme['dialog_bg']};
+            }}
+            QPushButton {{
+                background-color: {theme['button_bg']};
+                color: {theme['button_text']};
+                padding: 6px 14px;
+                border-radius: 4px;
+                min-width: 80px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme['button_hover']};
+            }}
+        """)
+    
+        msg_box.exec()
 
     def show_settings(self):
         dialog = SettingsDialog(self)
