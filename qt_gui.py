@@ -121,6 +121,19 @@ class MainWindow(QMainWindow):
         folder_layout.addWidget(self.folder_button)
         layout.addLayout(folder_layout)
 
+        # Provider selection
+        self.provider_combo = QComboBox()
+        self.provider_combo.addItems(config.PROVIDERS)
+        self.provider_combo.setCurrentText(config.DEFAULT_PROVIDER)
+        provider_layout, self.provider_label = self.create_labeled_layout(
+            STRINGS[self.current_lang].get('select_provider', 'Select Provider:'),
+            self.provider_combo
+        )
+        layout.addLayout(provider_layout)
+
+        # Connect provider change event
+        self.provider_combo.currentTextChanged.connect(self.on_provider_changed)
+
         # Model selection
         self.model_combo = QComboBox()
         self.update_model_list(include_local=False)
@@ -200,10 +213,22 @@ class MainWindow(QMainWindow):
         current_model = self.model_combo.currentText()
         config.refresh_available_models(include_local)
         self.model_combo.clear()
-        self.model_combo.addItems(config.AVAILABLE_MODELS)
+        
+        # Filter models by selected provider
+        provider = self.provider_combo.currentText()
+        filtered_models = config.filter_models_by_provider(provider)
+        self.model_combo.addItems(filtered_models)
+        
+        # Try to restore previous selection
         index = self.model_combo.findText(current_model)
         if index >= 0:
             self.model_combo.setCurrentIndex(index)
+        elif self.model_combo.count() > 0:
+            self.model_combo.setCurrentIndex(0)
+
+    def on_provider_changed(self, provider):
+        """Handle provider selection change"""
+        self.update_model_list(self.provider_combo.currentText() in ["LMstudio", "Kobold", "Ollama"])
 
     def apply_theme(self):
         theme = config.THEMES[self.current_theme]

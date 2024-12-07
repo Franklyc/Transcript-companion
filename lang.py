@@ -31,6 +31,7 @@ STRINGS = {
         'settings_title': '设置',
         'use_predefined_prefix': '使用预定义前缀',
         'use_transcript_text': '使用转录文件内容',
+        'select_provider': '选择服务提供商:',
     },
     'en': {
         'window_title': "TMSpeech Companion",
@@ -64,5 +65,6 @@ Sidebar Features:
         'settings_title': 'Settings',
         'use_predefined_prefix': 'Use Predefined Prefix',
         'use_transcript_text': 'Use Transcript Text',
+        'select_provider': 'Select Provider:',
     }
 }
