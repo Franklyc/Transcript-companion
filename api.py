@@ -29,7 +29,6 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
                 api_key=config.GROQ_API_KEY
             )
             model_name = model_name.replace("[Groq] ", "")
-            params["max_tokens"] = 32768 if model_name == "mixtral-8x7b-32768" else 8000
 
         elif model_name.startswith("[Gemini]"):
             client = openai.OpenAI(
