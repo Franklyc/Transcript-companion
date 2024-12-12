@@ -116,7 +116,8 @@ THEMES = {
         "button_hover": "#005A9E",
         "button_text": "#FFFFFF",
         "title_button_hover": "#E81123",
-        "sidebar_bg": "#EBEBEB"  
+        "sidebar_bg": "#EBEBEB",
+        "dialog_bg": "#F5F5F5"  # Added dialog background color
     },
     "dark": {
         "window_bg": "#2D2D2D",   
@@ -127,7 +128,8 @@ THEMES = {
         "button_hover": "#005A9E",
         "button_text": "#FFFFFF",
         "title_button_hover": "#E81123",
-        "sidebar_bg": "#252525"  
+        "sidebar_bg": "#252525",
+        "dialog_bg": "#2D2D2D"  # Added dialog background color
     }
 }
 
