@@ -38,6 +38,9 @@ class TitleBar(QWidget):
     def apply_theme(self):
         theme = src.config.config.THEMES[self.parent.current_theme]
         self.setStyleSheet(f"""
+            QLabel {{
+                color: {theme['text']};
+            }}
             #titleButton {{
                 background-color: transparent;
                 border: none;
