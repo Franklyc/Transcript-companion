@@ -52,34 +52,14 @@ class Sidebar(QWidget):
                 background-color: {theme['sidebar_bg']};
                 border-right: 1px solid {theme['input_border']};
             }}
-            #themeButton {{
+            #sidebarButton, #langButton, #themeButton {{
                 background-color: transparent;
                 border: none;
                 color: {theme['text']};
                 font-size: 16px;
                 padding: 4px;
             }}
-            #themeButton:hover {{
-                background-color: {theme['input_border']};
-            }}
-            #langButton {{
-                background-color: transparent;
-                border: none;
-                color: {theme['text']};
-                font-size: 16px;
-                padding: 4px;
-            }}
-            #langButton:hover {{
-                background-color: {theme['input_border']};
-            }}
-            #sidebarButton {{
-                background-color: transparent;
-                border: none;
-                color: {theme['text']};
-                font-size: 16px;
-                padding: 4px;
-            }}
-            #sidebarButton:hover {{
+            #sidebarButton:hover, #langButton:hover, #themeButton:hover {{
                 background-color: {theme['input_border']};
                 border-radius: 4px;
             }}

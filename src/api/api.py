@@ -2,6 +2,7 @@ import openai
 import src.config.config
 from PyQt6.QtWidgets import QApplication
 import tkinter as tk
+from src.gui.lang import STRINGS
 
 def fetch_model_response(prompt, output_textbox, model_name, temperature):
     try:
@@ -89,5 +90,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
 
     except Exception as e:
         output_textbox.clear()
-        output_textbox.insertPlainText(f"调用模型失败: {e}")
+        main_window = QApplication.instance().activeWindow()
+        lang = main_window.current_lang if main_window else 'zh'
+        output_textbox.insertPlainText(f"{STRINGS[lang]['model_call_error']}{e}")
         QApplication.processEvents()
