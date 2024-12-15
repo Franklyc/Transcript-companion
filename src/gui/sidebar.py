@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 from PyQt6.QtCore import Qt
-from lang import STRINGS
-import config
+from src.gui.lang import STRINGS
+import src.config.config
 
 class Sidebar(QWidget):
     def __init__(self, parent):
@@ -46,7 +46,7 @@ class Sidebar(QWidget):
         sidebar_layout.addStretch()
 
     def apply_theme(self):
-        theme = config.THEMES[self.parent.current_theme]
+        theme = src.config.config.THEMES[self.parent.current_theme]
         self.setStyleSheet(f"""
             QWidget#sidebar {{
                 background-color: {theme['sidebar_bg']};

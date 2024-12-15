@@ -1,5 +1,5 @@
 import openai
-import config
+import src.config.config
 from PyQt6.QtWidgets import QApplication
 import tkinter as tk
 
@@ -18,7 +18,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         if model_name.startswith("[Cerebras]"):
             client = openai.OpenAI(
                 base_url="https://api.cerebras.ai/v1",
-                api_key=config.CEREBRAS_API_KEY
+                api_key=src.config.config.CEREBRAS_API_KEY
             )
             model_name = model_name.replace("[Cerebras] ", "")
             params["max_completion_tokens"] = 8192
@@ -26,14 +26,14 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         elif model_name.startswith("[Groq]"):
             client = openai.OpenAI(
                 base_url="https://api.groq.com/openai/v1",
-                api_key=config.GROQ_API_KEY
+                api_key=src.config.config.GROQ_API_KEY
             )
             model_name = model_name.replace("[Groq] ", "")
 
         elif model_name.startswith("[Gemini]"):
             client = openai.OpenAI(
                 base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-                api_key=config.GEMINI_API_KEY
+                api_key=src.config.config.GEMINI_API_KEY
             )
             model_name = model_name.replace("[Gemini] ", "")
             params["model"] = model_name
@@ -49,7 +49,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         elif model_name.startswith("[SambaNova]"):
             client = openai.OpenAI(
                 base_url="https://api.sambanova.ai/v1",
-                api_key=config.SAMBANOVA_API_KEY
+                api_key=src.config.config.SAMBANOVA_API_KEY
             )
             model_name = model_name.replace("[SambaNova] ", "")
             params["model"] = model_name
@@ -57,7 +57,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         elif model_name.startswith("[LMstudio]"):
             client = openai.OpenAI(
                 base_url="http://localhost:1234/v1",
-                api_key=config.LMSTUDIO_API_KEY
+                api_key=src.config.config.LMSTUDIO_API_KEY
             )
             model_name = model_name.replace("[LMstudio] ", "")
             params["model"] = model_name
@@ -65,7 +65,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         elif model_name.startswith("[Kobold]"):
             client = openai.OpenAI(
                 base_url="http://localhost:5001/v1",
-                api_key=config.KOBOLD_API_KEY
+                api_key=src.config.config.KOBOLD_API_KEY
             )
             model_name = model_name.replace("[Kobold] ", "")
             params["model"] = model_name
@@ -73,7 +73,7 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         elif model_name.startswith("[Ollama]"):
             client = openai.OpenAI(
                 base_url="http://localhost:11434/v1",
-                api_key=config.OLLAMA_API_KEY
+                api_key=src.config.config.OLLAMA_API_KEY
             )
             model_name = model_name.replace("[Ollama] ", "")
             params["model"] = model_name

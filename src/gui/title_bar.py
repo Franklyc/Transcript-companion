@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLabel
 from PyQt6.QtCore import Qt
-from lang import STRINGS
-import config
+from src.gui.lang import STRINGS
+import src.config.config
 
 class TitleBar(QWidget):
     def __init__(self, parent):
@@ -36,7 +36,7 @@ class TitleBar(QWidget):
         self.title_label.setText(STRINGS[self.parent.current_lang]['window_title'])
 
     def apply_theme(self):
-        theme = config.THEMES[self.parent.current_theme]
+        theme = src.config.config.THEMES[self.parent.current_theme]
         self.setStyleSheet(f"""
             #titleButton {{
                 background-color: transparent;

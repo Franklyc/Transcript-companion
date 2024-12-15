@@ -2,22 +2,22 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                            QPushButton, QLabel, QComboBox, QLineEdit, QTextEdit, QFileDialog,
                            QRadioButton, QButtonGroup, QScrollBar, QMessageBox, QDialog, QCheckBox)
 from PyQt6.QtCore import Qt, QPoint
-import config
-import utils
-import api
-from lang import STRINGS
-import prefix
-from title_bar import TitleBar
-from sidebar import Sidebar
-from content_area import ContentArea
-from settings_dialog import SettingsDialog
+import src.config.config
+import src.gui.utils
+import src.api.api
+from src.gui.lang import STRINGS
+import src.gui.prefix
+from src.gui.title_bar import TitleBar
+from src.gui.sidebar import Sidebar
+from src.gui.content_area import ContentArea
+from src.gui.settings_dialog import SettingsDialog
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__(flags=Qt.WindowType.FramelessWindowHint)  # 无边框窗口
         self.old_pos = None  # 用于窗口拖动
         self.current_lang = 'zh'
-        self.current_theme = config.DEFAULT_THEME
+        self.current_theme = src.config.config.DEFAULT_THEME
         self.init_ui()
 
     def init_ui(self):
@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
         self.apply_theme()
 
     def apply_theme(self):
-        theme = config.THEMES[self.current_theme]
+        theme = src.config.config.THEMES[self.current_theme]
         # 设置主窗口背景色
         self.setStyleSheet(f"""
             QMainWindow {{
@@ -126,7 +126,7 @@ class MainWindow(QMainWindow):
         msg_box.setIcon(QMessageBox.Icon.Information)
     
         # Apply theme to message box
-        theme = config.THEMES[self.current_theme]
+        theme = src.config.config.THEMES[self.current_theme]
         msg_box.setStyleSheet(f"""
             QMessageBox {{
                 background-color: {theme['dialog_bg']};

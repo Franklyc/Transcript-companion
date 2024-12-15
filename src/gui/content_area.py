@@ -1,11 +1,11 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, 
                            QPushButton, QComboBox, QTextEdit, QFileDialog)
 from PyQt6.QtCore import Qt
-import config
-from lang import STRINGS
-import utils
-import api
-import prefix
+import src.config.config
+from src.gui.lang import STRINGS
+import src.gui.utils
+import src.api.api
+import src.gui.prefix
 
 class ContentArea(QWidget):
     def __init__(self, parent):
@@ -25,7 +25,7 @@ class ContentArea(QWidget):
         layout = QVBoxLayout(self)
 
         # Folder selection
-        self.folder_edit = QLineEdit(config.DEFAULT_FOLDER_PATH)
+        self.folder_edit = QLineEdit(src.config.config.DEFAULT_FOLDER_PATH)
         self.folder_edit.setReadOnly(True)
         self.folder_button = QPushButton(STRINGS[self.parent.current_lang]['select_folder'])
         folder_layout, self.folder_label = self.create_labeled_layout(
@@ -37,8 +37,8 @@ class ContentArea(QWidget):
 
         # Provider selection
         self.provider_combo = QComboBox()
-        self.provider_combo.addItems(config.PROVIDERS)
-        self.provider_combo.setCurrentText(config.DEFAULT_PROVIDER)
+        self.provider_combo.addItems(src.config.config.PROVIDERS)
+        self.provider_combo.setCurrentText(src.config.config.DEFAULT_PROVIDER)
         provider_layout, self.provider_label = self.create_labeled_layout(
             STRINGS[self.parent.current_lang].get('select_provider', 'Select Provider:'),
             self.provider_combo
@@ -58,7 +58,7 @@ class ContentArea(QWidget):
         layout.addLayout(model_layout)
 
         # Temperature
-        self.temp_edit = QLineEdit(config.DEFAULT_TEMPERATURE)
+        self.temp_edit = QLineEdit(src.config.config.DEFAULT_TEMPERATURE)
         temp_layout, self.temp_label = self.create_labeled_layout(
             STRINGS[self.parent.current_lang]['set_temperature'],
             self.temp_edit
@@ -108,12 +108,12 @@ class ContentArea(QWidget):
 
     def update_model_list(self, include_local=False):
         current_model = self.model_combo.currentText()
-        config.refresh_available_models(include_local)
+        src.config.config.refresh_available_models(include_local)
         self.model_combo.clear()
         
         # Filter models by selected provider
         provider = self.provider_combo.currentText()
-        filtered_models = config.filter_models_by_provider(provider)
+        filtered_models = src.config.config.filter_models_by_provider(provider)
         self.model_combo.addItems(filtered_models)
         
         # Try to restore previous selection
@@ -128,7 +128,7 @@ class ContentArea(QWidget):
         self.update_model_list(self.provider_combo.currentText() in ["LMstudio", "Kobold", "Ollama"])
 
     def apply_theme(self):
-        theme = config.THEMES[self.parent.current_theme]
+        theme = src.config.config.THEMES[self.parent.current_theme]
         self.setStyleSheet(f"""
             QLabel {{
                 font-size: 10pt;
@@ -160,23 +160,23 @@ class ContentArea(QWidget):
 
     def copy_and_get_answer(self):
         directory = self.folder_edit.text()
-        latest_file = utils.get_latest_file(directory)
-        original_prefix = prefix.get_original_prefix() if config.USE_PREDEFINED_PREFIX else ""
+        latest_file = src.gui.utils.get_latest_file(directory)
+        original_prefix = src.gui.prefix.get_original_prefix() if src.config.config.USE_PREDEFINED_PREFIX else ""
 
         if latest_file:
             try:
                 transcript_content = ""
-                if config.USE_TRANSCRIPT_TEXT:
+                if src.config.config.USE_TRANSCRIPT_TEXT:
                     with open(latest_file, 'r', encoding='utf-8') as file:
                         transcript_content = file.read()
 
                 combined_content = f"{original_prefix}\n{self.prefix_text.toPlainText()}\n{transcript_content}\n{self.suffix_text.toPlainText()}"
-                utils.copy_to_clipboard(combined_content)
+                src.gui.utils.copy_to_clipboard(combined_content)
                 self.status_label.setText(f"{STRINGS[self.parent.current_lang]['copied_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{latest_file}")
                 self.status_label.setStyleSheet("color: green")
                 
                 self.copy_button.setEnabled(False)
-                api.fetch_model_response(combined_content, self.output_text, self.model_combo.currentText(), self.temp_edit.text())
+                src.api.api.fetch_model_response(combined_content, self.output_text, self.model_combo.currentText(), self.temp_edit.text())
                 self.copy_button.setEnabled(True)
                 
             except Exception as e:
