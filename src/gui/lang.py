@@ -27,6 +27,7 @@ STRINGS = {
 ❓ - 显示帮助
 ⚙️ - 设置
 🗑️ - 清除内容
+🔄 - 刷新本地模型列表（用于LMstudio/Kobold/Ollama）
 ''',
         'settings_title': '设置',
         'use_predefined_prefix': '使用预定义前缀',
@@ -62,6 +63,7 @@ Sidebar Features:
 ❓ - Show Help
 ⚙️ - Settings
 🗑️ - Clear Content
+🔄 - Refresh Local Models (for LMstudio/Kobold/Ollama)
 ''',
         'settings_title': 'Settings',
         'use_predefined_prefix': 'Use Predefined Prefix',
