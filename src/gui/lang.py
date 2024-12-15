@@ -37,8 +37,6 @@ STRINGS = {
         'export_conversation': "导出对话",
         'export_success': "对话已成功导出到 history 文件夹！",
         'export_error': "导出对话失败: ",
-        'error': "错误",
-        'success': "成功",
     },
     'en': {
         'window_title': "TMSpeech Companion",
@@ -78,7 +76,5 @@ Sidebar Features:
         'export_conversation': "Export Conversation",
         'export_success': "Conversation successfully exported to history folder!",
         'export_error': "Failed to export conversation: ",
-        'error': "Error",
-        'success': "Success",
     }
 }

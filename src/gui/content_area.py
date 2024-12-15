@@ -228,7 +228,8 @@ class ContentArea(QWidget):
                 with open(latest_file, 'r', encoding='utf-8') as file:
                     transcript_content = file.read()
             except Exception as e:
-                QMessageBox.critical(self, STRINGS[self.parent.current_lang]['error'], f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}")
+                self.status_label.setText(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}")
+                self.status_label.setStyleSheet("color: red")
                 return
 
         prompt = f"{original_prefix}\n{self.prefix_text.toPlainText()}\n{transcript_content}\n{self.suffix_text.toPlainText()}"
@@ -237,9 +238,11 @@ class ContentArea(QWidget):
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(f"Prompt:\n{prompt}\n\nOutput:\n{output}")
-            QMessageBox.information(self, STRINGS[self.parent.current_lang]['success'], STRINGS[self.parent.current_lang]['export_success'])
+            self.status_label.setText(f"{STRINGS[self.parent.current_lang]['export_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{filepath}")
+            self.status_label.setStyleSheet("color: green")
         except Exception as e:
-            QMessageBox.critical(self, STRINGS[self.parent.current_lang]['error'], f"{STRINGS[self.parent.current_lang]['export_error']}{e}")
+            self.status_label.setText(f"{STRINGS[self.parent.current_lang]['export_error']}{e}")
+            self.status_label.setStyleSheet("color: red")
 
     def update_texts(self):
         self.folder_label.setText(STRINGS[self.parent.current_lang]['current_folder'])
