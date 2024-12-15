@@ -50,6 +50,11 @@ def _get_openai_client(model_name):
             api_key=src.config.config.GLHF_API_KEY,
             base_url="https://glhf.chat/api/openai/v1",
         ), model_name.replace("[GLHF] ", "")
+    elif model_name.startswith("[SiliconFlow]"):
+        return openai.OpenAI(
+            base_url="https://api.siliconflow.cn/v1",
+            api_key=src.config.config.SILICONFLOW_API_KEY
+        ), model_name.replace("[SiliconFlow] ", "")
     else:
         return None, model_name
 

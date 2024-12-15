@@ -8,6 +8,7 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 SAMBANOVA_API_KEY = os.environ.get("SAMBANOVA_API_KEY")
 ZHIPUAI_API_KEY = os.environ.get("ZHIPUAI_API_KEY")
 GLHF_API_KEY = os.environ.get("GLHF_API_KEY")
+SILICONFLOW_API_KEY = os.environ.get("SILICONFLOW_API_KEY")
 # LMstudio API configuration
 LMSTUDIO_BASE_URL = "http://localhost:1234/v1"
 LMSTUDIO_API_KEY = "not-needed"  # LMstudio doesn't require API key
@@ -38,7 +39,8 @@ AVAILABLE_MODELS = [
     "[SambaNova] Qwen2.5-72B-Instruct",
     "[SambaNova] Qwen2.5-Coder-32B-Instruct",
     "[Zhipu] glm-4-flash",
-    "[GLHF] hf:meta-llama/Llama-3.3-70B-Instruct"
+    "[GLHF] hf:meta-llama/Llama-3.3-70B-Instruct",
+    "[SiliconFlow] Qwen/Qwen2.5-7B-Instruct"
 ]
 
 PROVIDERS = [
@@ -49,6 +51,7 @@ PROVIDERS = [
     "SambaNova",
     "Zhipu",
     "GLHF",
+    "SiliconFlow",
     "LMstudio",
     "Kobold",
     "Ollama"
