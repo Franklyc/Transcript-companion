@@ -74,6 +74,10 @@ class MainWindow(QMainWindow):
                 background-color: {theme['window_bg']};
                 border: 1px solid {theme['input_border']};
             }}
+            QComboBox QAbstractItemView {{
+                color: {theme['dropdown_text']};
+                background-color: {theme['input_bg']};
+            }}
         """)
         self.main_container.setStyleSheet(f"""
             QWidget {{
