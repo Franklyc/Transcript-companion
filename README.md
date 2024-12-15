@@ -87,7 +87,7 @@ pip install PyQt6 openai pyperclip
 ## Interface Preview
 
 ### Light Theme
-<img src="qt_gui_en_light.png" width="400">
+<img src="assets/qt_gui_en_light.png" width="400">
 
 ### Dark Theme
-<img src="qt_gui_en_dark.png" width="400">
+<img src="assets/qt_gui_en_dark.png" width="400">
