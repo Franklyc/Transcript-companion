@@ -3,3 +3,4 @@
 prefix.py
 config.py
 *.pyc
+/history

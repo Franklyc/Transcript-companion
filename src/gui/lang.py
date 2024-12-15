@@ -34,6 +34,11 @@ STRINGS = {
         'use_transcript_text': '使用转录文件内容',
         'select_provider': '选择服务提供商:',
         'model_call_error': "调用模型失败: ",
+        'export_conversation': "导出对话",
+        'export_success': "对话已成功导出到 history 文件夹！",
+        'export_error': "导出对话失败: ",
+        'error': "错误",
+        'success': "成功",
     },
     'en': {
         'window_title': "TMSpeech Companion",
@@ -70,5 +75,10 @@ Sidebar Features:
         'use_transcript_text': 'Use Transcript Text',
         'select_provider': 'Select Provider:',
         'model_call_error': "Failed to call model: ",
+        'export_conversation': "Export Conversation",
+        'export_success': "Conversation successfully exported to history folder!",
+        'export_error': "Failed to export conversation: ",
+        'error': "Error",
+        'success': "Success",
     }
 }

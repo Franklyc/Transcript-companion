@@ -1,11 +1,13 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, 
-                           QPushButton, QComboBox, QTextEdit, QFileDialog)
+                           QPushButton, QComboBox, QTextEdit, QFileDialog, QMessageBox)
 from PyQt6.QtCore import Qt
 import src.config.config
 from src.gui.lang import STRINGS
 import src.gui.utils
 import src.api.api
 import src.gui.prefix
+import os
+import datetime
 
 class ContentArea(QWidget):
     def __init__(self, parent):
@@ -86,6 +88,9 @@ class ContentArea(QWidget):
         self.output_text = QTextEdit()
         layout.addWidget(self.output_text)
 
+        # Buttons layout
+        buttons_layout = QHBoxLayout()
+
         # Copy button
         self.copy_button = QPushButton(STRINGS[self.parent.current_lang]['copy_and_get_answer'])
         self.copy_button.setStyleSheet("""
@@ -100,11 +105,29 @@ class ContentArea(QWidget):
                 background-color: #005A9E;
             }
         """)
-        layout.addWidget(self.copy_button)
+        buttons_layout.addWidget(self.copy_button)
+
+        # Export button
+        self.export_button = QPushButton(STRINGS[self.parent.current_lang]['export_conversation'])
+        self.export_button.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                padding: 8px;
+                border-radius: 4px;
+                font-size: 12pt;
+            }
+            QPushButton:hover {
+                background-color: #367C39;
+            }
+        """)
+        buttons_layout.addWidget(self.export_button)
+        layout.addLayout(buttons_layout)
 
         # Connect signals
         self.folder_button.clicked.connect(self.select_folder)
         self.copy_button.clicked.connect(self.copy_and_get_answer)
+        self.export_button.clicked.connect(self.export_conversation)
 
     def update_model_list(self, include_local=False):
         current_model = self.model_combo.currentText()
@@ -187,6 +210,37 @@ class ContentArea(QWidget):
             self.status_label.setText(STRINGS[self.parent.current_lang]['no_files_available'])
             self.status_label.setStyleSheet("color: red")
 
+    def export_conversation(self):
+        history_dir = os.path.join(os.getcwd(), "history")
+        if not os.path.exists(history_dir):
+            os.makedirs(history_dir)
+
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"conversation_{timestamp}.txt"
+        filepath = os.path.join(history_dir, filename)
+
+        original_prefix = src.gui.prefix.get_original_prefix() if src.config.config.USE_PREDEFINED_PREFIX else ""
+        transcript_content = ""
+        directory = self.folder_edit.text()
+        latest_file = src.gui.utils.get_latest_file(directory)
+        if latest_file and src.config.config.USE_TRANSCRIPT_TEXT:
+            try:
+                with open(latest_file, 'r', encoding='utf-8') as file:
+                    transcript_content = file.read()
+            except Exception as e:
+                QMessageBox.critical(self, STRINGS[self.parent.current_lang]['error'], f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}")
+                return
+
+        prompt = f"{original_prefix}\n{self.prefix_text.toPlainText()}\n{transcript_content}\n{self.suffix_text.toPlainText()}"
+        output = self.output_text.toPlainText()
+
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(f"Prompt:\n{prompt}\n\nOutput:\n{output}")
+            QMessageBox.information(self, STRINGS[self.parent.current_lang]['success'], STRINGS[self.parent.current_lang]['export_success'])
+        except Exception as e:
+            QMessageBox.critical(self, STRINGS[self.parent.current_lang]['error'], f"{STRINGS[self.parent.current_lang]['export_error']}{e}")
+
     def update_texts(self):
         self.folder_label.setText(STRINGS[self.parent.current_lang]['current_folder'])
         self.folder_button.setText(STRINGS[self.parent.current_lang]['select_folder'])
@@ -196,3 +250,4 @@ class ContentArea(QWidget):
         self.prefix_label.setText(STRINGS[self.parent.current_lang]['custom_prefix'])
         self.suffix_label.setText(STRINGS[self.parent.current_lang]['custom_suffix'])
         self.copy_button.setText(STRINGS[self.parent.current_lang]['copy_and_get_answer'])
+        self.export_button.setText(STRINGS[self.parent.current_lang]['export_conversation'])
