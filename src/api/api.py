@@ -33,15 +33,10 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         if model_name.startswith("cerebras"):
             params["max_completion_tokens"] = 8192
 
-        is_gemini = model_name.startswith("gemini")
         stream = client.chat.completions.create(**params)
-
         output_textbox.clear()
         for chunk in stream:
-            if is_gemini:
-                delta = chunk.choices[0].delta.content or ""
-            else:
-                delta = chunk.choices[0].delta.content or ""
+            delta = chunk.choices[0].delta.content or ""
             output_textbox.insertPlainText(delta)
             QApplication.processEvents()
 
