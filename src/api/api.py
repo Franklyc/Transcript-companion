@@ -55,6 +55,14 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             model_name = model_name.replace("[SambaNova] ", "")
             params["model"] = model_name
 
+        elif model_name.startswith("[Zhipu]"):
+            client = openai.OpenAI(
+                base_url="https://open.bigmodel.cn/api/paas/v4/",
+                api_key=src.config.config.ZHIPUAI_API_KEY
+            )
+            model_name = model_name.replace("[Zhipu] ", "")
+            params["model"] = model_name
+
         elif model_name.startswith("[LMstudio]"):
             client = openai.OpenAI(
                 base_url="http://localhost:1234/v1",
@@ -77,6 +85,14 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
                 api_key=src.config.config.OLLAMA_API_KEY
             )
             model_name = model_name.replace("[Ollama] ", "")
+            params["model"] = model_name
+        
+        elif model_name.startswith("[GLHF]"):
+            client = openai.OpenAI(
+                api_key=src.config.config.GLHF_API_KEY,
+                base_url="https://glhf.chat/api/openai/v1",
+            )
+            model_name = model_name.replace("[GLHF] ", "")
             params["model"] = model_name
 
         params["model"] = model_name
