@@ -4,6 +4,55 @@ from PyQt6.QtWidgets import QApplication
 import tkinter as tk
 from src.gui.lang import STRINGS
 
+def _get_openai_client(model_name):
+    if model_name.startswith("[Cerebras]"):
+        return openai.OpenAI(
+            base_url="https://api.cerebras.ai/v1",
+            api_key=src.config.config.CEREBRAS_API_KEY
+        ), model_name.replace("[Cerebras] ", "")
+    elif model_name.startswith("[Groq]"):
+        return openai.OpenAI(
+            base_url="https://api.groq.com/openai/v1",
+            api_key=src.config.config.GROQ_API_KEY
+        ), model_name.replace("[Groq] ", "")
+    elif model_name.startswith("[Gemini]"):
+        return openai.OpenAI(
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+            api_key=src.config.config.GEMINI_API_KEY
+        ), model_name.replace("[Gemini] ", "")
+    elif model_name.startswith("[SambaNova]"):
+        return openai.OpenAI(
+            base_url="https://api.sambanova.ai/v1",
+            api_key=src.config.config.SAMBANOVA_API_KEY
+        ), model_name.replace("[SambaNova] ", "")
+    elif model_name.startswith("[Zhipu]"):
+        return openai.OpenAI(
+            base_url="https://open.bigmodel.cn/api/paas/v4/",
+            api_key=src.config.config.ZHIPUAI_API_KEY
+        ), model_name.replace("[Zhipu] ", "")
+    elif model_name.startswith("[LMstudio]"):
+        return openai.OpenAI(
+            base_url="http://localhost:1234/v1",
+            api_key=src.config.config.LMSTUDIO_API_KEY
+        ), model_name.replace("[LMstudio] ", "")
+    elif model_name.startswith("[Kobold]"):
+        return openai.OpenAI(
+            base_url="http://localhost:5001/v1",
+            api_key=src.config.config.KOBOLD_API_KEY
+        ), model_name.replace("[Kobold] ", "")
+    elif model_name.startswith("[Ollama]"):
+        return openai.OpenAI(
+            base_url="http://localhost:11434/v1",
+            api_key=src.config.config.OLLAMA_API_KEY
+        ), model_name.replace("[Ollama] ", "")
+    elif model_name.startswith("[GLHF]"):
+        return openai.OpenAI(
+            api_key=src.config.config.GLHF_API_KEY,
+            base_url="https://glhf.chat/api/openai/v1",
+        ), model_name.replace("[GLHF] ", "")
+    else:
+        return None, model_name
+
 def fetch_model_response(prompt, output_textbox, model_name, temperature):
     try:
         params = {
@@ -16,93 +65,32 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
             "top_p": 1
         }
 
-        if model_name.startswith("[Cerebras]"):
-            client = openai.OpenAI(
-                base_url="https://api.cerebras.ai/v1",
-                api_key=src.config.config.CEREBRAS_API_KEY
-            )
-            model_name = model_name.replace("[Cerebras] ", "")
-            params["max_completion_tokens"] = 8192
-            
-        elif model_name.startswith("[Groq]"):
-            client = openai.OpenAI(
-                base_url="https://api.groq.com/openai/v1",
-                api_key=src.config.config.GROQ_API_KEY
-            )
-            model_name = model_name.replace("[Groq] ", "")
-
-        elif model_name.startswith("[Gemini]"):
-            client = openai.OpenAI(
-                base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-                api_key=src.config.config.GEMINI_API_KEY
-            )
-            model_name = model_name.replace("[Gemini] ", "")
+        client, model_name = _get_openai_client(model_name)
+        if client is None:
             params["model"] = model_name
-            response = client.chat.completions.create(**params)
+            client = openai.OpenAI() # default client
+        else:
+            params["model"] = model_name
 
+        if model_name.startswith("gemini"):
+            response = client.chat.completions.create(**params)
             output_textbox.clear()
             for chunk in response:
                 delta = chunk.choices[0].delta.content or ""
                 output_textbox.insertPlainText(delta)
-                QApplication.processEvents()  # 保留事件处理
+                QApplication.processEvents()
             return
-            
-        elif model_name.startswith("[SambaNova]"):
-            client = openai.OpenAI(
-                base_url="https://api.sambanova.ai/v1",
-                api_key=src.config.config.SAMBANOVA_API_KEY
-            )
-            model_name = model_name.replace("[SambaNova] ", "")
-            params["model"] = model_name
-
-        elif model_name.startswith("[Zhipu]"):
-            client = openai.OpenAI(
-                base_url="https://open.bigmodel.cn/api/paas/v4/",
-                api_key=src.config.config.ZHIPUAI_API_KEY
-            )
-            model_name = model_name.replace("[Zhipu] ", "")
-            params["model"] = model_name
-
-        elif model_name.startswith("[LMstudio]"):
-            client = openai.OpenAI(
-                base_url="http://localhost:1234/v1",
-                api_key=src.config.config.LMSTUDIO_API_KEY
-            )
-            model_name = model_name.replace("[LMstudio] ", "")
-            params["model"] = model_name
-
-        elif model_name.startswith("[Kobold]"):
-            client = openai.OpenAI(
-                base_url="http://localhost:5001/v1",
-                api_key=src.config.config.KOBOLD_API_KEY
-            )
-            model_name = model_name.replace("[Kobold] ", "")
-            params["model"] = model_name
-
-        elif model_name.startswith("[Ollama]"):
-            client = openai.OpenAI(
-                base_url="http://localhost:11434/v1",
-                api_key=src.config.config.OLLAMA_API_KEY
-            )
-            model_name = model_name.replace("[Ollama] ", "")
-            params["model"] = model_name
         
-        elif model_name.startswith("[GLHF]"):
-            client = openai.OpenAI(
-                api_key=src.config.config.GLHF_API_KEY,
-                base_url="https://glhf.chat/api/openai/v1",
-            )
-            model_name = model_name.replace("[GLHF] ", "")
-            params["model"] = model_name
+        if model_name.startswith("cerebras"):
+            params["max_completion_tokens"] = 8192
 
-        params["model"] = model_name
         stream = client.chat.completions.create(**params)
 
         output_textbox.clear()
         for chunk in stream:
             delta = chunk.choices[0].delta.content or ""
             output_textbox.insertPlainText(delta)
-            QApplication.processEvents()  # 保留事件处理
+            QApplication.processEvents()
 
     except Exception as e:
         output_textbox.clear()
