@@ -22,6 +22,9 @@
     * **Groq** (mixtral-8x7b-32768, llama-3.1 等模型)
     * **Google Gemini** (gemini-1.5-flash 等模型) :books: **最大上下文：** 长转录的理想选择
     * **Sambanova** (llama-3.1 等模型，包括 llama3.1-405B)
+    * **智谱清言** (glm-4-flash 模型)
+    * **GLHF** (Llama-3.3-70B 系列模型)
+    * **硅基流动** (Qwen2.5-7b 模型)
     * **本地：** (LMstudio/Kobold/Ollama) :computer: **私密：** 数据安全的最佳选择
 * **温度控制：** 调整温度参数 (0.0-1.5) 以微调 LLM 响应的创造性和随机性。较低的值会导致更集中和确定的输出，而较高的值会鼓励更多样化和意想不到的生成。
 * **可自定义的前缀/后缀：** 在将转录发送到 LLM 之前，向其添加自定义前缀和后缀文本。这允许您向模型提供额外的上下文或说明，从而调整其输出以更好地满足您的需求。
@@ -35,13 +38,15 @@
 * **Python 3.x**
 * **PyQt6**
 * 以下 Python 包：
+    * ``PyQt6``
     * ``openai``
     * ``pyperclip``
+    * ``requests``
 
-您可以使用 pip 安装这些包：
+您可以使用 pip 安装依赖：
 
 ```bash
-pip install PyQt6 openai pyperclip
+pip install -r requirements.txt
 ```
 
 ## 设置

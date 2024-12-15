@@ -19,9 +19,12 @@
 * **Folder Selection:** Choose the directory containing your speech transcription files (e.g., `.txt`, `.md`).
 * **Multi-LLM Support:** Seamlessly integrate with various LLM providers:
     * **Cerebras** (llama3.1-70b, llama3.1-8b) :sparkles: **FASTEST:** Best choice for quick response times
-    * **Groq** (mixtral-8x7b-32768, llama-3.1 models) 
+    * **Groq** (mixtral-8x7b-32768, llama-3.1/3.3 models) 
     * **Google Gemini** (gemini-1.5-flash models) :books: **LARGEST CONTEXT:** Ideal for long transcripts
-    * **Sambanova** (llama-3.1 models, including llama3.1-405B)
+    * **Sambanova** (llama-3.1 models, including llama3.1-405B, Qwen2.5 models)
+    * **Zhipu** (glm-4-flash)
+    * **GLHF** (Llama-3.3-70B)
+    * **SiliconFlow** (Qwen2.5-7b)
     * **LOCAL** (LMstudio/Kobold/Ollama) :computer: **PRIVATE:** Best choice for data security
 * **Temperature Control:** Adjust the temperature parameter (0.0-1.5) to fine-tune the creativity and randomness of the LLM's responses. Lower values result in more focused and deterministic outputs, while higher values encourage more diverse and unexpected generation.
 * **Customizable Prefix/Suffix:** Add custom prefix and suffix text to your transcripts before sending them to the LLM. This allows you to provide additional context or instructions to the model, shaping its output to better suit your needs.
@@ -35,13 +38,15 @@
 * **Python 3.x**
 * **PyQt6**
 * The following Python packages:
+    * ``PyQt6``
     * ``openai``
     * ``pyperclip``
+    * ``requests``
 
 You can install these packages using pip:
 
 ```bash
-pip install PyQt6 openai pyperclip
+pip install -r requirements.txt
 ```
 
 ## Setup
