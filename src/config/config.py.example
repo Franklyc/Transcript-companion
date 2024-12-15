@@ -1,23 +1,27 @@
 import os
 
-# API Keys / API 密钥
-# Please replace with your actual keys / 请替换成你的实际密钥
-CEREBRAS_API_KEY = os.environ.get("CEREBRAS_API_KEY")
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-SAMBANOVA_API_KEY = os.environ.get("SAMBANOVA_API_KEY")
-ZHIPUAI_API_KEY = os.environ.get("ZHIPUAI_API_KEY")
-GLHF_API_KEY = os.environ.get("GLHF_API_KEY")
-SILICONFLOW_API_KEY = os.environ.get("SILICONFLOW_API_KEY")
-# LMstudio API configuration
-LMSTUDIO_BASE_URL = "http://localhost:1234/v1"
-LMSTUDIO_API_KEY = "not-needed"  # LMstudio doesn't require API key
-# Kobold API configuration 
-KOBOLD_BASE_URL = "http://localhost:5001/v1"
-KOBOLD_API_KEY = "not-needed"  # Kobold doesn't require API key
-# Ollama API configuration
-OLLAMA_BASE_URL = "http://localhost:11434/v1"
-OLLAMA_API_KEY = "ollama"  # required but unused
+class Provider:
+    def __init__(self, name, base_url=None, api_key=None, models=None):
+        self.name = name
+        self.base_url = base_url
+        self.api_key = api_key if api_key else os.environ.get(f"{name.upper()}_API_KEY")
+        self.models = models or []
+
+PROVIDERS_CONFIG = {
+    "Cerebras": Provider("Cerebras", "https://api.cerebras.ai/v1"),
+    "Groq": Provider("Groq", "https://api.groq.com/openai/v1"),
+    "Gemini": Provider("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai/"),
+    "SambaNova": Provider("SambaNova", "https://api.sambanova.ai/v1"),
+    "Zhipu": Provider("Zhipu", "https://open.bigmodel.cn/api/paas/v4/"),
+    "GLHF": Provider("GLHF", "https://glhf.chat/api/openai/v1"),
+    "SiliconFlow": Provider("SiliconFlow", "https://api.siliconflow.cn/v1"),
+    "LMstudio": Provider("LMstudio", "http://localhost:1234/v1", "not-needed"),
+    "Kobold": Provider("Kobold", "http://localhost:5001/v1", "not-needed"),
+    "Ollama": Provider("Ollama", "http://localhost:11434/v1", "ollama")
+}
+
+PROVIDERS = ["All"] + list(PROVIDERS_CONFIG.keys())
+DEFAULT_PROVIDER = "All"
 
 # Available models list / 可用模型列表
 AVAILABLE_MODELS = [
@@ -40,24 +44,26 @@ AVAILABLE_MODELS = [
     "[SambaNova] Qwen2.5-Coder-32B-Instruct",
     "[Zhipu] glm-4-flash",
     "[GLHF] hf:meta-llama/Llama-3.3-70B-Instruct",
+    "[GLHF] hf:Qwen/Qwen2.5-Coder-32B-Instruct",
     "[SiliconFlow] Qwen/Qwen2.5-7B-Instruct"
 ]
 
-PROVIDERS = [
-    "All",
-    "Cerebras",
-    "Groq", 
-    "Gemini",
-    "SambaNova",
-    "Zhipu",
-    "GLHF",
-    "SiliconFlow",
-    "LMstudio",
-    "Kobold",
-    "Ollama"
-]
+def get_provider_info(model_name):
+    """Get provider information from model name"""
+    if not model_name.startswith("["):
+        return None
+    provider_name = model_name[1:model_name.index("]")]
+    return PROVIDERS_CONFIG.get(provider_name)
 
-DEFAULT_PROVIDER = "All"
+def get_api_models(provider):
+    """Generic function to fetch models from API endpoints"""
+    try:
+        import requests
+        response = requests.get(f"{provider.base_url}/models", timeout=1)
+        models_data = response.json()
+        return [f"[{provider.name}] {model['id']}" for model in models_data['data']]
+    except:
+        return []
 
 def filter_models_by_provider(provider):
     """Filter models list by provider"""
@@ -65,43 +71,18 @@ def filter_models_by_provider(provider):
         return AVAILABLE_MODELS
     return [m for m in AVAILABLE_MODELS if m.startswith(f"[{provider}]")]
 
-def get_api_models(base_url, prefix):
-    try:
-        import requests
-        response = requests.get(f"{base_url}/models", timeout=1)
-        models_data = response.json()
-        return [f"[{prefix}] {model['id']}" for model in models_data['data']]
-    except:
-        return []
-
-def get_lmstudio_models():
-    return get_api_models(LMSTUDIO_BASE_URL, "LMstudio")
-    
-def get_kobold_models():
-    return get_api_models(KOBOLD_BASE_URL, "Kobold")
-
-def get_ollama_models():
-    return get_api_models(OLLAMA_BASE_URL, "Ollama")
-
-# Function to refresh available models
 def refresh_available_models(include_local=False):
-    """
-    Refresh available models list
-    刷新可用模型列表
-    
-    Args:
-        include_local (bool): Whether to include local models / 是否包含本地模型
-    """
+    """Refresh available models list"""
     global AVAILABLE_MODELS
-    # Keep cloud models / 保留云端模型
     base_models = [m for m in AVAILABLE_MODELS if not m.startswith(("[LMstudio]", "[Kobold]", "[Ollama]"))]
     
     if include_local:
-        # Get local models / 获取本地模型
-        lmstudio_models = get_lmstudio_models()
-        kobold_models = get_kobold_models()
-        ollama_models = get_ollama_models()
-        AVAILABLE_MODELS = base_models + lmstudio_models + kobold_models + ollama_models
+        local_providers = ["LMstudio", "Kobold", "Ollama"]
+        local_models = []
+        for provider_name in local_providers:
+            provider = PROVIDERS_CONFIG[provider_name]
+            local_models.extend(get_api_models(provider))
+        AVAILABLE_MODELS = base_models + local_models
     else:
         AVAILABLE_MODELS = base_models
 
@@ -126,7 +107,8 @@ THEMES = {
         "button_text": "#FFFFFF",
         "title_button_hover": "#E81123",
         "sidebar_bg": "#EBEBEB",
-        "dialog_bg": "#F5F5F5"  # Added dialog background color
+        "dialog_bg": "#F5F5F5",
+        "dropdown_text": "#000000"
     },
     "dark": {
         "window_bg": "#2D2D2D",   
@@ -138,7 +120,8 @@ THEMES = {
         "button_text": "#FFFFFF",
         "title_button_hover": "#E81123",
         "sidebar_bg": "#252525",
-        "dialog_bg": "#2D2D2D"  # Added dialog background color
+        "dialog_bg": "#2D2D2D",
+        "dropdown_text": "#FFFFFF"
     }
 }
 

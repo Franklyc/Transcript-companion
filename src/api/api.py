@@ -1,62 +1,18 @@
 import openai
-import src.config.config
+from src.config.config import get_provider_info
 from PyQt6.QtWidgets import QApplication
-import tkinter as tk
 from src.gui.lang import STRINGS
 
 def _get_openai_client(model_name):
-    if model_name.startswith("[Cerebras]"):
-        return openai.OpenAI(
-            base_url="https://api.cerebras.ai/v1",
-            api_key=src.config.config.CEREBRAS_API_KEY
-        ), model_name.replace("[Cerebras] ", "")
-    elif model_name.startswith("[Groq]"):
-        return openai.OpenAI(
-            base_url="https://api.groq.com/openai/v1",
-            api_key=src.config.config.GROQ_API_KEY
-        ), model_name.replace("[Groq] ", "")
-    elif model_name.startswith("[Gemini]"):
-        return openai.OpenAI(
-            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-            api_key=src.config.config.GEMINI_API_KEY
-        ), model_name.replace("[Gemini] ", "")
-    elif model_name.startswith("[SambaNova]"):
-        return openai.OpenAI(
-            base_url="https://api.sambanova.ai/v1",
-            api_key=src.config.config.SAMBANOVA_API_KEY
-        ), model_name.replace("[SambaNova] ", "")
-    elif model_name.startswith("[Zhipu]"):
-        return openai.OpenAI(
-            base_url="https://open.bigmodel.cn/api/paas/v4/",
-            api_key=src.config.config.ZHIPUAI_API_KEY
-        ), model_name.replace("[Zhipu] ", "")
-    elif model_name.startswith("[LMstudio]"):
-        return openai.OpenAI(
-            base_url="http://localhost:1234/v1",
-            api_key=src.config.config.LMSTUDIO_API_KEY
-        ), model_name.replace("[LMstudio] ", "")
-    elif model_name.startswith("[Kobold]"):
-        return openai.OpenAI(
-            base_url="http://localhost:5001/v1",
-            api_key=src.config.config.KOBOLD_API_KEY
-        ), model_name.replace("[Kobold] ", "")
-    elif model_name.startswith("[Ollama]"):
-        return openai.OpenAI(
-            base_url="http://localhost:11434/v1",
-            api_key=src.config.config.OLLAMA_API_KEY
-        ), model_name.replace("[Ollama] ", "")
-    elif model_name.startswith("[GLHF]"):
-        return openai.OpenAI(
-            api_key=src.config.config.GLHF_API_KEY,
-            base_url="https://glhf.chat/api/openai/v1",
-        ), model_name.replace("[GLHF] ", "")
-    elif model_name.startswith("[SiliconFlow]"):
-        return openai.OpenAI(
-            base_url="https://api.siliconflow.cn/v1",
-            api_key=src.config.config.SILICONFLOW_API_KEY
-        ), model_name.replace("[SiliconFlow] ", "")
-    else:
-        return None, model_name
+    provider_info = get_provider_info(model_name)
+    if provider_info:
+        client = openai.OpenAI(
+            base_url=provider_info.base_url,
+            api_key=provider_info.api_key
+        )
+        clean_model_name = model_name[model_name.index("]") + 2:]
+        return client, clean_model_name
+    return openai.OpenAI(), model_name
 
 def fetch_model_response(prompt, output_textbox, model_name, temperature):
     try:
@@ -71,29 +27,21 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature):
         }
 
         client, model_name = _get_openai_client(model_name)
-        if client is None:
-            params["model"] = model_name
-            client = openai.OpenAI() # default client
-        else:
-            params["model"] = model_name
+        params["model"] = model_name
 
-        if model_name.startswith("gemini"):
-            response = client.chat.completions.create(**params)
-            output_textbox.clear()
-            for chunk in response:
-                delta = chunk.choices[0].delta.content or ""
-                output_textbox.insertPlainText(delta)
-                QApplication.processEvents()
-            return
-        
+        # Special handling for specific providers
         if model_name.startswith("cerebras"):
             params["max_completion_tokens"] = 8192
 
+        is_gemini = model_name.startswith("gemini")
         stream = client.chat.completions.create(**params)
 
         output_textbox.clear()
         for chunk in stream:
-            delta = chunk.choices[0].delta.content or ""
+            if is_gemini:
+                delta = chunk.choices[0].delta.content or ""
+            else:
+                delta = chunk.choices[0].delta.content or ""
             output_textbox.insertPlainText(delta)
             QApplication.processEvents()
 
