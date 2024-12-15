@@ -35,8 +35,8 @@ class MainWindow(QMainWindow):
         horizontal_layout.addWidget(self.sidebar)
 
         # Main content area
-        main_container = QWidget()
-        main_layout = QVBoxLayout(main_container)
+        self.main_container = QWidget()
+        main_layout = QVBoxLayout(self.main_container)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
         # Title bar
@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
         self.content_area = ContentArea(self)
         main_layout.addWidget(self.content_area)
 
-        horizontal_layout.addWidget(main_container)
+        horizontal_layout.addWidget(self.main_container)
 
         self.setStyleSheet("""
             QMainWindow {
@@ -74,7 +74,9 @@ class MainWindow(QMainWindow):
                 background-color: {theme['window_bg']};
                 border: 1px solid {theme['input_border']};
             }}
-            QWidget{{
+        """)
+        self.main_container.setStyleSheet(f"""
+            QWidget {{
                 background-color: {theme['window_bg']};
             }}
         """)
