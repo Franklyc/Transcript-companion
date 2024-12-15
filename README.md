@@ -32,6 +32,7 @@
 * **Clipboard Integration:** Easily copy the processed transcript content to the clipboard for use in other applications.
 * **Bilingual Support (Chinese/English):** The GUI now supports both Chinese and English. You can switch between languages within the application.
 * **Dark Mode:** Toggle between light and dark themes for comfortable viewing in different lighting conditions. Use the moon/sun icon in the sidebar to switch themes.
+* **Conversation Export:** Export conversations including prompts and responses to timestamped text files in the history folder for future reference.
 
 ## Requirements
 
@@ -88,6 +89,7 @@ pip install -r requirements.txt
 4. **Set Temperature:** Adjust the temperature value as needed.
 5. **Add Custom Text:** Enter any custom prefix or suffix text in the provided text boxes.
 6. **Process Transcript:** Click "Copy and Get Answer" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
+7. **Export Conversation:** Click the "Export Conversation" button to save both the prompt and response to a timestamped file in the history folder.
 
 ## Interface Preview
 
