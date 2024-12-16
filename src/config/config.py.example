@@ -25,6 +25,7 @@ DEFAULT_PROVIDER = "All"
 
 # Available models list / 可用模型列表
 AVAILABLE_MODELS = [
+    "[Cerebras] llama3.3-70b",
     "[Cerebras] llama3.1-70b",
     "[Cerebras] llama3.1-8b",
     "[Groq] mixtral-8x7b-32768",
