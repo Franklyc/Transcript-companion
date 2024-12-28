@@ -37,6 +37,12 @@ STRINGS = {
         'export_conversation': "导出对话",
         'export_success': "对话已成功导出到 history 文件夹！",
         'export_error': "导出对话失败: ",
+        'ocr_screenshot': "截图并OCR",
+        'ocr_text': "OCR文本 (可编辑):",
+        'ocr_instructions': "请按住鼠标右键拖动以选择截图区域。",
+        'ocr_success': "OCR 完成！",
+        'ocr_error': "OCR 失败",
+        'ocr_selection_canceled': "OCR 截图已取消。",
     },
     'en': {
         'window_title': "TMSpeech Companion",
@@ -76,5 +82,11 @@ Sidebar Features:
         'export_conversation': "Export Conversation",
         'export_success': "Conversation successfully exported to history folder!",
         'export_error': "Failed to export conversation: ",
+        'ocr_screenshot': "Screenshot and OCR",
+        'ocr_text': "OCR Text (Editable):",
+        'ocr_instructions': "Hold and drag the right mouse button to select a screenshot area.",
+        'ocr_success': "OCR Completed!",
+        'ocr_error': "OCR Failed",
+        'ocr_selection_canceled': "OCR screenshot canceled.",
     }
 }
