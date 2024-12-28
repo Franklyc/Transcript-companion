@@ -201,40 +201,32 @@ class ContentArea(QWidget):
 
     def enable_ocr(self):
         self.ocr_enabled = True
-        self.parent.setMouseTracking(True)
         QApplication.instance().setOverrideCursor(Qt.CursorShape.CrossCursor)
         self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_instructions'])
         self.status_label.setStyleSheet("color: blue")
 
     def mousePressEvent(self, event):
         if self.ocr_enabled and event.button() == Qt.MouseButton.RightButton:
-            self.start_point = event.pos()
+            self.start_point = event.globalPosition().toPoint()
             self.end_point = self.start_point
             self.update_selection_overlay()
 
     def mouseMoveEvent(self, event):
         if self.ocr_enabled and event.buttons() & Qt.MouseButton.RightButton:
-            self.end_point = event.pos()
+            self.end_point = event.globalPosition().toPoint()
             self.update_selection_overlay()
 
     def mouseReleaseEvent(self, event):
         if self.ocr_enabled and event.button() == Qt.MouseButton.RightButton:
             self.ocr_enabled = False
-            self.parent.setMouseTracking(False)
             QApplication.instance().restoreOverrideCursor()
             self.capture_and_ocr()
 
-    def leaveEvent(self, event):
-        # No need to handle mouse position here
-        pass
-
     def update_selection_overlay(self):
         if not self.selection_overlay:
-            self.selection_overlay = SelectionOverlay(self)
+            self.selection_overlay = SelectionOverlay()
         rect = QRect(self.start_point, self.end_point).normalized()
-        self.selection_overlay.setGeometry(self.mapToGlobal(rect.topLeft()).x(),
-                                            self.mapToGlobal(rect.topLeft()).y(),
-                                            rect.width(), rect.height())
+        self.selection_overlay.setGeometry(rect)
         self.selection_overlay.show()
         self.selection_overlay.raise_()
 
@@ -245,8 +237,8 @@ class ContentArea(QWidget):
             self.selection_overlay.destroy()
             self.selection_overlay = None
 
-            x, y, w, h = geometry.x(), geometry.y(), geometry.width(), geometry.height()
-            screenshot = QScreen.grabWindow(QGuiApplication.primaryScreen(), 0, x, y, w, h)
+            screen = QApplication.primaryScreen()
+            screenshot = screen.grabWindow(0, geometry.x(), geometry.y(), geometry.width(), geometry.height())
             image = screenshot.toImage()
             image_path = os.path.join(os.getcwd(), "temp_screenshot.png")
             image.save(image_path)
@@ -346,8 +338,8 @@ class ContentArea(QWidget):
 class SelectionOverlay(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground, True)
-        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def paintEvent(self, event):
         painter = QPainter(self)

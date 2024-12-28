@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                            QPushButton, QLabel, QComboBox, QLineEdit, QTextEdit, QFileDialog,
                            QRadioButton, QButtonGroup, QScrollBar, QMessageBox, QDialog, QCheckBox)
-from PyQt6.QtCore import Qt, QPoint
+from PyQt6.QtCore import Qt, QPoint, QEvent
 import src.config.config
 import src.gui.utils
 import src.api.api
@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
         self.current_lang = 'zh'
         self.current_theme = src.config.config.DEFAULT_THEME
         self.init_ui()
+        self.installEventFilter(self)  # 安装全局事件过滤器
 
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
@@ -65,6 +66,17 @@ class MainWindow(QMainWindow):
         """)
 
         self.apply_theme()
+
+    def eventFilter(self, obj, event):
+        """全局事件过滤器，用于捕获鼠标在屏幕范围内的操作"""
+        if self.content_area.ocr_enabled:
+            if event.type() == QEvent.Type.MouseButtonPress:
+                self.content_area.mousePressEvent(event)
+            elif event.type() == QEvent.Type.MouseMove:
+                self.content_area.mouseMoveEvent(event)
+            elif event.type() == QEvent.Type.MouseButtonRelease:
+                self.content_area.mouseReleaseEvent(event)
+        return super().eventFilter(obj, event)
 
     def apply_theme(self):
         theme = src.config.config.THEMES[self.current_theme]
@@ -123,7 +135,6 @@ class MainWindow(QMainWindow):
         self.title_bar.update_title()
         self.content_area.update_texts()
 
-    # Add new methods for the new buttons
     def show_help(self):
         help_text = STRINGS[self.current_lang]['help_text']
         msg_box = QMessageBox(self)
