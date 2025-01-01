@@ -43,6 +43,8 @@ AVAILABLE_MODELS = [
     "[SambaNova] Meta-Llama-3.1-405B-Instruct",
     "[SambaNova] Qwen2.5-72B-Instruct",
     "[SambaNova] Qwen2.5-Coder-32B-Instruct",
+    "[SambaNova] Meta-Llama-3.3-70B-Instruct",
+    "[SambaNova] QwQ-32B-Preview",
     "[Zhipu] glm-4-flash",
     "[GLHF] hf:meta-llama/Llama-3.3-70B-Instruct",
     "[GLHF] hf:Qwen/Qwen2.5-Coder-32B-Instruct",
