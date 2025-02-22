@@ -26,18 +26,18 @@ DEFAULT_PROVIDER = "All"
 # Available models list / 可用模型列表
 AVAILABLE_MODELS = [
     "[Cerebras] llama3.3-70b",
-    "[Cerebras] llama3.1-70b",
     "[Cerebras] llama3.1-8b",
-    "[Groq] mixtral-8x7b-32768",
+    "[Groq] qwen-2.5-32b",
+    "[Groq] deepseek-r1-distill-qwen-32b",
     "[Groq] llama-3.1-70b-versatile",
     "[Groq] llama-3.1-8b-instant",
     "[Groq] llama-3.2-90b-vision-preview",
     "[Groq] llama-3.3-70b-versatile",
     "[Groq] llama-3.3-70b-specdec",
-    "[Gemini] gemini-1.5-flash-002",
-    "[Gemini] gemini-1.5-flash-8b",
-    "[Gemini] gemini-exp-1206",
+    "[Gemini] gemini-2.0-flash-lite-preview-02-05",
     "[Gemini] gemini-2.0-flash-exp",
+    "[Gemini] gemini-2.0-pro-exp-02-05",
+    "[Gemini] gemini-2.0-flash-thinking-exp-01-21",
     "[SambaNova] Meta-Llama-3.1-8B-Instruct",
     "[SambaNova] Meta-Llama-3.1-70B-Instruct",
     "[SambaNova] Meta-Llama-3.1-405B-Instruct",
@@ -48,7 +48,11 @@ AVAILABLE_MODELS = [
     "[Zhipu] glm-4-flash",
     "[GLHF] hf:meta-llama/Llama-3.3-70B-Instruct",
     "[GLHF] hf:Qwen/Qwen2.5-Coder-32B-Instruct",
-    "[SiliconFlow] Qwen/Qwen2.5-7B-Instruct"
+    "[SiliconFlow] Qwen/Qwen2.5-7B-Instruct",
+    "[ModelScope] Qwen/Qwen2.5-72B-Instruct",
+    "[ModelScope] Qwen/Qwen2.5-Coder-32B-Instruct",
+    "[ModelScope] Qwen/Qwen2.5-VL-72B-Instruct",
+    "[ModelScope] deepseek-ai/DeepSeek-V3",
 ]
 
 def get_provider_info(model_name):
