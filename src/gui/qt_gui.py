@@ -23,7 +23,7 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
-        self.setFixedSize(650, 700)  # Increased width to accommodate sidebar
+        self.setFixedSize(650, 700)  # 恢复原始窗口尺寸
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)

@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                           QPushButton, QComboBox, QTextEdit, QFileDialog, QMessageBox)
+                           QPushButton, QComboBox, QTextEdit, QFileDialog, QMessageBox, QSplitter,
+                           QTabWidget, QScrollArea, QGridLayout)
 from PyQt6.QtGui import QScreen, QPixmap, QPainter, QColor, QGuiApplication
-from PyQt6.QtCore import Qt, QRect, QPoint
+from PyQt6.QtCore import Qt, QRect, QPoint, QSize
 import src.config.config
 from src.gui.lang import STRINGS
 import src.gui.utils
@@ -33,122 +34,178 @@ class ContentArea(QWidget):
         return layout, label
 
     def init_ui(self):
-        layout = QVBoxLayout(self)
-
-        # Folder selection
+        # 创建主垂直布局
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(10, 5, 10, 5)
+        
+        # 创建上下分割的布局
+        splitter = QSplitter(Qt.Orientation.Vertical)
+        
+        # ========== 创建上半部分区域 ==========
+        top_widget = QWidget()
+        top_layout = QVBoxLayout(top_widget)
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # 创建选项卡，将设置和输入内容分开
+        tab_widget = QTabWidget()
+        
+        # ===== 选项卡1: 基本设置 =====
+        settings_widget = QWidget()
+        settings_layout = QVBoxLayout(settings_widget)
+        
+        # 创建网格布局，更紧凑地显示基本设置
+        grid_layout = QGridLayout()
+        
+        # 文件夹选择
         self.folder_edit = QLineEdit(src.config.config.DEFAULT_FOLDER_PATH)
         self.folder_edit.setReadOnly(True)
         self.folder_button = QPushButton(STRINGS[self.parent.current_lang]['select_folder'])
-        folder_layout, self.folder_label = self.create_labeled_layout(
-            STRINGS[self.parent.current_lang]['current_folder'],
-            self.folder_edit
-        )
-        folder_layout.addWidget(self.folder_button)
-        layout.addLayout(folder_layout)
-
-        # Provider selection
+        self.folder_label = QLabel(STRINGS[self.parent.current_lang]['current_folder'])
+        grid_layout.addWidget(self.folder_label, 0, 0)
+        grid_layout.addWidget(self.folder_edit, 0, 1)
+        grid_layout.addWidget(self.folder_button, 0, 2)
+        
+        # 提供商选择
         self.provider_combo = QComboBox()
         self.provider_combo.addItems(src.config.config.PROVIDERS)
         self.provider_combo.setCurrentText(src.config.config.DEFAULT_PROVIDER)
-        provider_layout, self.provider_label = self.create_labeled_layout(
-            STRINGS[self.parent.current_lang].get('select_provider', 'Select Provider:'),
-            self.provider_combo
-        )
-        layout.addLayout(provider_layout)
-
-        # Connect provider change event
-        self.provider_combo.currentTextChanged.connect(self.on_provider_changed)
-
-        # Model selection
+        self.provider_label = QLabel(STRINGS[self.parent.current_lang].get('select_provider', 'Select Provider:'))
+        grid_layout.addWidget(self.provider_label, 1, 0)
+        grid_layout.addWidget(self.provider_combo, 1, 1, 1, 2)
+        
+        # 模型选择
         self.model_combo = QComboBox()
         self.update_model_list(include_local=False)
-        model_layout, self.model_label = self.create_labeled_layout(
-            STRINGS[self.parent.current_lang]['select_model'],
-            self.model_combo
-        )
-        layout.addLayout(model_layout)
-
-        # Temperature
+        self.model_label = QLabel(STRINGS[self.parent.current_lang]['select_model'])
+        grid_layout.addWidget(self.model_label, 2, 0)
+        grid_layout.addWidget(self.model_combo, 2, 1, 1, 2)
+        
+        # 温度设置
         self.temp_edit = QLineEdit(src.config.config.DEFAULT_TEMPERATURE)
-        temp_layout, self.temp_label = self.create_labeled_layout(
-            STRINGS[self.parent.current_lang]['set_temperature'],
-            self.temp_edit
-        )
-        layout.addLayout(temp_layout)
-
-        # Custom prefix/suffix
+        self.temp_label = QLabel(STRINGS[self.parent.current_lang]['set_temperature'])
+        grid_layout.addWidget(self.temp_label, 3, 0)
+        grid_layout.addWidget(self.temp_edit, 3, 1, 1, 2)
+        
+        settings_layout.addLayout(grid_layout)
+        tab_widget.addTab(settings_widget, "设置")
+        
+        # ===== 选项卡2: 输入内容 =====
+        input_widget = QWidget()
+        input_layout = QVBoxLayout(input_widget)
+        
+        # 自定义前缀/后缀
+        prefix_suffix_layout = QHBoxLayout()
+        
+        # 前缀
+        prefix_container = QWidget()
+        prefix_container_layout = QVBoxLayout(prefix_container)
         self.prefix_label = QLabel(STRINGS[self.parent.current_lang]['custom_prefix'])
         self.prefix_text = QTextEdit()
-        self.prefix_text.setMaximumHeight(30)
-        layout.addWidget(self.prefix_label)
-        layout.addWidget(self.prefix_text)
-
+        self.prefix_text.setMaximumHeight(60)
+        prefix_container_layout.addWidget(self.prefix_label)
+        prefix_container_layout.addWidget(self.prefix_text)
+        prefix_suffix_layout.addWidget(prefix_container)
+        
+        # 后缀
+        suffix_container = QWidget()
+        suffix_container_layout = QVBoxLayout(suffix_container)
         self.suffix_label = QLabel(STRINGS[self.parent.current_lang]['custom_suffix'])
         self.suffix_text = QTextEdit()
-        self.suffix_text.setMaximumHeight(30)
-        layout.addWidget(self.suffix_label)
-        layout.addWidget(self.suffix_text)
-
-        # Image handling layout (horizontal)
+        self.suffix_text.setMaximumHeight(60)
+        suffix_container_layout.addWidget(self.suffix_label)
+        suffix_container_layout.addWidget(self.suffix_text)
+        prefix_suffix_layout.addWidget(suffix_container)
+        
+        input_layout.addLayout(prefix_suffix_layout)
+        
+        # 图像功能区
+        image_section = QWidget()
+        image_section_layout = QVBoxLayout(image_section)
+        
+        # 图像按钮行
         image_buttons_layout = QHBoxLayout()
         
-        # OCR Functionality
+        # OCR功能
         self.ocr_button = QPushButton(STRINGS[self.parent.current_lang]['ocr_screenshot'])
         self.ocr_button.clicked.connect(self.enable_ocr)
         image_buttons_layout.addWidget(self.ocr_button)
         
-        # Image upload functionality
+        # 图像上传功能
         self.image_upload_button = QPushButton(STRINGS[self.parent.current_lang]['image_upload'])
         self.image_upload_button.clicked.connect(self.upload_image)
         image_buttons_layout.addWidget(self.image_upload_button)
         
-        # Screenshot functionality (without OCR)
+        # 截图功能
         self.screenshot_button = QPushButton(STRINGS[self.parent.current_lang]['screenshot_capture'])
         self.screenshot_button.clicked.connect(self.enable_screenshot)
         image_buttons_layout.addWidget(self.screenshot_button)
         
-        # Clear image button
+        # 清除图像按钮
         self.clear_image_button = QPushButton(STRINGS[self.parent.current_lang]['image_clear'])
         self.clear_image_button.clicked.connect(self.clear_image)
         image_buttons_layout.addWidget(self.clear_image_button)
         
-        layout.addLayout(image_buttons_layout)
-
-        # Image preview
+        image_section_layout.addLayout(image_buttons_layout)
+        
+        # 图像预览和OCR文本的水平布局
+        image_ocr_layout = QHBoxLayout()
+        
+        # 图像预览
+        image_preview_container = QWidget()
+        image_preview_layout = QVBoxLayout(image_preview_container)
         self.image_preview_label = QLabel(STRINGS[self.parent.current_lang]['image_preview'])
-        layout.addWidget(self.image_preview_label)
         self.image_display = QLabel()
-        self.image_display.setMinimumHeight(100)
-        self.image_display.setMaximumHeight(200)
+        self.image_display.setMinimumSize(QSize(150, 100))
+        self.image_display.setMaximumHeight(150)
         self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_display.setStyleSheet("border: 1px solid #CCCCCC;")
-        layout.addWidget(self.image_display)
+        image_preview_layout.addWidget(self.image_preview_label)
+        image_preview_layout.addWidget(self.image_display)
+        image_ocr_layout.addWidget(image_preview_container)
         
-        # OCR text
+        # OCR文本
+        ocr_container = QWidget()
+        ocr_layout = QVBoxLayout(ocr_container)
         self.ocr_text_label = QLabel(STRINGS[self.parent.current_lang]['ocr_text'])
-        layout.addWidget(self.ocr_text_label)
         self.ocr_text_edit = QTextEdit()
-        self.ocr_text_edit.setMaximumHeight(100)
-        layout.addWidget(self.ocr_text_edit)
-
-        # Status label
+        self.ocr_text_edit.setMaximumHeight(150)
+        ocr_layout.addWidget(self.ocr_text_label)
+        ocr_layout.addWidget(self.ocr_text_edit)
+        image_ocr_layout.addWidget(ocr_container)
+        
+        image_section_layout.addLayout(image_ocr_layout)
+        input_layout.addWidget(image_section)
+        
+        tab_widget.addTab(input_widget, "输入")
+        
+        top_layout.addWidget(tab_widget)
+        
+        # ========== 创建下半部分区域 ==========
+        bottom_widget = QWidget()
+        bottom_layout = QVBoxLayout(bottom_widget)
+        bottom_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # 状态标签
         self.status_label = QLabel()
-        layout.addWidget(self.status_label)
-
-        # Output text
+        bottom_layout.addWidget(self.status_label)
+        
+        # 输出文本区域
+        output_label = QLabel("输出结果:")
+        bottom_layout.addWidget(output_label)
         self.output_text = QTextEdit()
-        layout.addWidget(self.output_text)
-
-        # Buttons layout
+        self.output_text.setStyleSheet("font-size: 12pt;")  # 增大输出文本字体
+        bottom_layout.addWidget(self.output_text)
+        
+        # 底部按钮布局
         buttons_layout = QHBoxLayout()
-
-        # Copy button
+        
+        # 复制按钮
         self.copy_button = QPushButton(STRINGS[self.parent.current_lang]['copy_and_get_answer'])
         self.copy_button.setStyleSheet("""
             QPushButton {
                 background-color: #0078D7;
                 color: white;
-                padding: 8px;
+                padding: 10px;
                 border-radius: 4px;
                 font-size: 12pt;
             }
@@ -157,14 +214,14 @@ class ContentArea(QWidget):
             }
         """)
         buttons_layout.addWidget(self.copy_button)
-
-        # Export button
+        
+        # 导出按钮
         self.export_button = QPushButton(STRINGS[self.parent.current_lang]['export_conversation'])
         self.export_button.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
-                padding: 8px;
+                padding: 10px;
                 border-radius: 4px;
                 font-size: 12pt;
             }
@@ -173,12 +230,23 @@ class ContentArea(QWidget):
             }
         """)
         buttons_layout.addWidget(self.export_button)
-        layout.addLayout(buttons_layout)
-
-        # Connect signals
+        bottom_layout.addLayout(buttons_layout)
+        
+        # 将上下部件添加到分割器
+        splitter.addWidget(top_widget)
+        splitter.addWidget(bottom_widget)
+        
+        # 设置分割器的初始大小比例 (上部:下部 = 1:2)
+        splitter.setSizes([300, 500])
+        
+        # 将分割器添加到主布局
+        main_layout.addWidget(splitter)
+        
+        # 连接信号
         self.folder_button.clicked.connect(self.select_folder)
         self.copy_button.clicked.connect(self.copy_and_get_answer)
         self.export_button.clicked.connect(self.export_conversation)
+        self.provider_combo.currentTextChanged.connect(self.on_provider_changed)
 
     def update_model_list(self, include_local=False):
         current_model = self.model_combo.currentText()
@@ -192,7 +260,7 @@ class ContentArea(QWidget):
 
         # Try to restore previous selection
         index = self.model_combo.findText(current_model)
-        if index >= 0:
+        if (index >= 0):
             self.model_combo.setCurrentIndex(index)
         elif self.model_combo.count() > 0:
             self.model_combo.setCurrentIndex(0)
@@ -225,6 +293,24 @@ class ContentArea(QWidget):
             QPushButton:hover {{
                 background-color: {theme['button_hover']};
             }}
+            QTabWidget::pane {{
+                border: 1px solid {theme['input_border']};
+                background-color: {theme['input_bg']};
+            }}
+            QTabBar::tab {{
+                background-color: {theme['sidebar_bg']};
+                color: {theme['text']};
+                padding: 6px 12px;
+                margin-right: 2px;
+                border: 1px solid {theme['input_border']};
+                border-bottom: none;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+            }}
+            QTabBar::tab:selected {{
+                background-color: {theme['input_bg']};
+                border-bottom-color: {theme['input_bg']};
+            }}
         """)
 
     def select_folder(self):
@@ -238,6 +324,8 @@ class ContentArea(QWidget):
         QApplication.instance().setOverrideCursor(Qt.CursorShape.CrossCursor)
         self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_instructions'])
         self.status_label.setStyleSheet("color: blue")
+        # 设置窗口半透明
+        self.parent.setWindowOpacity(0.6)
 
     def enable_screenshot(self):
         self.screenshot_enabled = True
@@ -245,6 +333,8 @@ class ContentArea(QWidget):
         QApplication.instance().setOverrideCursor(Qt.CursorShape.CrossCursor)
         self.status_label.setText(STRINGS[self.parent.current_lang]['screenshot_instructions'])
         self.status_label.setStyleSheet("color: blue")
+        # 设置窗口半透明
+        self.parent.setWindowOpacity(0.6)
 
     def upload_image(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -298,6 +388,8 @@ class ContentArea(QWidget):
             self.ocr_enabled = False
             self.screenshot_enabled = False
             QApplication.instance().restoreOverrideCursor()
+            # 恢复窗口不透明度
+            self.parent.setWindowOpacity(1.0)
             self.capture_screenshot(mode)
 
     def update_selection_overlay(self):
@@ -394,7 +486,7 @@ class ContentArea(QWidget):
         transcript_content = ""
         directory = self.folder_edit.text()
         latest_file = src.gui.utils.get_latest_file(directory)
-        if latest_file and src.config.config.USE_TRANSCRIPT_TEXT:
+        if (latest_file and src.config.config.USE_TRANSCRIPT_TEXT):
             try:
                 with open(latest_file, 'r', encoding='utf-8') as file:
                     transcript_content = file.read()
@@ -420,6 +512,7 @@ class ContentArea(QWidget):
             self.status_label.setStyleSheet("color: red")
 
     def update_texts(self):
+        # 更新所有文本标签
         self.folder_label.setText(STRINGS[self.parent.current_lang]['current_folder'])
         self.folder_button.setText(STRINGS[self.parent.current_lang]['select_folder'])
         self.provider_label.setText(STRINGS[self.parent.current_lang]['select_provider'])
