@@ -36,6 +36,12 @@
     * **LOCAL** (LMstudio/Kobold/Ollama) :computer: **PRIVATE:** Best choice for data security
 * **Temperature Control:** Adjust the temperature parameter (0.0-1.5) to fine-tune the creativity and randomness of the LLM's responses. Lower values result in more focused and deterministic outputs, while higher values encourage more diverse and unexpected generation.
 * **Customizable Prefix/Suffix:** Add custom prefix and suffix text to your transcripts before sending them to the LLM. This allows you to provide additional context or instructions to the model, shaping its output to better suit your needs.
+* **Image Integration:** Enhance your prompts with visual content:
+    * **Screenshot with OCR:** Capture a region of your screen and automatically extract text from it
+    * **Image Upload:** Add images from your local files
+    * **Direct Screenshot:** Capture a region of your screen without OCR processing
+    * **Image Preview:** View the currently selected image within the application
+    * **Vision Models Support:** Use compatible models to analyze both text and images together
 * **Real-time Streaming:** View LLM responses in real-time as they are generated, providing immediate feedback and a dynamic interaction with the model.
 * **Clipboard Integration:** Easily copy the processed transcript content to the clipboard for use in other applications.
 * **Bilingual Support (Chinese/English):** The GUI now supports both Chinese and English. You can switch between languages within the application.
@@ -51,6 +57,8 @@
     * ``openai``
     * ``pyperclip``
     * ``requests``
+    * ``Pillow``
+    * ``textract``
 
 You can install these packages using pip:
 
@@ -96,8 +104,14 @@ pip install -r requirements.txt
 3. **Choose Model:** Select your desired LLM model from the dropdown menu.
 4. **Set Temperature:** Adjust the temperature value as needed.
 5. **Add Custom Text:** Enter any custom prefix or suffix text in the provided text boxes.
-6. **Process Transcript:** Click "Copy and Get Answer" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
-7. **Export Conversation:** Click the "Export Conversation" button to save both the prompt and response to a timestamped file in the history folder.
+6. **Add Images or Screenshots:**
+    * Click "Screenshot and OCR" to capture a screen region and extract text from it
+    * Click "Upload Image" to select an image from your computer
+    * Click "Capture Screenshot" to take a screenshot without OCR
+    * Use the image preview area to see your currently selected image
+    * Click "Clear Image" to remove the current image
+7. **Process Transcript:** Click "Copy and Get Answer" to send the latest transcript to the selected LLM. The response will be displayed in the output text box.
+8. **Export Conversation:** Click the "Export Conversation" button to save both the prompt and response to a timestamped file in the history folder.
 
 ## Interface Preview
 
