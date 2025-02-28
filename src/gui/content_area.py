@@ -137,6 +137,7 @@ class ContentArea(QWidget):
         top_widget = QWidget()
         top_layout = QVBoxLayout(top_widget)
         top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(3)  # 减少垂直间距
         
         # 创建选项卡，将设置和输入内容分开
         tab_widget = QTabWidget()
@@ -144,14 +145,18 @@ class ContentArea(QWidget):
         # ===== 选项卡1: 基本设置 =====
         settings_widget = QWidget()
         settings_layout = QVBoxLayout(settings_widget)
+        settings_layout.setContentsMargins(5, 5, 5, 5)  # 减少内边距
+        settings_layout.setSpacing(3)  # 减少垂直间距
         
         # 创建网格布局，更紧凑地显示基本设置
         grid_layout = QGridLayout()
+        grid_layout.setVerticalSpacing(3)  # 减少垂直间距
         
         # 文件夹选择
         self.folder_edit = QLineEdit(src.config.config.DEFAULT_FOLDER_PATH)
         self.folder_edit.setReadOnly(True)
         self.folder_button = QPushButton(STRINGS[self.parent.current_lang]['select_folder'])
+        self.folder_button.setFixedHeight(28)  # 减少按钮高度
         self.folder_label = QLabel(STRINGS[self.parent.current_lang]['current_folder'])
         grid_layout.addWidget(self.folder_label, 0, 0)
         grid_layout.addWidget(self.folder_edit, 0, 1)
@@ -161,12 +166,14 @@ class ContentArea(QWidget):
         self.provider_combo = QComboBox()
         self.provider_combo.addItems(src.config.config.PROVIDERS)
         self.provider_combo.setCurrentText(src.config.config.DEFAULT_PROVIDER)
+        self.provider_combo.setFixedHeight(28)  # 减少下拉框高度
         self.provider_label = QLabel(STRINGS[self.parent.current_lang].get('select_provider', 'Select Provider:'))
         grid_layout.addWidget(self.provider_label, 1, 0)
         grid_layout.addWidget(self.provider_combo, 1, 1, 1, 2)
         
         # 模型选择
         self.model_combo = QComboBox()
+        self.model_combo.setFixedHeight(28)  # 减少下拉框高度
         self.update_model_list(include_local=False)
         self.model_label = QLabel(STRINGS[self.parent.current_lang]['select_model'])
         grid_layout.addWidget(self.model_label, 2, 0)
@@ -174,6 +181,7 @@ class ContentArea(QWidget):
         
         # 温度设置
         self.temp_edit = QLineEdit(src.config.config.DEFAULT_TEMPERATURE)
+        self.temp_edit.setFixedHeight(28)  # 减少输入框高度
         self.temp_label = QLabel(STRINGS[self.parent.current_lang]['set_temperature'])
         grid_layout.addWidget(self.temp_label, 3, 0)
         grid_layout.addWidget(self.temp_edit, 3, 1, 1, 2)
@@ -184,16 +192,21 @@ class ContentArea(QWidget):
         # ===== 选项卡2: 输入内容 =====
         input_widget = QWidget()
         input_layout = QVBoxLayout(input_widget)
+        input_layout.setContentsMargins(5, 5, 5, 5)  # 减少内边距
+        input_layout.setSpacing(3)  # 减少垂直间距
         
         # 自定义前缀/后缀
         prefix_suffix_layout = QHBoxLayout()
+        prefix_suffix_layout.setSpacing(5)  # 减少水平间距
         
         # 前缀
         prefix_container = QWidget()
         prefix_container_layout = QVBoxLayout(prefix_container)
+        prefix_container_layout.setContentsMargins(0, 0, 0, 0)
+        prefix_container_layout.setSpacing(2)  # 减少垂直间距
         self.prefix_label = QLabel(STRINGS[self.parent.current_lang]['custom_prefix'])
         self.prefix_text = QTextEdit()
-        self.prefix_text.setMaximumHeight(60)
+        self.prefix_text.setMaximumHeight(50)  # 减小前缀文本框高度
         prefix_container_layout.addWidget(self.prefix_label)
         prefix_container_layout.addWidget(self.prefix_text)
         prefix_suffix_layout.addWidget(prefix_container)
@@ -201,9 +214,11 @@ class ContentArea(QWidget):
         # 后缀
         suffix_container = QWidget()
         suffix_container_layout = QVBoxLayout(suffix_container)
+        suffix_container_layout.setContentsMargins(0, 0, 0, 0)
+        suffix_container_layout.setSpacing(2)  # 减少垂直间距
         self.suffix_label = QLabel(STRINGS[self.parent.current_lang]['custom_suffix'])
         self.suffix_text = QTextEdit()
-        self.suffix_text.setMaximumHeight(60)
+        self.suffix_text.setMaximumHeight(50)  # 减小后缀文本框高度
         suffix_container_layout.addWidget(self.suffix_label)
         suffix_container_layout.addWidget(self.suffix_text)
         prefix_suffix_layout.addWidget(suffix_container)
@@ -213,27 +228,34 @@ class ContentArea(QWidget):
         # 图像功能区
         image_section = QWidget()
         image_section_layout = QVBoxLayout(image_section)
+        image_section_layout.setContentsMargins(0, 0, 0, 0)
+        image_section_layout.setSpacing(3)  # 减少垂直间距
         
         # 图像按钮行
         image_buttons_layout = QHBoxLayout()
+        image_buttons_layout.setSpacing(3)  # 减少水平间距
         
         # OCR功能
         self.ocr_button = QPushButton(STRINGS[self.parent.current_lang]['ocr_screenshot'])
+        self.ocr_button.setFixedHeight(28)  # 减少按钮高度
         self.ocr_button.clicked.connect(self.enable_ocr)
         image_buttons_layout.addWidget(self.ocr_button)
         
         # 图像上传功能
         self.image_upload_button = QPushButton(STRINGS[self.parent.current_lang]['image_upload'])
+        self.image_upload_button.setFixedHeight(28)  # 减少按钮高度
         self.image_upload_button.clicked.connect(self.upload_image)
         image_buttons_layout.addWidget(self.image_upload_button)
         
         # 截图功能
         self.screenshot_button = QPushButton(STRINGS[self.parent.current_lang]['screenshot_capture'])
+        self.screenshot_button.setFixedHeight(28)  # 减少按钮高度
         self.screenshot_button.clicked.connect(self.enable_screenshot)
         image_buttons_layout.addWidget(self.screenshot_button)
         
         # 清除图像按钮
         self.clear_image_button = QPushButton(STRINGS[self.parent.current_lang]['image_clear'])
+        self.clear_image_button.setFixedHeight(28)  # 减少按钮高度
         self.clear_image_button.clicked.connect(self.clear_image)
         image_buttons_layout.addWidget(self.clear_image_button)
         
@@ -241,14 +263,17 @@ class ContentArea(QWidget):
         
         # 图像预览和OCR文本的水平布局
         image_ocr_layout = QHBoxLayout()
+        image_ocr_layout.setSpacing(5)  # 减少水平间距
         
         # 图像预览
         image_preview_container = QWidget()
         image_preview_layout = QVBoxLayout(image_preview_container)
+        image_preview_layout.setContentsMargins(0, 0, 0, 0)
+        image_preview_layout.setSpacing(2)  # 减少垂直间距
         self.image_preview_label = QLabel(STRINGS[self.parent.current_lang]['image_preview'])
         self.image_display = QLabel()
-        self.image_display.setMinimumSize(QSize(150, 100))
-        self.image_display.setMaximumHeight(150)
+        self.image_display.setMinimumSize(QSize(150, 80))  # 减少最小高度
+        self.image_display.setMaximumHeight(100)  # 减少最大高度
         self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_display.setStyleSheet("border: 1px solid #CCCCCC;")
         image_preview_layout.addWidget(self.image_preview_label)
@@ -258,9 +283,11 @@ class ContentArea(QWidget):
         # OCR文本
         ocr_container = QWidget()
         ocr_layout = QVBoxLayout(ocr_container)
+        ocr_layout.setContentsMargins(0, 0, 0, 0)
+        ocr_layout.setSpacing(2)  # 减少垂直间距
         self.ocr_text_label = QLabel(STRINGS[self.parent.current_lang]['ocr_text'])
         self.ocr_text_edit = QTextEdit()
-        self.ocr_text_edit.setMaximumHeight(150)
+        self.ocr_text_edit.setMaximumHeight(100)  # 减少最大高度
         ocr_layout.addWidget(self.ocr_text_label)
         ocr_layout.addWidget(self.ocr_text_edit)
         image_ocr_layout.addWidget(ocr_container)
@@ -276,18 +303,20 @@ class ContentArea(QWidget):
         bottom_widget = QWidget()
         bottom_layout = QVBoxLayout(bottom_widget)
         bottom_layout.setContentsMargins(0, 0, 0, 0)
+        bottom_layout.setSpacing(3)  # 减少垂直间距
         
         # 状态标签
         self.status_label = QLabel()
-        self.status_label.setObjectName("status_label")  # 添加ID以便于样式设置
+        self.status_label.setObjectName("status_label")
+        self.status_label.setMaximumHeight(40)  # 限制状态标签高度
         bottom_layout.addWidget(self.status_label)
         
         # 输出文本区域 - 使用QTextBrowser以支持显示HTML/Markdown
         output_label = QLabel("输出结果:")
-        bottom_layout.addWidget(output_label)
         
         # 创建一个带有标签的水平布局
         output_header_layout = QHBoxLayout()
+        output_header_layout.setSpacing(5)  # 减少水平间距
         output_header_layout.addWidget(output_label)
         
         # 添加显示模式切换按钮
@@ -296,6 +325,7 @@ class ContentArea(QWidget):
         self.toggle_markdown_button.setChecked(True)  # 默认开启Markdown
         self.toggle_markdown_button.clicked.connect(self.toggle_markdown_display)
         self.toggle_markdown_button.setFixedWidth(120)
+        self.toggle_markdown_button.setFixedHeight(28)  # 减少按钮高度
         output_header_layout.addStretch()
         output_header_layout.addWidget(self.toggle_markdown_button)
         
@@ -312,6 +342,7 @@ class ContentArea(QWidget):
         
         # 底部按钮布局
         buttons_layout = QHBoxLayout()
+        buttons_layout.setSpacing(5)  # 减少水平间距
         
         # 复制按钮
         self.copy_button = QPushButton(STRINGS[self.parent.current_lang]['copy_and_get_answer'])
@@ -319,7 +350,7 @@ class ContentArea(QWidget):
             QPushButton {
                 background-color: #0078D7;
                 color: white;
-                padding: 10px;
+                padding: 8px;
                 border-radius: 4px;
                 font-size: 12pt;
             }
@@ -335,7 +366,7 @@ class ContentArea(QWidget):
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
-                padding: 10px;
+                padding: 8px;
                 border-radius: 4px;
                 font-size: 12pt;
             }
@@ -350,8 +381,8 @@ class ContentArea(QWidget):
         splitter.addWidget(top_widget)
         splitter.addWidget(bottom_widget)
         
-        # 设置分割器的初始大小比例 (上部:下部 = 1:2)
-        splitter.setSizes([300, 500])
+        # 设置分割器的初始大小比例，调整为更有利于输出显示的比例 (上部:下部 = 2:5)
+        splitter.setSizes([200, 500])
         
         # 将分割器添加到主布局
         main_layout.addWidget(splitter)
