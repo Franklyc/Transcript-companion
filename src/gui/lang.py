@@ -20,6 +20,7 @@ STRINGS = {
 3. 设置温度：调整AI回答的创造性（0.0-2.0）
 4. 自定义前缀/后缀：添加额外的提示内容
 5. 点击"复制并获取回答"开始处理
+6. 使用截图功能添加图片到提问
 
 侧边栏功能：
 🀄/🔤 - 切换中英文
@@ -43,6 +44,16 @@ STRINGS = {
         'ocr_success': "OCR 完成！",
         'ocr_error': "OCR 失败",
         'ocr_selection_canceled': "OCR 截图已取消。",
+        'image_upload': "上传图片",
+        'image_upload_success': "图片已成功上传！",
+        'image_upload_error': "上传图片失败: ",
+        'screenshot_capture': "截图",
+        'screenshot_instructions': "请按住鼠标右键拖动以选择截图区域。",
+        'screenshot_success': "截图已捕获！",
+        'screenshot_canceled': "截图已取消。",
+        'image_preview': "图片预览:",
+        'image_clear': "清除图片",
+        'use_image': "使用图片与模型交流",
     },
     'en': {
         'window_title': "TMSpeech Companion",
@@ -65,6 +76,7 @@ Instructions:
 3. Set Temperature: Adjust AI response creativity (0.0-2.0)
 4. Custom Prefix/Suffix: Add additional prompts
 5. Click "Copy and Get Answer" to start
+6. Use screenshot feature to include images in questions
 
 Sidebar Features:
 🀄/🔤 - Toggle Language
@@ -88,5 +100,15 @@ Sidebar Features:
         'ocr_success': "OCR Completed!",
         'ocr_error': "OCR Failed",
         'ocr_selection_canceled': "OCR screenshot canceled.",
+        'image_upload': "Upload Image",
+        'image_upload_success': "Image successfully uploaded!",
+        'image_upload_error': "Failed to upload image: ",
+        'screenshot_capture': "Capture Screenshot",
+        'screenshot_instructions': "Hold and drag the right mouse button to select a screenshot area.",
+        'screenshot_success': "Screenshot captured!",
+        'screenshot_canceled': "Screenshot canceled.",
+        'image_preview': "Image Preview:",
+        'image_clear': "Clear Image",
+        'use_image': "Use Image with Model",
     }
 }

@@ -17,9 +17,11 @@ class ContentArea(QWidget):
         super().__init__(parent)
         self.parent = parent
         self.ocr_enabled = False
+        self.screenshot_enabled = False
         self.start_point = QPoint()
         self.end_point = QPoint()
         self.selection_overlay = None
+        self.current_image_path = None
         self.init_ui()
 
     def create_labeled_layout(self, label_text, widget):
@@ -87,11 +89,42 @@ class ContentArea(QWidget):
         layout.addWidget(self.suffix_label)
         layout.addWidget(self.suffix_text)
 
+        # Image handling layout (horizontal)
+        image_buttons_layout = QHBoxLayout()
+        
         # OCR Functionality
         self.ocr_button = QPushButton(STRINGS[self.parent.current_lang]['ocr_screenshot'])
         self.ocr_button.clicked.connect(self.enable_ocr)
-        layout.addWidget(self.ocr_button)
+        image_buttons_layout.addWidget(self.ocr_button)
+        
+        # Image upload functionality
+        self.image_upload_button = QPushButton(STRINGS[self.parent.current_lang]['image_upload'])
+        self.image_upload_button.clicked.connect(self.upload_image)
+        image_buttons_layout.addWidget(self.image_upload_button)
+        
+        # Screenshot functionality (without OCR)
+        self.screenshot_button = QPushButton(STRINGS[self.parent.current_lang]['screenshot_capture'])
+        self.screenshot_button.clicked.connect(self.enable_screenshot)
+        image_buttons_layout.addWidget(self.screenshot_button)
+        
+        # Clear image button
+        self.clear_image_button = QPushButton(STRINGS[self.parent.current_lang]['image_clear'])
+        self.clear_image_button.clicked.connect(self.clear_image)
+        image_buttons_layout.addWidget(self.clear_image_button)
+        
+        layout.addLayout(image_buttons_layout)
 
+        # Image preview
+        self.image_preview_label = QLabel(STRINGS[self.parent.current_lang]['image_preview'])
+        layout.addWidget(self.image_preview_label)
+        self.image_display = QLabel()
+        self.image_display.setMinimumHeight(100)
+        self.image_display.setMaximumHeight(200)
+        self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_display.setStyleSheet("border: 1px solid #CCCCCC;")
+        layout.addWidget(self.image_display)
+        
+        # OCR text
         self.ocr_text_label = QLabel(STRINGS[self.parent.current_lang]['ocr_text'])
         layout.addWidget(self.ocr_text_label)
         self.ocr_text_edit = QTextEdit()
@@ -201,26 +234,71 @@ class ContentArea(QWidget):
 
     def enable_ocr(self):
         self.ocr_enabled = True
+        self.screenshot_enabled = False
         QApplication.instance().setOverrideCursor(Qt.CursorShape.CrossCursor)
         self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_instructions'])
         self.status_label.setStyleSheet("color: blue")
 
+    def enable_screenshot(self):
+        self.screenshot_enabled = True
+        self.ocr_enabled = False
+        QApplication.instance().setOverrideCursor(Qt.CursorShape.CrossCursor)
+        self.status_label.setText(STRINGS[self.parent.current_lang]['screenshot_instructions'])
+        self.status_label.setStyleSheet("color: blue")
+
+    def upload_image(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, 
+            "Select Image", 
+            "", 
+            "Image Files (*.png *.jpg *.jpeg *.bmp *.gif)"
+        )
+        
+        if file_path:
+            try:
+                self.current_image_path = file_path
+                self.display_image(file_path)
+                self.status_label.setText(STRINGS[self.parent.current_lang]['image_upload_success'])
+                self.status_label.setStyleSheet("color: green")
+            except Exception as e:
+                self.status_label.setText(f"{STRINGS[self.parent.current_lang]['image_upload_error']}{e}")
+                self.status_label.setStyleSheet("color: red")
+
+    def clear_image(self):
+        self.image_display.clear()
+        self.current_image_path = None
+        self.status_label.clear()
+
+    def display_image(self, image_path):
+        pixmap = QPixmap(image_path)
+        if not pixmap.isNull():
+            # Scale while maintaining aspect ratio
+            pixmap = pixmap.scaled(
+                self.image_display.width(), 
+                self.image_display.maximumHeight(),
+                Qt.AspectRatioMode.KeepAspectRatio, 
+                Qt.TransformationMode.SmoothTransformation
+            )
+            self.image_display.setPixmap(pixmap)
+
     def mousePressEvent(self, event):
-        if self.ocr_enabled and event.button() == Qt.MouseButton.RightButton:
+        if (self.ocr_enabled or self.screenshot_enabled) and event.button() == Qt.MouseButton.RightButton:
             self.start_point = event.globalPosition().toPoint()
             self.end_point = self.start_point
             self.update_selection_overlay()
 
     def mouseMoveEvent(self, event):
-        if self.ocr_enabled and event.buttons() & Qt.MouseButton.RightButton:
+        if (self.ocr_enabled or self.screenshot_enabled) and event.buttons() & Qt.MouseButton.RightButton:
             self.end_point = event.globalPosition().toPoint()
             self.update_selection_overlay()
 
     def mouseReleaseEvent(self, event):
-        if self.ocr_enabled and event.button() == Qt.MouseButton.RightButton:
+        if (self.ocr_enabled or self.screenshot_enabled) and event.button() == Qt.MouseButton.RightButton:
+            mode = "ocr" if self.ocr_enabled else "screenshot"
             self.ocr_enabled = False
+            self.screenshot_enabled = False
             QApplication.instance().restoreOverrideCursor()
-            self.capture_and_ocr()
+            self.capture_screenshot(mode)
 
     def update_selection_overlay(self):
         if not self.selection_overlay:
@@ -230,7 +308,7 @@ class ContentArea(QWidget):
         self.selection_overlay.show()
         self.selection_overlay.raise_()
 
-    def capture_and_ocr(self):
+    def capture_screenshot(self, mode):
         if self.selection_overlay:
             geometry = self.selection_overlay.geometry()
             self.selection_overlay.hide()
@@ -239,23 +317,32 @@ class ContentArea(QWidget):
 
             screen = QApplication.primaryScreen()
             screenshot = screen.grabWindow(0, geometry.x(), geometry.y(), geometry.width(), geometry.height())
-            image = screenshot.toImage()
-            image_path = os.path.join(os.getcwd(), "temp_screenshot.png")
-            image.save(image_path)
-
-            try:
-                text = textract.process(image_path).decode('utf-8')
-                self.ocr_text_edit.setText(text)
-                self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_success'])
+            
+            # Save to a temp file
+            temp_dir = os.path.join(os.getcwd(), "temp")
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir)
+                
+            image_path = os.path.join(temp_dir, f"screenshot_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
+            screenshot.save(image_path)
+            
+            if mode == "ocr":
+                try:
+                    text = textract.process(image_path).decode('utf-8')
+                    self.ocr_text_edit.setText(text)
+                    self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_success'])
+                    self.status_label.setStyleSheet("color: green")
+                except Exception as e:
+                    self.status_label.setText(f"{STRINGS[self.parent.current_lang]['ocr_error']}: {e}")
+                    self.status_label.setStyleSheet("color: red")
+            else:  # Screenshot mode
+                self.current_image_path = image_path
+                self.display_image(image_path)
+                self.status_label.setText(STRINGS[self.parent.current_lang]['screenshot_success'])
                 self.status_label.setStyleSheet("color: green")
-            except Exception as e:
-                self.status_label.setText(f"{STRINGS[self.parent.current_lang]['ocr_error']}: {e}")
-                self.status_label.setStyleSheet("color: red")
-            finally:
-                if os.path.exists(image_path):
-                    os.remove(image_path)
         else:
-            self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_selection_canceled'])
+            mode_text = 'ocr_selection_canceled' if mode == 'ocr' else 'screenshot_canceled'
+            self.status_label.setText(STRINGS[self.parent.current_lang][mode_text])
             self.status_label.setStyleSheet("color: orange")
 
     def copy_and_get_answer(self):
@@ -277,7 +364,13 @@ class ContentArea(QWidget):
                 self.status_label.setStyleSheet("color: green")
 
                 self.copy_button.setEnabled(False)
-                src.api.api.fetch_model_response(combined_content, self.output_text, self.model_combo.currentText(), self.temp_edit.text())
+                src.api.api.fetch_model_response(
+                    combined_content, 
+                    self.output_text, 
+                    self.model_combo.currentText(), 
+                    self.temp_edit.text(),
+                    self.current_image_path
+                )
                 self.copy_button.setEnabled(True)
 
             except Exception as e:
@@ -312,14 +405,18 @@ class ContentArea(QWidget):
 
         prompt = f"{original_prefix}\n{self.prefix_text.toPlainText()}\n{transcript_content}\n{self.suffix_text.toPlainText()}\n{self.ocr_text_edit.toPlainText()}"
         output = self.output_text.toPlainText()
+        
+        image_info = ""
+        if self.current_image_path:
+            image_info = f"\n\nImage was included: {self.current_image_path}"
 
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
-                f.write(f"Prompt:\n{prompt}\n\nOutput:\n{output}")
+                f.write(f"Prompt:\n{prompt}\n{image_info}\n\nOutput:\n{output}")
             self.status_label.setText(f"{STRINGS[self.parent.current_lang]['export_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{filepath}")
             self.status_label.setStyleSheet("color: green")
         except Exception as e:
-            self.status_label.setText(f"{STRINGS[self.parent.currentlang]['export_error']}{e}")
+            self.status_label.setText(f"{STRINGS[self.parent.current_lang]['export_error']}{e}")
             self.status_label.setStyleSheet("color: red")
 
     def update_texts(self):
@@ -334,6 +431,10 @@ class ContentArea(QWidget):
         self.export_button.setText(STRINGS[self.parent.current_lang]['export_conversation'])
         self.ocr_button.setText(STRINGS[self.parent.current_lang]['ocr_screenshot'])
         self.ocr_text_label.setText(STRINGS[self.parent.current_lang]['ocr_text'])
+        self.image_upload_button.setText(STRINGS[self.parent.current_lang]['image_upload'])
+        self.screenshot_button.setText(STRINGS[self.parent.current_lang]['screenshot_capture'])
+        self.clear_image_button.setText(STRINGS[self.parent.current_lang]['image_clear'])
+        self.image_preview_label.setText(STRINGS[self.parent.current_lang]['image_preview'])
 
 class SelectionOverlay(QWidget):
     def __init__(self, parent=None):

@@ -1,4 +1,5 @@
 import openai
+import base64
 from src.config.config import get_provider_info
 from PyQt6.QtWidgets import QApplication
 from src.gui.lang import STRINGS
@@ -14,12 +15,45 @@ def _get_openai_client(model_name):
         return client, clean_model_name
     return openai.OpenAI(), model_name
 
-def fetch_model_response(prompt, output_textbox, model_name, temperature):
+def encode_image_to_base64(image_path):
+    """Encode an image file to base64 string"""
+    if not image_path:
+        return None
+        
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+def fetch_model_response(prompt, output_textbox, model_name, temperature, image_path=None):
     try:
+        # Prepare base message content
+        user_message = {"role": "user", "content": []}
+        
+        # Add text content
+        if prompt:
+            user_message["content"].append({
+                "type": "text", 
+                "text": prompt
+            })
+        
+        # Add image content if provided and model supports vision
+        if image_path and any(vision_model in model_name for vision_model in ["vision", "VL", "gemini", "claude", "gpt-4"]):
+            base64_image = encode_image_to_base64(image_path)
+            if base64_image:
+                user_message["content"].append({
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image}"
+                    }
+                })
+        
+        # If no vision capabilities needed, revert to simpler format
+        if not image_path or len(user_message["content"]) == 1 and user_message["content"][0]["type"] == "text":
+            user_message = {"role": "user", "content": prompt}
+
         params = {
             "messages": [
                 {"role": "system", "content": ""},
-                {"role": "user", "content": prompt},
+                user_message
             ],
             "stream": True,
             "temperature": float(temperature),
