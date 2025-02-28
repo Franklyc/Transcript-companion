@@ -19,7 +19,8 @@ class MainWindow(QMainWindow):
         self.current_lang = 'zh'
         self.current_theme = src.config.config.DEFAULT_THEME
         self.init_ui()
-        self.installEventFilter(self)  # 安装全局事件过滤器
+        # We no longer need the event filter as our screenshot dialog handles events directly
+        # self.installEventFilter(self)
 
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
@@ -67,16 +68,17 @@ class MainWindow(QMainWindow):
 
         self.apply_theme()
 
-    def eventFilter(self, obj, event):
-        """全局事件过滤器，用于捕获鼠标在屏幕范围内的操作"""
-        if self.content_area.ocr_enabled:
-            if event.type() == QEvent.Type.MouseButtonPress:
-                self.content_area.mousePressEvent(event)
-            elif event.type() == QEvent.Type.MouseMove:
-                self.content_area.mouseMoveEvent(event)
-            elif event.type() == QEvent.Type.MouseButtonRelease:
-                self.content_area.mouseReleaseEvent(event)
-        return super().eventFilter(obj, event)
+    # The eventFilter is no longer needed as we're using a dedicated dialog for screenshots
+    # def eventFilter(self, obj, event):
+    #    """全局事件过滤器，用于捕获鼠标在屏幕范围内的操作"""
+    #    if self.content_area.ocr_enabled:
+    #        if event.type() == QEvent.Type.MouseButtonPress:
+    #            self.content_area.mousePressEvent(event)
+    #        elif event.type() == QEvent.Type.MouseMove:
+    #            self.content_area.mouseMoveEvent(event)
+    #        elif event.type() == QEvent.Type.MouseButtonRelease:
+    #            self.content_area.mouseReleaseEvent(event)
+    #    return super().eventFilter(obj, event)
 
     def apply_theme(self):
         theme = src.config.config.THEMES[self.current_theme]
@@ -176,6 +178,9 @@ class MainWindow(QMainWindow):
         self.content_area.prefix_text.clear()
         self.content_area.suffix_text.clear()
         self.content_area.status_label.clear()
+        self.content_area.ocr_text_edit.clear()
+        self.content_area.image_display.clear()
+        self.content_area.current_image_path = None
 
     def update_model_list(self, include_local=False):
         self.content_area.update_model_list(include_local)

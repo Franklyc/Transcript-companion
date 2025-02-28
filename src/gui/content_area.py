@@ -1,8 +1,8 @@
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                            QPushButton, QComboBox, QTextEdit, QFileDialog, QMessageBox, QSplitter,
-                           QTabWidget, QScrollArea, QGridLayout)
-from PyQt6.QtGui import QScreen, QPixmap, QPainter, QColor, QGuiApplication
-from PyQt6.QtCore import Qt, QRect, QPoint, QSize
+                           QTabWidget, QScrollArea, QGridLayout, QDialog)
+from PyQt6.QtGui import QScreen, QPixmap, QPainter, QColor, QGuiApplication, QCursor
+from PyQt6.QtCore import Qt, QRect, QPoint, QSize, QTimer
 import src.config.config
 from src.gui.lang import STRINGS
 import src.gui.utils
@@ -12,6 +12,97 @@ import os
 import datetime
 import textract
 from PIL import Image
+
+class ScreenshotDialog(QDialog):
+    def __init__(self, parent=None, mode="screenshot"):
+        super().__init__(parent, Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setWindowOpacity(0.3)
+        self.setGeometry(QGuiApplication.primaryScreen().geometry())
+        self.setCursor(Qt.CursorShape.CrossCursor)
+        
+        self.mode = mode
+        self.start_point = None
+        self.end_point = None
+        self.selection_rect = QRect()
+        self.is_selecting = False
+        
+        self.setMouseTracking(True)
+        
+        # Add an instruction label
+        self.instruction = QLabel(STRINGS[parent.parent.current_lang]['screenshot_instructions' if mode == 'screenshot' else 'ocr_instructions'])
+        self.instruction.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 150); padding: 10px; border-radius: 5px;")
+        self.instruction.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.instruction, 0, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
+        layout.addStretch()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        
+        # Draw semi-transparent overlay
+        painter.fillRect(self.rect(), QColor(0, 0, 0, 30))
+        
+        # Draw selection rectangle if we're selecting
+        if self.is_selecting and not self.selection_rect.isEmpty():
+            # Draw the selection rectangle with a border
+            painter.setPen(QColor(0, 162, 232, 255))  # Blue border
+            painter.setBrush(QColor(0, 162, 232, 30))  # Semi-transparent blue fill
+            painter.drawRect(self.selection_rect)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.start_point = event.position().toPoint()
+            self.is_selecting = True
+            self.selection_rect = QRect()
+            self.update()
+
+    def mouseMoveEvent(self, event):
+        if self.is_selecting and self.start_point:
+            self.end_point = event.position().toPoint()
+            self.selection_rect = QRect(self.start_point, self.end_point).normalized()
+            self.update()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton and self.is_selecting:
+            self.end_point = event.position().toPoint()
+            self.selection_rect = QRect(self.start_point, self.end_point).normalized()
+            self.is_selecting = False
+            
+            if self.selection_rect.width() > 10 and self.selection_rect.height() > 10:
+                # Take the screenshot with a small delay to allow dialog to hide
+                QTimer.singleShot(200, self.take_screenshot)
+            else:
+                self.reject()  # Cancel if the selection is too small
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.reject()
+        super().keyPressEvent(event)
+
+    def take_screenshot(self):
+        if not self.selection_rect.isValid() or self.selection_rect.isEmpty():
+            self.reject()
+            return
+            
+        screen = QGuiApplication.primaryScreen()
+        screenshot = screen.grabWindow(0, self.selection_rect.x(), self.selection_rect.y(), 
+                                      self.selection_rect.width(), self.selection_rect.height())
+        
+        # Create temp directory if needed
+        temp_dir = os.path.join(os.getcwd(), "temp")
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+            
+        # Save the screenshot
+        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        image_path = os.path.join(temp_dir, f"screenshot_{timestamp}.png")
+        screenshot.save(image_path)
+        
+        # Pass the image path back through accept()
+        self.image_path = image_path
+        self.accept()
 
 class ContentArea(QWidget):
     def __init__(self, parent):
@@ -319,22 +410,56 @@ class ContentArea(QWidget):
             self.folder_edit.setText(folder_path)
 
     def enable_ocr(self):
-        self.ocr_enabled = True
+        self.ocr_enabled = False  # We'll handle this differently now
         self.screenshot_enabled = False
-        QApplication.instance().setOverrideCursor(Qt.CursorShape.CrossCursor)
-        self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_instructions'])
-        self.status_label.setStyleSheet("color: blue")
-        # 设置窗口半透明
-        self.parent.setWindowOpacity(0.6)
+        self.parent.showMinimized()
+        
+        # Small delay to allow window to minimize
+        QTimer.singleShot(300, lambda: self.start_screenshot_dialog("ocr"))
 
     def enable_screenshot(self):
-        self.screenshot_enabled = True
+        self.screenshot_enabled = False  # We'll handle this differently now
         self.ocr_enabled = False
-        QApplication.instance().setOverrideCursor(Qt.CursorShape.CrossCursor)
-        self.status_label.setText(STRINGS[self.parent.current_lang]['screenshot_instructions'])
-        self.status_label.setStyleSheet("color: blue")
-        # 设置窗口半透明
-        self.parent.setWindowOpacity(0.6)
+        self.parent.showMinimized()
+        
+        # Small delay to allow window to minimize
+        QTimer.singleShot(300, lambda: self.start_screenshot_dialog("screenshot"))
+        
+    def start_screenshot_dialog(self, mode):
+        dialog = ScreenshotDialog(self, mode)
+        result = dialog.exec()
+        
+        self.parent.show()  # Restore the main window
+        self.parent.raise_()  # Bring it to the front
+        
+        if result == QDialog.DialogCode.Accepted:
+            image_path = dialog.image_path
+            if mode == "ocr":
+                self.process_ocr(image_path)
+            else:
+                self.process_screenshot(image_path)
+        else:
+            mode_text = 'ocr_selection_canceled' if mode == 'ocr' else 'screenshot_canceled'
+            self.status_label.setText(STRINGS[self.parent.current_lang][mode_text])
+            self.status_label.setStyleSheet("color: orange")
+            
+    def process_ocr(self, image_path):
+        try:
+            text = textract.process(image_path).decode('utf-8')
+            self.ocr_text_edit.setText(text)
+            self.current_image_path = image_path
+            self.display_image(image_path)
+            self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_success'])
+            self.status_label.setStyleSheet("color: green")
+        except Exception as e:
+            self.status_label.setText(f"{STRINGS[self.parent.current_lang]['ocr_error']}: {e}")
+            self.status_label.setStyleSheet("color: red")
+            
+    def process_screenshot(self, image_path):
+        self.current_image_path = image_path
+        self.display_image(image_path)
+        self.status_label.setText(STRINGS[self.parent.current_lang]['screenshot_success'])
+        self.status_label.setStyleSheet("color: green")
 
     def upload_image(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -371,71 +496,22 @@ class ContentArea(QWidget):
             )
             self.image_display.setPixmap(pixmap)
 
+    # The following methods are no longer needed with the new screenshot approach
+    # But we'll keep empty implementations for compatibility
     def mousePressEvent(self, event):
-        if (self.ocr_enabled or self.screenshot_enabled) and event.button() == Qt.MouseButton.RightButton:
-            self.start_point = event.globalPosition().toPoint()
-            self.end_point = self.start_point
-            self.update_selection_overlay()
+        pass
 
     def mouseMoveEvent(self, event):
-        if (self.ocr_enabled or self.screenshot_enabled) and event.buttons() & Qt.MouseButton.RightButton:
-            self.end_point = event.globalPosition().toPoint()
-            self.update_selection_overlay()
+        pass
 
     def mouseReleaseEvent(self, event):
-        if (self.ocr_enabled or self.screenshot_enabled) and event.button() == Qt.MouseButton.RightButton:
-            mode = "ocr" if self.ocr_enabled else "screenshot"
-            self.ocr_enabled = False
-            self.screenshot_enabled = False
-            QApplication.instance().restoreOverrideCursor()
-            # 恢复窗口不透明度
-            self.parent.setWindowOpacity(1.0)
-            self.capture_screenshot(mode)
+        pass
 
     def update_selection_overlay(self):
-        if not self.selection_overlay:
-            self.selection_overlay = SelectionOverlay()
-        rect = QRect(self.start_point, self.end_point).normalized()
-        self.selection_overlay.setGeometry(rect)
-        self.selection_overlay.show()
-        self.selection_overlay.raise_()
+        pass
 
     def capture_screenshot(self, mode):
-        if self.selection_overlay:
-            geometry = self.selection_overlay.geometry()
-            self.selection_overlay.hide()
-            self.selection_overlay.destroy()
-            self.selection_overlay = None
-
-            screen = QApplication.primaryScreen()
-            screenshot = screen.grabWindow(0, geometry.x(), geometry.y(), geometry.width(), geometry.height())
-            
-            # Save to a temp file
-            temp_dir = os.path.join(os.getcwd(), "temp")
-            if not os.path.exists(temp_dir):
-                os.makedirs(temp_dir)
-                
-            image_path = os.path.join(temp_dir, f"screenshot_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
-            screenshot.save(image_path)
-            
-            if mode == "ocr":
-                try:
-                    text = textract.process(image_path).decode('utf-8')
-                    self.ocr_text_edit.setText(text)
-                    self.status_label.setText(STRINGS[self.parent.current_lang]['ocr_success'])
-                    self.status_label.setStyleSheet("color: green")
-                except Exception as e:
-                    self.status_label.setText(f"{STRINGS[self.parent.current_lang]['ocr_error']}: {e}")
-                    self.status_label.setStyleSheet("color: red")
-            else:  # Screenshot mode
-                self.current_image_path = image_path
-                self.display_image(image_path)
-                self.status_label.setText(STRINGS[self.parent.current_lang]['screenshot_success'])
-                self.status_label.setStyleSheet("color: green")
-        else:
-            mode_text = 'ocr_selection_canceled' if mode == 'ocr' else 'screenshot_canceled'
-            self.status_label.setText(STRINGS[self.parent.current_lang][mode_text])
-            self.status_label.setStyleSheet("color: orange")
+        pass
 
     def copy_and_get_answer(self):
         directory = self.folder_edit.text()
