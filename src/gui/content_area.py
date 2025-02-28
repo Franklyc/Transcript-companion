@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                            QPushButton, QComboBox, QTextEdit, QFileDialog, QMessageBox, QSplitter,
-                           QTabWidget, QScrollArea, QGridLayout, QDialog)
+                           QTabWidget, QScrollArea, QGridLayout, QDialog, QTextBrowser)
 from PyQt6.QtGui import QScreen, QPixmap, QPainter, QColor, QGuiApplication, QCursor
 from PyQt6.QtCore import Qt, QRect, QPoint, QSize, QTimer
 import src.config.config
@@ -12,6 +12,7 @@ import os
 import datetime
 import textract
 from PIL import Image
+import markdown
 
 class ScreenshotDialog(QDialog):
     def __init__(self, parent=None, mode="screenshot"):
@@ -278,14 +279,36 @@ class ContentArea(QWidget):
         
         # 状态标签
         self.status_label = QLabel()
+        self.status_label.setObjectName("status_label")  # 添加ID以便于样式设置
         bottom_layout.addWidget(self.status_label)
         
-        # 输出文本区域
+        # 输出文本区域 - 使用QTextBrowser以支持显示HTML/Markdown
         output_label = QLabel("输出结果:")
         bottom_layout.addWidget(output_label)
-        self.output_text = QTextEdit()
-        self.output_text.setStyleSheet("font-size: 12pt;")  # 增大输出文本字体
+        
+        # 创建一个带有标签的水平布局
+        output_header_layout = QHBoxLayout()
+        output_header_layout.addWidget(output_label)
+        
+        # 添加显示模式切换按钮
+        self.toggle_markdown_button = QPushButton("显示Markdown")
+        self.toggle_markdown_button.setCheckable(True)
+        self.toggle_markdown_button.setChecked(True)  # 默认开启Markdown
+        self.toggle_markdown_button.clicked.connect(self.toggle_markdown_display)
+        self.toggle_markdown_button.setFixedWidth(120)
+        output_header_layout.addStretch()
+        output_header_layout.addWidget(self.toggle_markdown_button)
+        
+        bottom_layout.addLayout(output_header_layout)
+        
+        # 替换QTextEdit为QTextBrowser
+        self.output_text = QTextBrowser()
+        self.output_text.setOpenExternalLinks(True)  # 允许打开外部链接
+        self.output_text.setStyleSheet("font-size: 12pt;")
         bottom_layout.addWidget(self.output_text)
+        
+        # 存储原始文本内容
+        self.raw_output_text = ""
         
         # 底部按钮布局
         buttons_layout = QHBoxLayout()
@@ -532,9 +555,15 @@ class ContentArea(QWidget):
                 self.status_label.setStyleSheet("color: green")
 
                 self.copy_button.setEnabled(False)
+                
+                # 清空旧内容
+                self.output_text.clear()
+                self.raw_output_text = ""
+                
+                # 使用修改后的回调来支持动态更新Markdown
                 src.api.api.fetch_model_response(
                     combined_content, 
-                    self.output_text, 
+                    self,  # 传递self而不是output_text
                     self.model_combo.currentText(), 
                     self.temp_edit.text(),
                     self.current_image_path
@@ -548,6 +577,118 @@ class ContentArea(QWidget):
         else:
             self.status_label.setText(STRINGS[self.parent.current_lang]['no_files_available'])
             self.status_label.setStyleSheet("color: red")
+
+    # 自定义方法用于API回调
+    def append_text(self, text):
+        """API调用将使用此方法来添加文本"""
+        self.raw_output_text += text
+        if self.toggle_markdown_button.isChecked():
+            # 更新Markdown渲染
+            self.render_markdown(self.raw_output_text)
+        else:
+            # 直接显示文本
+            current_text = self.output_text.toPlainText()
+            self.output_text.setPlainText(current_text + text)
+        
+        # 滚动到底部
+        sb = self.output_text.verticalScrollBar()
+        sb.setValue(sb.maximum())
+        
+        # 处理Qt事件循环，确保UI及时更新
+        QApplication.processEvents()
+
+    def clear_output(self):
+        """清空输出区域"""
+        self.output_text.clear()
+        self.raw_output_text = ""
+
+    # 添加切换Markdown显示的方法
+    def toggle_markdown_display(self):
+        is_markdown = self.toggle_markdown_button.isChecked()
+        if is_markdown:
+            self.toggle_markdown_button.setText("显示Markdown")
+            # 将原始文本转换为HTML并显示
+            self.render_markdown(self.raw_output_text)
+        else:
+            self.toggle_markdown_button.setText("显示源文本")
+            # 显示原始文本
+            self.output_text.setPlainText(self.raw_output_text)
+
+    # 渲染Markdown的方法
+    def render_markdown(self, text):
+        if not text:
+            return
+            
+        try:
+            # 将Markdown转换为HTML
+            html = markdown.markdown(
+                text,
+                extensions=['tables', 'fenced_code', 'codehilite']
+            )
+            
+            # 添加基本CSS样式
+            styled_html = f"""
+            <html>
+            <head>
+            <style>
+                body {{ font-family: 'Segoe UI', Arial, sans-serif; }}
+                h1, h2, h3, h4, h5, h6 {{ color: #3B82F6; margin-top: 20px; margin-bottom: 10px; }}
+                h1 {{ font-size: 24px; }}
+                h2 {{ font-size: 20px; }}
+                h3 {{ font-size: 18px; }}
+                h4 {{ font-size: 16px; }}
+                p {{ margin-bottom: 12px; line-height: 1.6; }}
+                code {{ background-color: #F1F5F9; padding: 2px 4px; border-radius: 3px; font-family: Consolas, monospace; }}
+                pre {{ background-color: #F1F5F9; padding: 12px; border-radius: 5px; overflow-x: auto; }}
+                pre code {{ background-color: transparent; padding: 0; }}
+                blockquote {{ border-left: 4px solid #CBD5E1; padding-left: 12px; color: #64748B; margin: 12px 0; }}
+                a {{ color: #3B82F6; text-decoration: none; }}
+                a:hover {{ text-decoration: underline; }}
+                ul, ol {{ padding-left: 20px; margin-bottom: 12px; }}
+                li {{ margin-bottom: 4px; }}
+                table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; }}
+                th, td {{ border: 1px solid #E2E8F0; padding: 8px; text-align: left; }}
+                th {{ background-color: #F1F5F9; }}
+            </style>
+            </head>
+            <body>{html}</body>
+            </html>
+            """
+            
+            # 检查当前主题并应用相应的深色模式样式
+            if self.parent.current_theme == "dark":
+                styled_html = f"""
+                <html>
+                <head>
+                <style>
+                    body {{ font-family: 'Segoe UI', Arial, sans-serif; color: #E2E8F0; }}
+                    h1, h2, h3, h4, h5, h6 {{ color: #3B82F6; margin-top: 20px; margin-bottom: 10px; }}
+                    h1 {{ font-size: 24px; }}
+                    h2 {{ font-size: 20px; }}
+                    h3 {{ font-size: 18px; }}
+                    h4 {{ font-size: 16px; }}
+                    p {{ margin-bottom: 12px; line-height: 1.6; }}
+                    code {{ background-color: #1E293B; color: #E2E8F0; padding: 2px 4px; border-radius: 3px; font-family: Consolas, monospace; }}
+                    pre {{ background-color: #1E293B; padding: 12px; border-radius: 5px; overflow-x: auto; }}
+                    pre code {{ background-color: transparent; padding: 0; }}
+                    blockquote {{ border-left: 4px solid #4B5563; padding-left: 12px; color: #94A3B8; margin: 12px 0; }}
+                    a {{ color: #60A5FA; text-decoration: none; }}
+                    a:hover {{ text-decoration: underline; }}
+                    ul, ol {{ padding-left: 20px; margin-bottom: 12px; }}
+                    li {{ margin-bottom: 4px; }}
+                    table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; }}
+                    th, td {{ border: 1px solid #4B5563; padding: 8px; text-align: left; }}
+                    th {{ background-color: #1E293B; }}
+                </style>
+                </head>
+                <body>{html}</body>
+                </html>
+                """
+            
+            # 设置HTML内容
+            self.output_text.setHtml(styled_html)
+        except Exception as e:
+            self.output_text.setPlainText(f"Markdown渲染错误: {str(e)}\n\n{text}")
 
     def export_conversation(self):
         history_dir = os.path.join(os.getcwd(), "history")
@@ -604,6 +745,9 @@ class ContentArea(QWidget):
         self.screenshot_button.setText(STRINGS[self.parent.current_lang]['screenshot_capture'])
         self.clear_image_button.setText(STRINGS[self.parent.current_lang]['image_clear'])
         self.image_preview_label.setText(STRINGS[self.parent.current_lang]['image_preview'])
+        
+        # 更新Markdown切换按钮文本
+        self.toggle_markdown_button.setText("显示Markdown" if self.toggle_markdown_button.isChecked() else "显示源文本")
 
 class SelectionOverlay(QWidget):
     def __init__(self, parent=None):

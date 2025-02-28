@@ -6,7 +6,7 @@ from src.gui.lang import STRINGS
 
 def _get_openai_client(model_name):
     provider_info = get_provider_info(model_name)
-    if provider_info:
+    if (provider_info):
         client = openai.OpenAI(
             base_url=provider_info.base_url,
             api_key=provider_info.api_key
@@ -23,8 +23,21 @@ def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
-def fetch_model_response(prompt, output_textbox, model_name, temperature, image_path=None):
+def fetch_model_response(prompt, content_area, model_name, temperature, image_path=None):
+    """
+    从API获取模型的回复
+    
+    参数:
+    - prompt: 提示文本
+    - content_area: ContentArea实例，用于显示回复文本
+    - model_name: 使用的模型名称
+    - temperature: 温度参数
+    - image_path: 可选的图片路径
+    """
     try:
+        # 首先清空输出
+        content_area.clear_output()
+        
         # Prepare base message content
         user_message = {"role": "user", "content": []}
         
@@ -68,15 +81,15 @@ def fetch_model_response(prompt, output_textbox, model_name, temperature, image_
             params["max_completion_tokens"] = 8192
 
         stream = client.chat.completions.create(**params)
-        output_textbox.clear()
+        
         for chunk in stream:
             delta = chunk.choices[0].delta.content or ""
-            output_textbox.insertPlainText(delta)
-            QApplication.processEvents()
+            # 使用content_area的append_text方法添加文本，支持Markdown渲染
+            content_area.append_text(delta)
 
     except Exception as e:
-        output_textbox.clear()
         main_window = QApplication.instance().activeWindow()
         lang = main_window.current_lang if main_window else 'zh'
-        output_textbox.insertPlainText(f"{STRINGS[lang]['model_call_error']}{e}")
-        QApplication.processEvents()
+        error_message = f"{STRINGS[lang]['model_call_error']}{str(e)}"
+        content_area.clear_output()
+        content_area.append_text(error_message)
