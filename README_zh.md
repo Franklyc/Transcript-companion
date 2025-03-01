@@ -111,7 +111,9 @@ pip install -r requirements.txt
 ## 界面预览
 
 ### 浅色主题
-<img src="assets/qt_gui_zh_light.png" width="400">
+<img src="assets\UI_light_1.png" width="400">
+<img src="assets\UI_light_2.png" width="400">
 
 ### 深色主题
-<img src="assets/qt_gui_zh_dark.png" width="400">
+<img src="assets\UI_dark_1.png" width="400">
+<img src="assets\UI_dark_2.png" width="400">

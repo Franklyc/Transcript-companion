@@ -320,7 +320,7 @@ class ContentArea(QWidget):
         output_header_layout.addWidget(output_label)
         
         # 添加显示模式切换按钮
-        self.toggle_markdown_button = QPushButton("显示Markdown")
+        self.toggle_markdown_button = QPushButton("Markdown")
         self.toggle_markdown_button.setCheckable(True)
         self.toggle_markdown_button.setChecked(True)  # 默认开启Markdown
         self.toggle_markdown_button.clicked.connect(self.toggle_markdown_display)
@@ -640,7 +640,7 @@ class ContentArea(QWidget):
     def toggle_markdown_display(self):
         is_markdown = self.toggle_markdown_button.isChecked()
         if is_markdown:
-            self.toggle_markdown_button.setText("显示Markdown")
+            self.toggle_markdown_button.setText("Markdown")
             # 将原始文本转换为HTML并显示
             self.render_markdown(self.raw_output_text)
         else:
@@ -781,7 +781,7 @@ class ContentArea(QWidget):
         self.image_preview_label.setText(STRINGS[self.parent.current_lang]['image_preview'])
         
         # 更新Markdown切换按钮文本
-        self.toggle_markdown_button.setText("显示Markdown" if self.toggle_markdown_button.isChecked() else "显示源文本")
+        self.toggle_markdown_button.setText("Markdown" if self.toggle_markdown_button.isChecked() else "显示源文本")
 
 class SelectionOverlay(QWidget):
     def __init__(self, parent=None):
