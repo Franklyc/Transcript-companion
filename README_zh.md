@@ -3,6 +3,7 @@
 
 - [功能](#功能)
 - [要求](#要求)
+- [核心工作流程](#核心工作流程)
 - [设置](#设置)
 - [使用方法](#使用方法)
 - [界面预览](#界面预览)
@@ -43,6 +44,58 @@
 * **双语支持（中文/英文）：** GUI 现在支持中文和英文。您可以在应用程序内切换语言。
 * **深色模式：** 在浅色和深色主题之间切换，以适应不同的照明条件。使用侧边栏内的月亮/太阳图标切换主题。
 * **对话导出：** 将包含提示和回答的对话内容导出为带时间戳的文本文件，保存在 history 文件夹中以供未来回顾。
+
+## 核心工作流程
+```mermaid
+flowchart TD
+    Start([启动应用程序]) --> MainWindow[初始化主窗口]
+    MainWindow --> UI[设置UI组件]
+    
+    subgraph "输入处理"
+        UI --> SelectFolder[选择转录文件夹]
+        UI --> ConfigLLM[配置LLM设置]
+        ConfigLLM --> SelectProvider[选择提供商]
+        ConfigLLM --> SelectModel[选择模型]
+        ConfigLLM --> SetTemperature[设置温度]
+        
+        UI --> InputMethods{输入方式}
+        InputMethods -->|文本| CustomText[添加前缀/后缀]
+        InputMethods -->|图像| ImageInput[图像输入]
+        
+        ImageInput --> CaptureOptions{捕获选项}
+        CaptureOptions -->|截图 + OCR| OCRProcess[提取文本]
+        CaptureOptions -->|上传图像| UploadProcess[处理图像]
+        CaptureOptions -->|仅截图| ScreenshotProcess[捕获图像]
+        
+        SelectFolder --> GetTranscript[获取最新转录]
+        CustomText --> CombineInput[合并所有输入]
+        OCRProcess --> CombineInput
+        UploadProcess --> CombineInput
+        ScreenshotProcess --> CombineInput
+        GetTranscript --> CombineInput
+    end
+    
+    subgraph "API处理"
+        CombineInput --> APIRequest[发送到LLM API]
+        SelectProvider --> APIRequest
+        SelectModel --> APIRequest
+        SetTemperature --> APIRequest
+        APIRequest --> StreamResponse[流式响应]
+    end
+    
+    subgraph "输出处理"
+        StreamResponse --> FormatOutput{格式化输出}
+        FormatOutput -->|Markdown| RenderMarkdown[渲染Markdown]
+        FormatOutput -->|纯文本| DisplayText[显示文本]
+        
+        RenderMarkdown --> ExportOption[导出选项]
+        DisplayText --> ExportOption
+        ExportOption --> SaveConversation[保存到历史记录]
+    end
+    
+    SaveConversation --> NewQuery[新查询]
+    NewQuery --> InputMethods
+```
 
 ## 要求
 
