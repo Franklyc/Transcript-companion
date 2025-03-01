@@ -11,10 +11,6 @@
 
 **A GUI application built with Python/PyQt6 that processes speech transcripts using LLM APIs. This tool simplifies the workflow of analyzing and summarizing meeting recordings by leveraging the power of large language models.**
 
-> ~~**Important Note:** This companion tool was specifically created to work with [TMSpeech](https://github.com/jxlpzqc/TMSpeech) v0.0.1-rc3. Due to changes in how transcript history is stored in TMSpeech v0.4.0 and above, this tool is currently not compatible with newer versions.~~
-
-> **Update:** With the release of TMSpeech v0.4.2, transcript history functionality has been restored. This tool is now fully compatible with the latest version of TMSpeech.
-
 ## Features
 
 * **Modern UI with Sidebar:** A clean, modern interface with a convenient sidebar for quick access to common functions:
@@ -71,7 +67,7 @@ pip install -r requirements.txt
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/Franklyc/TMSpeech-companion.git
+   git clone https://github.com/Franklyc/Transcript-companion.git
    ```
 
 2. **Configuration:**

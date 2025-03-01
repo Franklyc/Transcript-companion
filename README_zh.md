@@ -11,10 +11,6 @@
 
 **一款使用 Python/PyQt6 构建的 GUI 应用程序，它使用 LLM API 处理语音转录本。此工具利用大型语言模型的强大功能，简化了分析和总结会议记录的工作流程。**
 
-> ~~**重要提示：** 此配套工具专为与 [TMSpeech](https://github.com/jxlpzqc/TMSpeech) v0.0.1-rc3 配合使用而创建。由于 TMSpeech v0.4.0 及更高版本中转录历史记录存储方式的更改，此工具目前与较新版本不兼容。~~
-
-> **更新：** 随着 TMSpeech v0.4.2 的发布，转录历史功能已恢复。此工具现在可以与最新版本的 TMSpeech 完全兼容。
-
 ## 功能
 
 * **现代化侧边栏界面：** 清新现代的界面设计，配备便捷的侧边栏快速访问常用功能：
@@ -71,7 +67,7 @@ pip install -r requirements.txt
 1. **克隆存储库：**
 
    ```bash
-   git clone https://github.com/Franklyc/TMSpeech-companion.git
+   git clone https://github.com/Franklyc/Transcript-companion.git
    ```
 
 2. **配置：**
