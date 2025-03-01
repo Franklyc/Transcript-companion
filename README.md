@@ -44,6 +44,58 @@
 * **Dark Mode:** Toggle between light and dark themes for comfortable viewing in different lighting conditions. Use the moon/sun icon in the sidebar to switch themes.
 * **Conversation Export:** Export conversations including prompts and responses to timestamped text files in the history folder for future reference.
 
+## Core workflow
+```mermaid
+flowchart TD
+    Start([Launch Application]) --> MainWindow[Initialize Main Window]
+    MainWindow --> UI[Setup UI Components]
+    
+    subgraph "Input Processing"
+        UI --> SelectFolder[Select Transcript Folder]
+        UI --> ConfigLLM[Configure LLM Settings]
+        ConfigLLM --> SelectProvider[Choose Provider]
+        ConfigLLM --> SelectModel[Select Model]
+        ConfigLLM --> SetTemperature[Set Temperature]
+        
+        UI --> InputMethods{Input Method}
+        InputMethods -->|Text| CustomText[Add Prefix/Suffix]
+        InputMethods -->|Image| ImageInput[Image Input]
+        
+        ImageInput --> CaptureOptions{Capture Options}
+        CaptureOptions -->|Screenshot + OCR| OCRProcess[Extract Text]
+        CaptureOptions -->|Upload Image| UploadProcess[Process Image]
+        CaptureOptions -->|Screenshot Only| ScreenshotProcess[Capture Image]
+        
+        SelectFolder --> GetTranscript[Get Latest Transcript]
+        CustomText --> CombineInput[Combine All Inputs]
+        OCRProcess --> CombineInput
+        UploadProcess --> CombineInput
+        ScreenshotProcess --> CombineInput
+        GetTranscript --> CombineInput
+    end
+    
+    subgraph "API Processing"
+        CombineInput --> APIRequest[Send to LLM API]
+        SelectProvider --> APIRequest
+        SelectModel --> APIRequest
+        SetTemperature --> APIRequest
+        APIRequest --> StreamResponse[Stream Response]
+    end
+    
+    subgraph "Output Handling"
+        StreamResponse --> FormatOutput{Format Output}
+        FormatOutput -->|Markdown| RenderMarkdown[Render Markdown]
+        FormatOutput -->|Plain Text| DisplayText[Display Text]
+        
+        RenderMarkdown --> ExportOption[Export Option]
+        DisplayText --> ExportOption
+        ExportOption --> SaveConversation[Save to History]
+    end
+    
+    SaveConversation --> NewQuery[New Query]
+    NewQuery --> InputMethods
+```
+
 ## Requirements
 
 * **Python 3.x**
