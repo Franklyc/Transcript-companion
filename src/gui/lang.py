@@ -1,6 +1,6 @@
 STRINGS = {
     'zh': {
-        'window_title': "TMSpeech Companion",
+        'window_title': "Transcript companion",
         'current_folder': "当前文件夹:",
         'select_folder': "选择文件夹",
         'select_model': "选择模型:",
@@ -56,7 +56,7 @@ STRINGS = {
         'use_image': "使用图片与模型交流",
     },
     'en': {
-        'window_title': "TMSpeech Companion",
+        'window_title': "Transcript companion",
         'current_folder': "Current Folder:",
         'select_folder': "Select Folder",
         'select_model': "Select Model:",

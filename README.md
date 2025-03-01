@@ -1,4 +1,4 @@
-# TMSpeech-companion
+# Transcript-companion
 [中文版README](README_zh.md)
 
 - [Features](#features)
