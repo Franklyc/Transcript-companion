@@ -483,8 +483,11 @@ class ContentArea(QWidget):
         dialog = ScreenshotDialog(self, mode)
         result = dialog.exec()
         
-        self.parent.show()  # Restore the main window
-        self.parent.raise_()  # Bring it to the front
+        # Get the main window using the correct reference chain
+        main_window = self.parent  # MainWindow instance
+        main_window.showNormal()  # Properly restore from minimized state
+        main_window.activateWindow()  # Ensure window gets focus
+        main_window.raise_()  # Bring it to the front
         
         if result == QDialog.DialogCode.Accepted:
             image_path = dialog.image_path
