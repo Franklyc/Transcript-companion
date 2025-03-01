@@ -23,8 +23,9 @@ class OutputArea(QWidget):
     def init_ui(self):
         """初始化输出区域UI"""
         bottom_layout = QVBoxLayout(self)
+        spacing = int(src.config.config.UI_SPACING.replace("px", ""))
         bottom_layout.setContentsMargins(0, 0, 0, 0)
-        bottom_layout.setSpacing(3)
+        bottom_layout.setSpacing(spacing)
         
         # 状态标签
         self.status_label = QLabel()
@@ -34,14 +35,16 @@ class OutputArea(QWidget):
         
         # 输出文本区域 - 使用QTextBrowser以支持显示HTML/Markdown
         self.output_label = QLabel(STRINGS[self.parent.current_lang]['output_result'])
+        self.output_label.setObjectName("outputLabel")
         
         # 创建一个带有标签的水平布局
         output_header_layout = QHBoxLayout()
-        output_header_layout.setSpacing(5)
+        output_header_layout.setSpacing(spacing)
         output_header_layout.addWidget(self.output_label)
         
         # 添加显示模式切换按钮
         self.toggle_markdown_button = QPushButton("Markdown")
+        self.toggle_markdown_button.setObjectName("markdownToggleButton")
         self.toggle_markdown_button.setCheckable(True)
         self.toggle_markdown_button.setChecked(True)
         self.toggle_markdown_button.clicked.connect(self.toggle_markdown_display)
@@ -54,8 +57,8 @@ class OutputArea(QWidget):
         
         # 使用QTextBrowser显示输出内容
         self.output_text = QTextBrowser()
+        self.output_text.setObjectName("outputBrowser")
         self.output_text.setOpenExternalLinks(True)
-        self.output_text.setStyleSheet("font-size: 12pt;")
         bottom_layout.addWidget(self.output_text)
         
         # 底部按钮布局
@@ -65,38 +68,17 @@ class OutputArea(QWidget):
     def _create_bottom_buttons(self):
         """创建底部按钮区域"""
         buttons_layout = QHBoxLayout()
-        buttons_layout.setSpacing(5)
+        spacing = int(src.config.config.UI_SPACING.replace("px", ""))
+        buttons_layout.setSpacing(spacing)
         
         # 复制按钮
         self.copy_button = QPushButton(STRINGS[self.parent.current_lang]['copy_and_get_answer'])
-        self.copy_button.setStyleSheet("""
-            QPushButton {
-                background-color: #0078D7;
-                color: white;
-                padding: 8px;
-                border-radius: 4px;
-                font-size: 12pt;
-            }
-            QPushButton:hover {
-                background-color: #005A9E;
-            }
-        """)
+        self.copy_button.setObjectName("copyButton")
         buttons_layout.addWidget(self.copy_button)
         
         # 导出按钮
         self.export_button = QPushButton(STRINGS[self.parent.current_lang]['export_conversation'])
-        self.export_button.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50;
-                color: white;
-                padding: 8px;
-                border-radius: 4px;
-                font-size: 12pt;
-            }
-            QPushButton:hover {
-                background-color: #367C39;
-            }
-        """)
+        self.export_button.setObjectName("exportButton")
         self.export_button.clicked.connect(self.export_conversation)
         buttons_layout.addWidget(self.export_button)
         
@@ -136,7 +118,9 @@ class OutputArea(QWidget):
     def set_status(self, message, is_error=False):
         """设置状态消息"""
         self.status_label.setText(message)
-        self.status_label.setStyleSheet(f"color: {'red' if is_error else 'green'}")
+        status_color = "status_error" if is_error else "status_success"
+        theme = src.config.config.THEMES[self.parent.current_theme]
+        self.status_label.setStyleSheet(f"color: {theme[status_color]};")
     
     def update_texts(self):
         """更新界面上的文本为当前语言"""
@@ -152,29 +136,61 @@ class OutputArea(QWidget):
     
     def apply_theme(self, theme):
         """应用主题样式"""
+        font_family = src.config.config.UI_FONT_FAMILY
+        font_size_normal = src.config.config.UI_FONT_SIZE_NORMAL
+        font_size_large = src.config.config.UI_FONT_SIZE_LARGE
+        border_radius = src.config.config.UI_BORDER_RADIUS
+        padding_small = src.config.config.UI_PADDING_SMALL
+        padding_normal = src.config.config.UI_PADDING_NORMAL
+        
         self.setStyleSheet(f"""
+            QWidget {{
+                font-family: {font_family};
+            }}
             QLabel {{
-                font-size: 10pt;
+                font-size: {font_size_normal};
                 color: {theme['text']};
             }}
-            QTextBrowser {{
-                font-size: 12pt;
-                padding: 4px;
+            #outputLabel {{
+                font-weight: bold;
+            }}
+            #outputBrowser {{
+                font-size: {font_size_large};
+                padding: {padding_small};
                 border: 1px solid {theme['input_border']};
-                border-radius: 4px;
+                border-radius: {border_radius};
                 background-color: {theme['input_bg']};
                 color: {theme['text']};
             }}
-            QPushButton {{
+            #markdownToggleButton {{
                 background-color: {theme['button_bg']};
                 color: {theme['button_text']};
-                padding: 8px;
-                border-radius: 4px;
+                padding: {padding_small};
+                border-radius: {border_radius};
+                font-size: {font_size_normal};
             }}
-            QPushButton:hover {{
+            #markdownToggleButton:hover {{
                 background-color: {theme['button_hover']};
             }}
+            #copyButton, #exportButton {{
+                background-color: {theme['button_bg']};
+                color: {theme['button_text']};
+                padding: {padding_normal};
+                border-radius: {border_radius};
+                font-size: {font_size_large};
+                min-height: 36px;
+            }}
+            #copyButton:hover, #exportButton:hover {{
+                background-color: {theme['button_hover']};
+            }}
+            #exportButton {{
+                background-color: {theme['button_success_bg']};
+            }}
+            #exportButton:hover {{
+                background-color: {theme['button_success_hover']};
+            }}
             #status_label {{
-                font-size: 10pt;
+                font-size: {font_size_normal};
+                padding: {padding_small};
             }}
         """)

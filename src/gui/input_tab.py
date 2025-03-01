@@ -19,8 +19,9 @@ class InputTab(QWidget):
     def init_ui(self):
         """初始化输入选项卡UI"""
         input_layout = QVBoxLayout(self)
+        spacing = int(src.config.config.UI_SPACING.replace("px", ""))
         input_layout.setContentsMargins(5, 5, 5, 5)
-        input_layout.setSpacing(3)
+        input_layout.setSpacing(spacing)
         
         # 自定义前缀/后缀
         prefix_suffix_layout = self._create_prefix_suffix_section()
@@ -33,7 +34,8 @@ class InputTab(QWidget):
     def _create_prefix_suffix_section(self):
         """创建前缀/后缀部分"""
         prefix_suffix_layout = QHBoxLayout()
-        prefix_suffix_layout.setSpacing(5)
+        spacing = int(src.config.config.UI_SPACING.replace("px", ""))
+        prefix_suffix_layout.setSpacing(spacing)
         
         # 前缀
         prefix_container = QWidget()
@@ -43,6 +45,7 @@ class InputTab(QWidget):
         self.prefix_label = QLabel(STRINGS[self.parent.current_lang]['custom_prefix'])
         self.prefix_text = QTextEdit()
         self.prefix_text.setMaximumHeight(50)
+        self.prefix_text.setObjectName("prefixTextEdit")
         prefix_container_layout.addWidget(self.prefix_label)
         prefix_container_layout.addWidget(self.prefix_text)
         prefix_suffix_layout.addWidget(prefix_container)
@@ -55,6 +58,7 @@ class InputTab(QWidget):
         self.suffix_label = QLabel(STRINGS[self.parent.current_lang]['custom_suffix'])
         self.suffix_text = QTextEdit()
         self.suffix_text.setMaximumHeight(50)
+        self.suffix_text.setObjectName("suffixTextEdit")
         suffix_container_layout.addWidget(self.suffix_label)
         suffix_container_layout.addWidget(self.suffix_text)
         prefix_suffix_layout.addWidget(suffix_container)
@@ -65,33 +69,38 @@ class InputTab(QWidget):
         """创建图像处理部分"""
         image_section = QWidget()
         image_section_layout = QVBoxLayout(image_section)
+        spacing = int(src.config.config.UI_SPACING.replace("px", ""))
         image_section_layout.setContentsMargins(0, 0, 0, 0)
-        image_section_layout.setSpacing(3)
+        image_section_layout.setSpacing(spacing)
         
         # 图像按钮行
         image_buttons_layout = QHBoxLayout()
-        image_buttons_layout.setSpacing(3)
+        image_buttons_layout.setSpacing(spacing)
         
         # OCR功能
         self.ocr_button = QPushButton(STRINGS[self.parent.current_lang]['ocr_screenshot'])
+        self.ocr_button.setObjectName("ocrButton")
         self.ocr_button.setFixedHeight(28)
         self.ocr_button.clicked.connect(self.enable_ocr)
         image_buttons_layout.addWidget(self.ocr_button)
         
         # 图像上传功能
         self.image_upload_button = QPushButton(STRINGS[self.parent.current_lang]['image_upload'])
+        self.image_upload_button.setObjectName("uploadButton")
         self.image_upload_button.setFixedHeight(28)
         self.image_upload_button.clicked.connect(self.upload_image)
         image_buttons_layout.addWidget(self.image_upload_button)
         
         # 截图功能
         self.screenshot_button = QPushButton(STRINGS[self.parent.current_lang]['screenshot_capture'])
+        self.screenshot_button.setObjectName("screenshotButton")
         self.screenshot_button.setFixedHeight(28)
         self.screenshot_button.clicked.connect(self.enable_screenshot)
         image_buttons_layout.addWidget(self.screenshot_button)
         
         # 清除图像按钮
         self.clear_image_button = QPushButton(STRINGS[self.parent.current_lang]['image_clear'])
+        self.clear_image_button.setObjectName("clearButton")
         self.clear_image_button.setFixedHeight(28)
         self.clear_image_button.clicked.connect(self.clear_image)
         image_buttons_layout.addWidget(self.clear_image_button)
@@ -107,7 +116,8 @@ class InputTab(QWidget):
     def _create_image_ocr_layout(self):
         """创建图像预览和OCR文本区域"""
         image_ocr_layout = QHBoxLayout()
-        image_ocr_layout.setSpacing(5)
+        spacing = int(src.config.config.UI_SPACING.replace("px", ""))
+        image_ocr_layout.setSpacing(spacing)
         
         # 图像预览
         image_preview_container = QWidget()
@@ -116,10 +126,10 @@ class InputTab(QWidget):
         image_preview_layout.setSpacing(2)
         self.image_preview_label = QLabel(STRINGS[self.parent.current_lang]['image_preview'])
         self.image_display = QLabel()
+        self.image_display.setObjectName("imageDisplay")
         self.image_display.setMinimumSize(200, 80)
         self.image_display.setMaximumHeight(100)
         self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_display.setStyleSheet("border: 1px solid #CCCCCC;")
         image_preview_layout.addWidget(self.image_preview_label)
         image_preview_layout.addWidget(self.image_display)
         image_ocr_layout.addWidget(image_preview_container)
@@ -131,6 +141,7 @@ class InputTab(QWidget):
         ocr_layout.setSpacing(2)
         self.ocr_text_label = QLabel(STRINGS[self.parent.current_lang]['ocr_text'])
         self.ocr_text_edit = QTextEdit()
+        self.ocr_text_edit.setObjectName("ocrTextEdit")
         self.ocr_text_edit.setMaximumHeight(100)
         ocr_layout.addWidget(self.ocr_text_label)
         ocr_layout.addWidget(self.ocr_text_edit)
@@ -193,26 +204,46 @@ class InputTab(QWidget):
     
     def apply_theme(self, theme):
         """应用主题样式"""
+        font_family = src.config.config.UI_FONT_FAMILY
+        font_size = src.config.config.UI_FONT_SIZE_NORMAL
+        border_radius = src.config.config.UI_BORDER_RADIUS
+        padding = src.config.config.UI_PADDING_SMALL
+        
         self.setStyleSheet(f"""
+            QWidget {{
+                font-family: {font_family};
+            }}
             QLabel {{
-                font-size: 10pt;
+                font-size: {font_size};
                 color: {theme['text']};
             }}
             QTextEdit {{
-                font-size: 10pt;
-                padding: 4px;
+                font-size: {font_size};
+                padding: {padding};
                 border: 1px solid {theme['input_border']};
-                border-radius: 4px;
+                border-radius: {border_radius};
                 background-color: {theme['input_bg']};
                 color: {theme['text']};
             }}
             QPushButton {{
                 background-color: {theme['button_bg']};
                 color: {theme['button_text']};
-                padding: 8px;
-                border-radius: 4px;
+                padding: {padding};
+                border-radius: {border_radius};
+                font-size: {font_size};
             }}
             QPushButton:hover {{
                 background-color: {theme['button_hover']};
+            }}
+            #imageDisplay {{
+                border: 1px solid {theme['input_border']};
+                border-radius: {border_radius};
+                background-color: {theme['input_bg']};
+            }}
+            #clearButton {{
+                background-color: {theme['button_danger_bg']};
+            }}
+            #clearButton:hover {{
+                background-color: {theme['button_danger_hover']};
             }}
         """)

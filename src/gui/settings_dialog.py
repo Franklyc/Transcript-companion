@@ -12,12 +12,18 @@ class SettingsDialog(QDialog):
 
     def setup_ui(self):
         layout = QVBoxLayout()
+        spacing = int(src.config.config.UI_SPACING.replace("px", ""))
+        padding = int(src.config.config.UI_PADDING_NORMAL.replace("px", ""))
+        layout.setSpacing(spacing)
+        layout.setContentsMargins(padding, padding, padding, padding)
 
         # Create checkboxes
         self.prefix_checkbox = QCheckBox(STRINGS[self.parent.current_lang]['use_predefined_prefix'])
+        self.prefix_checkbox.setObjectName("prefixCheckbox")
         self.prefix_checkbox.setChecked(src.config.config.USE_PREDEFINED_PREFIX)
         
         self.transcript_checkbox = QCheckBox(STRINGS[self.parent.current_lang]['use_transcript_text'])
+        self.transcript_checkbox.setObjectName("transcriptCheckbox")
         self.transcript_checkbox.setChecked(src.config.config.USE_TRANSCRIPT_TEXT)
 
         # Add checkboxes to layout
@@ -36,11 +42,34 @@ class SettingsDialog(QDialog):
 
     def apply_theme(self):
         theme = src.config.config.THEMES[self.parent.current_theme]
+        font_family = src.config.config.UI_FONT_FAMILY
+        font_size = src.config.config.UI_FONT_SIZE_NORMAL
+        border_radius = src.config.config.UI_BORDER_RADIUS
+        
         self.setStyleSheet(f"""
             QDialog {{
                 background-color: {theme['dialog_bg']};
+                border-radius: {border_radius};
+                font-family: {font_family};
             }}
             QCheckBox {{
                 color: {theme['text']};
+                font-size: {font_size};
+                padding: 5px;
+            }}
+            QCheckBox::indicator {{
+                width: 16px;
+                height: 16px;
+                border: 1px solid {theme['input_border']};
+                border-radius: 3px;
+                background-color: {theme['input_bg']};
+            }}
+            QCheckBox::indicator:checked {{
+                background-color: {theme['button_bg']};
+                border: 1px solid {theme['button_bg']};
+            }}
+            QCheckBox::indicator:checked:hover {{
+                background-color: {theme['button_hover']};
+                border: 1px solid {theme['button_hover']};
             }}
         """)

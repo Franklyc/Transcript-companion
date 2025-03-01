@@ -20,7 +20,7 @@ class Sidebar(QWidget):
 
     def init_ui(self):
         self.setFixedWidth(50)
-        self.setObjectName("sidebar")  # 添加这行来设置ObjectName
+        self.setObjectName("sidebar")
         sidebar_layout = QVBoxLayout(self)
         sidebar_layout.setContentsMargins(5, 5, 5, 5)
         sidebar_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -47,6 +47,11 @@ class Sidebar(QWidget):
 
     def apply_theme(self):
         theme = src.config.config.THEMES[self.parent.current_theme]
+        font_size_normal = src.config.config.UI_FONT_SIZE_NORMAL
+        font_size_large = src.config.config.UI_FONT_SIZE_LARGE
+        border_radius = src.config.config.UI_BORDER_RADIUS
+        padding = src.config.config.UI_PADDING_SMALL
+        
         self.setStyleSheet(f"""
             QWidget#sidebar {{
                 background-color: {theme['sidebar_bg']};
@@ -56,11 +61,11 @@ class Sidebar(QWidget):
                 background-color: transparent;
                 border: none;
                 color: {theme['text']};
-                font-size: 16px;
-                padding: 4px;
+                font-size: {font_size_large};
+                padding: {padding};
             }}
             #sidebarButton:hover, #langButton:hover, #themeButton:hover {{
                 background-color: {theme['input_border']};
-                border-radius: 4px;
+                border-radius: {border_radius};
             }}
         """)

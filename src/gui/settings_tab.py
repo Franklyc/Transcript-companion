@@ -19,16 +19,18 @@ class SettingsTab(QWidget):
         """初始化设置选项卡UI"""
         settings_layout = QVBoxLayout(self)
         settings_layout.setContentsMargins(5, 5, 5, 5)
-        settings_layout.setSpacing(3)
+        settings_layout.setSpacing(5)
         
         # 创建网格布局
         grid_layout = QGridLayout()
-        grid_layout.setVerticalSpacing(3)
+        grid_layout.setVerticalSpacing(8)
+        grid_layout.setHorizontalSpacing(8)
         
         # 文件夹选择
         self.folder_edit = QLineEdit(src.config.config.DEFAULT_FOLDER_PATH)
         self.folder_edit.setReadOnly(True)
         self.folder_button = QPushButton(STRINGS[self.parent.current_lang]['select_folder'])
+        self.folder_button.setObjectName("folderButton")
         self.folder_button.setFixedHeight(28)
         self.folder_label = QLabel(STRINGS[self.parent.current_lang]['current_folder'])
         grid_layout.addWidget(self.folder_label, 0, 0)
@@ -117,26 +119,52 @@ class SettingsTab(QWidget):
     
     def apply_theme(self, theme):
         """应用主题样式"""
+        font_family = src.config.config.UI_FONT_FAMILY
+        font_size = src.config.config.UI_FONT_SIZE_NORMAL
+        border_radius = src.config.config.UI_BORDER_RADIUS
+        padding = src.config.config.UI_PADDING_SMALL
+        
         self.setStyleSheet(f"""
+            QWidget {{
+                font-family: {font_family};
+            }}
             QLabel {{
-                font-size: 10pt;
+                font-size: {font_size};
                 color: {theme['text']};
             }}
             QLineEdit, QComboBox {{
-                font-size: 10pt;
-                padding: 4px;
+                font-size: {font_size};
+                padding: {padding};
                 border: 1px solid {theme['input_border']};
-                border-radius: 4px;
+                border-radius: {border_radius};
                 background-color: {theme['input_bg']};
                 color: {theme['text']};
+            }}
+            QComboBox::drop-down {{
+                border: none;
+                width: 20px;
+            }}
+            QComboBox::down-arrow {{
+                width: 12px;
+                height: 12px;
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {theme['dropdown_bg']};
+                color: {theme['dropdown_text']};
+                selection-background-color: {theme['button_bg']};
+                selection-color: {theme['button_text']};
             }}
             QPushButton {{
                 background-color: {theme['button_bg']};
                 color: {theme['button_text']};
-                padding: 8px;
-                border-radius: 4px;
+                padding: {padding};
+                border-radius: {border_radius};
+                font-size: {font_size};
             }}
             QPushButton:hover {{
                 background-color: {theme['button_hover']};
+            }}
+            #folderButton {{
+                min-width: 100px;
             }}
         """)

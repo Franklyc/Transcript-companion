@@ -1,5 +1,6 @@
 import markdown
 from PyQt6.QtWidgets import QApplication
+import src.config.config
 
 def render_markdown(text_browser, text, is_dark_theme=False):
     """
@@ -68,28 +69,65 @@ def append_markdown_text(text_browser, current_text, new_text, is_markdown_mode,
 
 def generate_light_html(html_content):
     """生成带有亮色主题样式的 HTML"""
+    theme = src.config.config.THEMES["light"]
+    font_family = src.config.config.UI_FONT_FAMILY
+    
     return f"""
     <html>
     <head>
     <style>
-        body {{ font-family: 'Segoe UI', Arial, sans-serif; }}
-        h1, h2, h3, h4, h5, h6 {{ color: #3B82F6; margin-top: 20px; margin-bottom: 10px; }}
+        body {{ 
+            font-family: {font_family};
+            color: {theme['text']};
+            line-height: 1.6;
+        }}
+        h1, h2, h3, h4, h5, h6 {{ 
+            color: {theme['md_header']};
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }}
         h1 {{ font-size: 24px; }}
         h2 {{ font-size: 20px; }}
         h3 {{ font-size: 18px; }}
         h4 {{ font-size: 16px; }}
         p {{ margin-bottom: 12px; line-height: 1.6; }}
-        code {{ background-color: #F1F5F9; padding: 2px 4px; border-radius: 3px; font-family: Consolas, monospace; }}
-        pre {{ background-color: #F1F5F9; padding: 12px; border-radius: 5px; overflow-x: auto; }}
+        code {{ 
+            background-color: {theme['md_code_bg']};
+            padding: 2px 4px;
+            border-radius: {src.config.config.UI_BORDER_RADIUS};
+            font-family: Consolas, monospace;
+        }}
+        pre {{ 
+            background-color: {theme['md_code_bg']};
+            padding: 12px;
+            border-radius: {src.config.config.UI_BORDER_RADIUS};
+            overflow-x: auto;
+        }}
         pre code {{ background-color: transparent; padding: 0; }}
-        blockquote {{ border-left: 4px solid #CBD5E1; padding-left: 12px; color: #64748B; margin: 12px 0; }}
-        a {{ color: #3B82F6; text-decoration: none; }}
+        blockquote {{ 
+            border-left: 4px solid {theme['md_blockquote_border']};
+            padding-left: 12px;
+            color: {theme['md_blockquote']};
+            margin: 12px 0;
+        }}
+        a {{ 
+            color: {theme['md_link']};
+            text-decoration: none;
+        }}
         a:hover {{ text-decoration: underline; }}
         ul, ol {{ padding-left: 20px; margin-bottom: 12px; }}
         li {{ margin-bottom: 4px; }}
-        table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; }}
-        th, td {{ border: 1px solid #E2E8F0; padding: 8px; text-align: left; }}
-        th {{ background-color: #F1F5F9; }}
+        table {{ 
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 12px;
+        }}
+        th, td {{ 
+            border: 1px solid {theme['md_table_border']};
+            padding: 8px;
+            text-align: left;
+        }}
+        th {{ background-color: {theme['md_table_header_bg']}; }}
     </style>
     </head>
     <body>{html_content}</body>
@@ -98,28 +136,66 @@ def generate_light_html(html_content):
 
 def generate_dark_html(html_content):
     """生成带有暗色主题样式的 HTML"""
+    theme = src.config.config.THEMES["dark"]
+    font_family = src.config.config.UI_FONT_FAMILY
+    
     return f"""
     <html>
     <head>
     <style>
-        body {{ font-family: 'Segoe UI', Arial, sans-serif; color: #E2E8F0; }}
-        h1, h2, h3, h4, h5, h6 {{ color: #3B82F6; margin-top: 20px; margin-bottom: 10px; }}
+        body {{ 
+            font-family: {font_family};
+            color: {theme['text']};
+            line-height: 1.6;
+        }}
+        h1, h2, h3, h4, h5, h6 {{ 
+            color: {theme['md_header']};
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }}
         h1 {{ font-size: 24px; }}
         h2 {{ font-size: 20px; }}
         h3 {{ font-size: 18px; }}
         h4 {{ font-size: 16px; }}
         p {{ margin-bottom: 12px; line-height: 1.6; }}
-        code {{ background-color: #1E293B; color: #E2E8F0; padding: 2px 4px; border-radius: 3px; font-family: Consolas, monospace; }}
-        pre {{ background-color: #1E293B; padding: 12px; border-radius: 5px; overflow-x: auto; }}
+        code {{ 
+            background-color: {theme['md_code_bg']};
+            color: {theme['text']};
+            padding: 2px 4px;
+            border-radius: {src.config.config.UI_BORDER_RADIUS};
+            font-family: Consolas, monospace;
+        }}
+        pre {{ 
+            background-color: {theme['md_code_bg']};
+            padding: 12px;
+            border-radius: {src.config.config.UI_BORDER_RADIUS};
+            overflow-x: auto;
+        }}
         pre code {{ background-color: transparent; padding: 0; }}
-        blockquote {{ border-left: 4px solid #4B5563; padding-left: 12px; color: #94A3B8; margin: 12px 0; }}
-        a {{ color: #60A5FA; text-decoration: none; }}
+        blockquote {{ 
+            border-left: 4px solid {theme['md_blockquote_border']};
+            padding-left: 12px;
+            color: {theme['md_blockquote']};
+            margin: 12px 0;
+        }}
+        a {{ 
+            color: {theme['md_link']};
+            text-decoration: none;
+        }}
         a:hover {{ text-decoration: underline; }}
         ul, ol {{ padding-left: 20px; margin-bottom: 12px; }}
         li {{ margin-bottom: 4px; }}
-        table {{ border-collapse: collapse; width: 100%; margin-bottom: 12px; }}
-        th, td {{ border: 1px solid #4B5563; padding: 8px; text-align: left; }}
-        th {{ background-color: #1E293B; }}
+        table {{ 
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 12px;
+        }}
+        th, td {{ 
+            border: 1px solid {theme['md_table_border']};
+            padding: 8px;
+            text-align: left;
+        }}
+        th {{ background-color: {theme['md_table_header_bg']}; }}
     </style>
     </head>
     <body>{html_content}</body>

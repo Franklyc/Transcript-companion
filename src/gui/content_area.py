@@ -26,15 +26,18 @@ class ContentArea(QWidget):
         
         # 创建上下分割的布局
         splitter = QSplitter(Qt.Orientation.Vertical)
+        splitter.setObjectName("mainSplitter")
         
         # ========== 创建上半部分区域 ==========
         top_widget = QWidget()
         top_layout = QVBoxLayout(top_widget)
+        spacing = int(src.config.config.UI_SPACING.replace("px", ""))
         top_layout.setContentsMargins(0, 0, 0, 0)
-        top_layout.setSpacing(3)  # 减少垂直间距
+        top_layout.setSpacing(spacing)
         
         # 创建选项卡，将设置和输入内容分开
         self.tab_widget = QTabWidget()
+        self.tab_widget.setObjectName("tabWidget")
         
         # ===== 选项卡1: 基本设置 =====
         self.settings_tab = SettingsTab(self.parent)
@@ -66,28 +69,43 @@ class ContentArea(QWidget):
     def apply_theme(self):
         """应用主题样式"""
         theme = src.config.config.THEMES[self.parent.current_theme]
+        font_family = src.config.config.UI_FONT_FAMILY
+        border_radius = src.config.config.UI_BORDER_RADIUS
+        
         self.settings_tab.apply_theme(theme)
         self.input_tab.apply_theme(theme)
         self.output_area.apply_theme(theme)
         
         self.setStyleSheet(f"""
+            QWidget {{
+                font-family: {font_family};
+            }}
+            
+            #mainSplitter::handle {{
+                background-color: {theme['input_border']};
+                height: 1px;
+            }}
+            
             QTabWidget::pane {{
                 border: 1px solid {theme['input_border']};
                 background-color: {theme['input_bg']};
+                border-radius: {border_radius};
             }}
+            
             QTabBar::tab {{
-                background-color: {theme['sidebar_bg']};
-                color: {theme['text']};
+                background-color: {theme['tab_bg']};
+                color: {theme['tab_text']};
                 padding: 6px 12px;
                 margin-right: 2px;
                 border: 1px solid {theme['input_border']};
                 border-bottom: none;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
+                border-top-left-radius: {border_radius};
+                border-top-right-radius: {border_radius};
             }}
+            
             QTabBar::tab:selected {{
-                background-color: {theme['input_bg']};
-                border-bottom-color: {theme['input_bg']};
+                background-color: {theme['tab_active_bg']};
+                border-bottom-color: {theme['tab_active_bg']};
             }}
         """)
 

@@ -19,12 +19,10 @@ class MainWindow(QMainWindow):
         self.current_lang = 'zh'
         self.current_theme = src.config.config.DEFAULT_THEME
         self.init_ui()
-        # We no longer need the event filter as our screenshot dialog handles events directly
-        # self.installEventFilter(self)
 
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
-        self.setFixedSize(650, 700)  # 恢复原始窗口尺寸
+        self.setFixedSize(650, 700)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -38,8 +36,10 @@ class MainWindow(QMainWindow):
 
         # Main content area
         self.main_container = QWidget()
+        self.main_container.setObjectName("mainContainer")
         main_layout = QVBoxLayout(self.main_container)
         main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
         # Title bar
         self.title_bar = TitleBar(self)
@@ -51,57 +51,87 @@ class MainWindow(QMainWindow):
 
         horizontal_layout.addWidget(self.main_container)
 
-        self.setStyleSheet("""
-            QMainWindow {
-                
-            }
-            QLabel {
-                font-size: 10pt;
-            }
-            QTextEdit, QLineEdit, QComboBox {
-                font-size: 10pt;
-                padding: 4px;
-                border: 1px solid #CCCCCC;
-                border-radius: 4px;
-            }
-        """)
-
         self.apply_theme()
-
-    # The eventFilter is no longer needed as we're using a dedicated dialog for screenshots
-    # def eventFilter(self, obj, event):
-    #    """全局事件过滤器，用于捕获鼠标在屏幕范围内的操作"""
-    #    if self.content_area.ocr_enabled:
-    #        if event.type() == QEvent.Type.MouseButtonPress:
-    #            self.content_area.mousePressEvent(event)
-    #        elif event.type() == QEvent.Type.MouseMove:
-    #            self.content_area.mouseMoveEvent(event)
-    #        elif event.type() == QEvent.Type.MouseButtonRelease:
-    #            self.content_area.mouseReleaseEvent(event)
-    #    return super().eventFilter(obj, event)
 
     def apply_theme(self):
         theme = src.config.config.THEMES[self.current_theme]
-        # 设置主窗口背景色
-        self.setStyleSheet(f"""
-            QMainWindow {{
-                background-color: {theme['window_bg']};
-                border: 1px solid {theme['input_border']};
-            }}
-            QComboBox QAbstractItemView {{
-                color: {theme['dropdown_text']};
-                background-color: {theme['input_bg']};
-            }}
-        """)
-        self.main_container.setStyleSheet(f"""
-            QWidget {{
-                background-color: {theme['window_bg']};
-            }}
-        """)
+        font_family = src.config.config.UI_FONT_FAMILY
+        border_radius = src.config.config.UI_BORDER_RADIUS
+        
         # 应用主题到各个组件
         self.title_bar.apply_theme()
         self.sidebar.apply_theme()
         self.content_area.apply_theme()
+        
+        # 设置主窗口样式
+        self.setStyleSheet(f"""
+            QMainWindow {{
+                background-color: {theme['window_bg']};
+                border: 1px solid {theme['input_border']};
+                font-family: {font_family};
+            }}
+            
+            #mainContainer {{
+                background-color: {theme['window_bg']};
+            }}
+            
+            QComboBox QAbstractItemView {{
+                color: {theme['dropdown_text']};
+                background-color: {theme['input_bg']};
+                selection-background-color: {theme['button_bg']};
+                selection-color: {theme['button_text']};
+            }}
+            
+            QScrollBar:vertical {{
+                border: none;
+                background: {theme['window_bg']};
+                width: 8px;
+                margin: 0px;
+            }}
+            
+            QScrollBar::handle:vertical {{
+                background: {theme['input_border']};
+                min-height: 30px;
+                border-radius: 4px;
+            }}
+            
+            QScrollBar::handle:vertical:hover {{
+                background: {theme['button_bg']};
+            }}
+            
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                height: 0px;
+            }}
+            
+            QScrollBar:horizontal {{
+                border: none;
+                background: {theme['window_bg']};
+                height: 8px;
+                margin: 0px;
+            }}
+            
+            QScrollBar::handle:horizontal {{
+                background: {theme['input_border']};
+                min-width: 30px;
+                border-radius: 4px;
+            }}
+            
+            QScrollBar::handle:horizontal:hover {{
+                background: {theme['button_bg']};
+            }}
+            
+            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+                width: 0px;
+            }}
+            
+            QToolTip {{
+                color: {theme['text']};
+                background-color: {theme['input_bg']};
+                border: 1px solid {theme['input_border']};
+                border-radius: {border_radius};
+                padding: 2px;
+            }}
+        """)
 
     def toggle_theme(self):
         self.current_theme = "dark" if self.current_theme == "light" else "light"
@@ -146,21 +176,28 @@ class MainWindow(QMainWindow):
     
         # Apply theme to message box
         theme = src.config.config.THEMES[self.current_theme]
+        font_family = src.config.config.UI_FONT_FAMILY
+        font_size = src.config.config.UI_FONT_SIZE_NORMAL
+        border_radius = src.config.config.UI_BORDER_RADIUS
+        padding = src.config.config.UI_PADDING_NORMAL
+        
         msg_box.setStyleSheet(f"""
             QMessageBox {{
                 background-color: {theme['dialog_bg']};
-                color: {theme['text']};
+                font-family: {font_family};
             }}
             QLabel {{
                 color: {theme['text']};
                 background-color: {theme['dialog_bg']};
+                font-size: {font_size};
             }}
             QPushButton {{
                 background-color: {theme['button_bg']};
                 color: {theme['button_text']};
                 padding: 6px 14px;
-                border-radius: 4px;
+                border-radius: {border_radius};
                 min-width: 80px;
+                font-family: {font_family};
             }}
             QPushButton:hover {{
                 background-color: {theme['button_hover']};

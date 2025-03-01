@@ -23,12 +23,15 @@ class TitleBar(QWidget):
 
         # 标题文本
         self.title_label = QLabel(STRINGS[self.parent.current_lang]['window_title'])
+        self.title_label.setObjectName("titleLabel")
         title_layout.addWidget(self.title_label)
         title_layout.addStretch()
 
         # Title bar buttons
         min_button = self.create_title_button("－", self.parent.showMinimized)
+        min_button.setObjectName("minButton")
         close_button = self.create_title_button("✕", self.parent.close)
+        close_button.setObjectName("closeButton")
         title_layout.addWidget(min_button)
         title_layout.addWidget(close_button)
 
@@ -37,18 +40,31 @@ class TitleBar(QWidget):
 
     def apply_theme(self):
         theme = src.config.config.THEMES[self.parent.current_theme]
+        font_family = src.config.config.UI_FONT_FAMILY
+        font_size_normal = src.config.config.UI_FONT_SIZE_NORMAL
+        font_size_large = src.config.config.UI_FONT_SIZE_LARGE
+        
         self.setStyleSheet(f"""
-            QLabel {{
-                color: {theme['text']};
+            QWidget {{
+                font-family: {font_family};
             }}
-            #titleButton {{
+            #titleLabel {{
+                color: {theme['text']};
+                font-size: {font_size_large};
+                font-weight: bold;
+            }}
+            #titleButton, #minButton, #closeButton {{
                 background-color: transparent;
                 border: none;
                 color: {theme['text']};
-                font-size: 16px;
+                font-size: {font_size_large};
             }}
-            #titleButton:hover {{
-                background-color: {theme['title_button_hover']};
+            #closeButton:hover {{
+                background-color: {theme['button_danger_bg']};
+                color: white;
+            }}
+            #minButton:hover {{
+                background-color: {theme['button_hover']};
                 color: white;
             }}
         """)
