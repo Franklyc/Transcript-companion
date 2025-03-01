@@ -54,6 +54,10 @@ STRINGS = {
         'image_preview': "图片预览:",
         'image_clear': "清除图片",
         'use_image': "使用图片与模型交流",
+        'tab_settings': "设置",
+        'tab_input': "输入",
+        'output_result': "输出结果:",
+        'show_source': "显示源文本",
     },
     'en': {
         'window_title': "Transcript companion",
@@ -110,5 +114,9 @@ Sidebar Features:
         'image_preview': "Image Preview:",
         'image_clear': "Clear Image",
         'use_image': "Use Image with Model",
+        'tab_settings': "Settings",
+        'tab_input': "Input",
+        'output_result': "Output Result:",
+        'show_source': "Show Source",
     }
 }
