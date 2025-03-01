@@ -47,17 +47,21 @@ class TitleBar(QWidget):
         self.setStyleSheet(f"""
             QWidget {{
                 font-family: {font_family};
+                background-color: {theme['window_bg']};
+                border-bottom: 1px solid {theme['input_border']};
             }}
             #titleLabel {{
                 color: {theme['text']};
                 font-size: {font_size_large};
                 font-weight: bold;
+                margin-left: 2px;
             }}
             #titleButton, #minButton, #closeButton {{
                 background-color: transparent;
                 border: none;
                 color: {theme['text']};
                 font-size: {font_size_large};
+                margin: 2px;
             }}
             #closeButton:hover {{
                 background-color: {theme['button_danger_bg']};

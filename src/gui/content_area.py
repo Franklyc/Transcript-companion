@@ -22,7 +22,7 @@ class ContentArea(QWidget):
     def init_ui(self):
         # 创建主垂直布局
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(10, 5, 10, 5)
+        main_layout.setContentsMargins(12, 5, 10, 5)  # 增加左侧边距
         
         # 创建上下分割的布局
         splitter = QSplitter(Qt.Orientation.Vertical)

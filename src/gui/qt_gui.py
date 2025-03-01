@@ -73,6 +73,7 @@ class MainWindow(QMainWindow):
             
             #mainContainer {{
                 background-color: {theme['window_bg']};
+                padding-left: 1px;
             }}
             
             QComboBox QAbstractItemView {{

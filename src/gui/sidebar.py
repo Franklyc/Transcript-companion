@@ -52,10 +52,13 @@ class Sidebar(QWidget):
         border_radius = src.config.config.UI_BORDER_RADIUS
         padding = src.config.config.UI_PADDING_SMALL
         
+        # 计算稍微深一点的边框颜色
+        border_color = theme['input_border']
+        
         self.setStyleSheet(f"""
             QWidget#sidebar {{
                 background-color: {theme['sidebar_bg']};
-                border-right: 1px solid {theme['input_border']};
+                border-right: 2px solid {border_color};
             }}
             #sidebarButton, #langButton, #themeButton {{
                 background-color: transparent;
@@ -63,6 +66,7 @@ class Sidebar(QWidget):
                 color: {theme['text']};
                 font-size: {font_size_large};
                 padding: {padding};
+                margin: 2px;
             }}
             #sidebarButton:hover, #langButton:hover, #themeButton:hover {{
                 background-color: {theme['input_border']};

@@ -15,6 +15,7 @@ PROVIDERS_CONFIG = {
     "Zhipu": Provider("Zhipu", "https://open.bigmodel.cn/api/paas/v4/"),
     "GLHF": Provider("GLHF", "https://glhf.chat/api/openai/v1"),
     "SiliconFlow": Provider("SiliconFlow", "https://api.siliconflow.cn/v1"),
+    "ModelScope": Provider("ModelScope", "https://api-inference.modelscope.cn/v1"),
     "LMstudio": Provider("LMstudio", "http://localhost:1234/v1", "not-needed"),
     "Kobold": Provider("Kobold", "http://localhost:5001/v1", "not-needed"),
     "Ollama": Provider("Ollama", "http://localhost:11434/v1", "ollama")
@@ -23,13 +24,12 @@ PROVIDERS_CONFIG = {
 PROVIDERS = ["All"] + list(PROVIDERS_CONFIG.keys())
 DEFAULT_PROVIDER = "All"
 
-# Available models list / 可用模型列表
+# Available models with their respective providers
 AVAILABLE_MODELS = [
     "[Cerebras] llama3.3-70b",
     "[Cerebras] llama3.1-8b",
     "[Groq] qwen-2.5-32b",
     "[Groq] deepseek-r1-distill-qwen-32b",
-    "[Groq] llama-3.1-70b-versatile",
     "[Groq] llama-3.1-8b-instant",
     "[Groq] llama-3.2-90b-vision-preview",
     "[Groq] llama-3.3-70b-versatile",
@@ -102,33 +102,113 @@ DEFAULT_TEMPERATURE = "1.0"
 
 DEFAULT_THEME = "light"
 
+# 统一设计变量
+UI_FONT_FAMILY = "'Segoe UI', Arial, sans-serif"
+UI_FONT_SIZE_SMALL = "9pt"
+UI_FONT_SIZE_NORMAL = "10pt" 
+UI_FONT_SIZE_LARGE = "12pt"
+UI_BORDER_RADIUS = "4px"
+UI_PADDING_SMALL = "4px"
+UI_PADDING_NORMAL = "8px"
+UI_PADDING_LARGE = "12px"
+UI_SPACING = "5px"
+UI_MARGIN = "10px"
+
+# Primary, Secondary, Success, Danger colors
+PRIMARY_COLOR = "#0078D7"  # Microsoft Blue
+PRIMARY_HOVER_COLOR = "#005A9E"
+SUCCESS_COLOR = "#4CAF50"  # Green
+SUCCESS_HOVER_COLOR = "#367C39"
+DANGER_COLOR = "#E81123"   # Red
+DANGER_HOVER_COLOR = "#C41019"
+INFO_COLOR = "#3B82F6"     # Blue
+WARNING_COLOR = "#F59E0B"  # Amber
+
 # Theme colors
 THEMES = {
     "light": {
+        # Base colors
         "window_bg": "#F5F5F5",   
         "text": "#000000",
+        "text_secondary": "#555555",
         "input_bg": "#FFFFFF",
         "input_border": "#CCCCCC",
-        "button_bg": "#0078D7",
-        "button_hover": "#005A9E",
+        
+        # Button colors
+        "button_bg": PRIMARY_COLOR,
+        "button_hover": PRIMARY_HOVER_COLOR,
         "button_text": "#FFFFFF",
-        "title_button_hover": "#E81123",
-        "sidebar_bg": "#EBEBEB",
+        "button_success_bg": SUCCESS_COLOR,
+        "button_success_hover": SUCCESS_HOVER_COLOR,
+        "button_danger_bg": DANGER_COLOR,
+        "button_danger_hover": DANGER_HOVER_COLOR,
+        
+        # Component specific
+        "title_button_hover": DANGER_COLOR,
+        "sidebar_bg": "#EBEBEB",  # Changed to #EBEBEB
         "dialog_bg": "#F5F5F5",
-        "dropdown_text": "#000000"
+        "dropdown_text": "#000000",
+        "dropdown_bg": "#FFFFFF",
+        "tab_bg": "#ECECEC",
+        "tab_active_bg": "#FFFFFF",
+        "tab_text": "#000000",
+        
+        # Status colors
+        "status_success": SUCCESS_COLOR,
+        "status_error": DANGER_COLOR,
+        "status_info": INFO_COLOR,
+        "status_warning": WARNING_COLOR,
+
+        # Markdown viewer
+        "md_header": INFO_COLOR,
+        "md_code_bg": "#F1F5F9",
+        "md_blockquote": "#64748B",
+        "md_blockquote_border": "#CBD5E1",
+        "md_link": INFO_COLOR,
+        "md_table_border": "#E2E8F0",
+        "md_table_header_bg": "#F1F5F9",
     },
     "dark": {
+        # Base colors
         "window_bg": "#2D2D2D",   
         "text": "#FFFFFF",
+        "text_secondary": "#BBBBBB",
         "input_bg": "#3D3D3D",
         "input_border": "#555555",
-        "button_bg": "#0078D7",
-        "button_hover": "#005A9E",
+        
+        # Button colors
+        "button_bg": PRIMARY_COLOR,
+        "button_hover": PRIMARY_HOVER_COLOR,
         "button_text": "#FFFFFF",
-        "title_button_hover": "#E81123",
-        "sidebar_bg": "#252525",
+        "button_success_bg": SUCCESS_COLOR, 
+        "button_success_hover": SUCCESS_HOVER_COLOR,
+        "button_danger_bg": DANGER_COLOR,
+        "button_danger_hover": DANGER_HOVER_COLOR,
+        
+        # Component specific
+        "title_button_hover": DANGER_COLOR,
+        "sidebar_bg": "#252525",  # Changed to #252525
         "dialog_bg": "#2D2D2D",
-        "dropdown_text": "#FFFFFF"
+        "dropdown_text": "#FFFFFF",
+        "dropdown_bg": "#3D3D3D",
+        "tab_bg": "#222222",
+        "tab_active_bg": "#3D3D3D",
+        "tab_text": "#FFFFFF",
+        
+        # Status colors
+        "status_success": SUCCESS_COLOR,
+        "status_error": DANGER_COLOR,
+        "status_info": INFO_COLOR, 
+        "status_warning": WARNING_COLOR,
+        
+        # Markdown viewer
+        "md_header": INFO_COLOR,
+        "md_code_bg": "#1E293B",
+        "md_blockquote": "#94A3B8",
+        "md_blockquote_border": "#4B5563",
+        "md_link": "#60A5FA",
+        "md_table_border": "#4B5563",
+        "md_table_header_bg": "#1E293B",
     }
 }
 
