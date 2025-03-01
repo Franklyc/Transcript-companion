@@ -174,13 +174,16 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def clear_content(self):
-        self.content_area.output_text.clear()
-        self.content_area.prefix_text.clear()
-        self.content_area.suffix_text.clear()
-        self.content_area.status_label.clear()
-        self.content_area.ocr_text_edit.clear()
-        self.content_area.image_display.clear()
-        self.content_area.current_image_path = None
+        # 清除输出区域
+        self.content_area.output_area.clear_output()
+        self.content_area.output_area.set_status("")
+        
+        # 清除输入区域文本
+        self.content_area.input_tab.prefix_text.clear()
+        self.content_area.input_tab.suffix_text.clear()
+        self.content_area.input_tab.ocr_text_edit.clear()
+        self.content_area.input_tab.image_display.clear()
+        self.content_area.input_tab.current_image_path = None
 
     def update_model_list(self, include_local=False):
         self.content_area.update_model_list(include_local)

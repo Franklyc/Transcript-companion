@@ -22,6 +22,17 @@ def display_image(image_display, image_path):
         return True
     return False
 
+def get_status_component(parent):
+    """根据组件类型获取正确的状态标签组件"""
+    # 尝试获取 parent 所属的主窗口
+    if hasattr(parent, 'parent') and hasattr(parent.parent, 'content_area'):
+        return parent.parent.content_area.output_area
+    # 如果 parent 是 ContentArea
+    elif hasattr(parent, 'output_area'):
+        return parent.output_area
+    # 如果都不是，返回 None
+    return None
+
 def process_ocr(parent, image_path):
     """处理OCR，从图像中提取文本"""
     try:
@@ -29,20 +40,28 @@ def process_ocr(parent, image_path):
         parent.ocr_text_edit.setText(text)
         parent.current_image_path = image_path
         display_image(parent.image_display, image_path)
-        parent.status_label.setText(STRINGS[parent.parent.current_lang]['ocr_success'])
-        parent.status_label.setStyleSheet("color: green")
+        
+        # 获取状态组件
+        status_component = get_status_component(parent)
+        if status_component:
+            status_component.set_status(STRINGS[parent.parent.current_lang]['ocr_success'])
         return True
     except Exception as e:
-        parent.status_label.setText(f"{STRINGS[parent.parent.current_lang]['ocr_error']}: {e}")
-        parent.status_label.setStyleSheet("color: red")
+        # 获取状态组件
+        status_component = get_status_component(parent)
+        if status_component:
+            status_component.set_status(f"{STRINGS[parent.parent.current_lang]['ocr_error']}: {e}", True)
         return False
 
 def process_screenshot(parent, image_path):
     """处理截图，显示图像"""
     parent.current_image_path = image_path
     display_image(parent.image_display, image_path)
-    parent.status_label.setText(STRINGS[parent.parent.current_lang]['screenshot_success'])
-    parent.status_label.setStyleSheet("color: green")
+    
+    # 获取状态组件
+    status_component = get_status_component(parent)
+    if status_component:
+        status_component.set_status(STRINGS[parent.parent.current_lang]['screenshot_success'])
 
 def upload_image(parent):
     """处理图像上传功能"""
@@ -57,12 +76,17 @@ def upload_image(parent):
         try:
             parent.current_image_path = file_path
             display_image(parent.image_display, file_path)
-            parent.status_label.setText(STRINGS[parent.parent.current_lang]['image_upload_success'])
-            parent.status_label.setStyleSheet("color: green")
+            
+            # 获取状态组件
+            status_component = get_status_component(parent)
+            if status_component:
+                status_component.set_status(STRINGS[parent.parent.current_lang]['image_upload_success'])
             return True
         except Exception as e:
-            parent.status_label.setText(f"{STRINGS[parent.parent.current_lang]['image_upload_error']}{e}")
-            parent.status_label.setStyleSheet("color: red")
+            # 获取状态组件
+            status_component = get_status_component(parent)
+            if status_component:
+                status_component.set_status(f"{STRINGS[parent.parent.current_lang]['image_upload_error']}{e}", True)
             return False
     return False
 
@@ -70,7 +94,11 @@ def clear_image(parent):
     """清除显示的图像"""
     parent.image_display.clear()
     parent.current_image_path = None
-    parent.status_label.clear()
+    
+    # 获取状态组件
+    status_component = get_status_component(parent)
+    if status_component:
+        status_component.set_status("")
 
 def start_screenshot_dialog(parent, mode):
     """启动截图对话框"""
@@ -92,6 +120,9 @@ def start_screenshot_dialog(parent, mode):
         return True
     else:
         mode_text = 'ocr_selection_canceled' if mode == 'ocr' else 'screenshot_canceled'
-        parent.status_label.setText(STRINGS[parent.parent.current_lang][mode_text])
-        parent.status_label.setStyleSheet("color: orange")
+        
+        # 获取状态组件
+        status_component = get_status_component(parent)
+        if status_component:
+            status_component.set_status(STRINGS[parent.parent.current_lang][mode_text], True)
         return False
