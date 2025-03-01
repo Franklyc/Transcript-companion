@@ -164,9 +164,9 @@ pip install -r requirements.txt
 ## 界面预览
 
 ### 浅色主题
-<img src="assets\UI_light_1.png" width="400">
-<img src="assets\UI_light_2.png" width="400">
+<img src="assets\ZH\UI_light_1_zh.png" width="400">
+<img src="assets\ZH\UI_light_2_zh.png" width="400">
 
 ### 深色主题
-<img src="assets\UI_dark_1.png" width="400">
-<img src="assets\UI_dark_2.png" width="400">
+<img src="assets\ZH\UI_dark_1_zh.png" width="400">
+<img src="assets\ZH\UI_dark_2_zh.png" width="400">

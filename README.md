@@ -164,9 +164,9 @@ pip install -r requirements.txt
 ## Interface Preview
 
 ### Light Theme
-<img src="assets\UI_light_1.png" width="400">
-<img src="assets\UI_light_2.png" width="400">
+<img src="assets\EN\UI_light_1_en.png" width="400">
+<img src="assets\EN\UI_light_2_en.png" width="400">
 
 ### Dark Theme
-<img src="assets\UI_dark_1.png" width="400">
-<img src="assets\UI_dark_2.png" width="400">
+<img src="assets\EN\UI_dark_1_en.png" width="400">
+<img src="assets\EN\UI_dark_2_en.png" width="400">
