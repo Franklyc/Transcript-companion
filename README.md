@@ -47,53 +47,70 @@
 ## Core workflow
 ```mermaid
 flowchart TD
-    Start([Launch Application]) --> MainWindow[Initialize Main Window]
-    MainWindow --> UI[Setup UI Components]
+    %% Use more formal styling
+    classDef process fill:#f5f5f5,stroke:#333,stroke-width:1px,color:black,font-family:Arial;
+    classDef decision fill:white,stroke:#333,stroke-width:1px,color:black,font-family:Arial,font-size:11px;
+    classDef start fill:white,stroke:#333,stroke-width:1.5px,color:black,font-family:Arial;
     
-    subgraph "Input Processing"
-        UI --> SelectFolder[Select Transcript Folder]
-        UI --> ConfigLLM[Configure LLM Settings]
-        ConfigLLM --> SelectProvider[Choose Provider]
-        ConfigLLM --> SelectModel[Select Model]
-        ConfigLLM --> SetTemperature[Set Temperature]
+    %% Start node and initialization
+    Start([System Initialization]) --> MainWindow[Initialize Application Window]
+    MainWindow --> UI[Configure User Interface Components]
+    
+    subgraph InputPhase["Input Acquisition Phase"]
+        style InputPhase fill:#f9f9f9,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5
         
-        UI --> InputMethods{Input Method}
-        InputMethods -->|Text| CustomText[Add Prefix/Suffix]
-        InputMethods -->|Image| ImageInput[Image Input]
+        UI --> SelectFolder[Select Source Transcript Directory]
+        UI --> ConfigLLM[Configure Language Model Parameters]
+        ConfigLLM --> SelectProvider[Provider Selection]
+        ConfigLLM --> SelectModel[Model Specification]
+        ConfigLLM --> SetTemperature[Temperature Parameter Setting]
         
-        ImageInput --> CaptureOptions{Capture Options}
-        CaptureOptions -->|Screenshot + OCR| OCRProcess[Extract Text]
-        CaptureOptions -->|Upload Image| UploadProcess[Process Image]
-        CaptureOptions -->|Screenshot Only| ScreenshotProcess[Capture Image]
+        UI --> InputMethods{Input Modality Selection}
+        InputMethods -->|Text-Based| CustomText[Text Modification with Prefix/Suffix]
+        InputMethods -->|Image-Based| ImageInput[Image Input Processing]
         
-        SelectFolder --> GetTranscript[Get Latest Transcript]
-        CustomText --> CombineInput[Combine All Inputs]
+        ImageInput --> CaptureOptions{Image Acquisition Method}
+        CaptureOptions -->|Screen Capture with OCR| OCRProcess[Optical Character Recognition]
+        CaptureOptions -->|File Upload| UploadProcess[Image File Processing]
+        CaptureOptions -->|Screen Region Capture| ScreenshotProcess[Screen Region Acquisition]
+        
+        SelectFolder --> GetTranscript[Retrieve Latest Transcript Data]
+        CustomText --> CombineInput[Input Data Integration]
         OCRProcess --> CombineInput
         UploadProcess --> CombineInput
         ScreenshotProcess --> CombineInput
         GetTranscript --> CombineInput
     end
     
-    subgraph "API Processing"
-        CombineInput --> APIRequest[Send to LLM API]
-        SelectProvider --> APIRequest
-        SelectModel --> APIRequest
-        SetTemperature --> APIRequest
-        APIRequest --> StreamResponse[Stream Response]
-    end
-    
-    subgraph "Output Handling"
-        StreamResponse --> FormatOutput{Format Output}
-        FormatOutput -->|Markdown| RenderMarkdown[Render Markdown]
-        FormatOutput -->|Plain Text| DisplayText[Display Text]
+    subgraph ModelPhase["Model Interaction Phase"]
+        style ModelPhase fill:#f9f9f9,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5
         
-        RenderMarkdown --> ExportOption[Export Option]
-        DisplayText --> ExportOption
-        ExportOption --> SaveConversation[Save to History]
+        CombineInput --> APIRequest[API Request Formation]
+        SelectProvider -.-> APIRequest
+        SelectModel -.-> APIRequest
+        SetTemperature -.-> APIRequest
+        APIRequest --> StreamResponse[Response Stream Processing]
     end
     
-    SaveConversation --> NewQuery[New Query]
+    subgraph OutputPhase["Output Processing Phase"]
+        style OutputPhase fill:#f9f9f9,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5
+        
+        StreamResponse --> FormatOutput{Output Format Determination}
+        FormatOutput -->|Markdown Content| RenderMarkdown[Markdown Rendering]
+        FormatOutput -->|Plain Text Content| DisplayText[Text Display]
+        
+        RenderMarkdown --> ExportOption[Export Functionality]
+        DisplayText --> ExportOption
+        ExportOption --> SaveConversation[Conversation Persistence]
+    end
+    
+    SaveConversation --> NewQuery[Query Reinitiation]
     NewQuery --> InputMethods
+    
+    %% Apply classes to nodes
+    class Start,MainWindow,UI start;
+    class SelectFolder,ConfigLLM,SelectProvider,SelectModel,SetTemperature,CustomText,ImageInput,OCRProcess,UploadProcess,ScreenshotProcess,GetTranscript,CombineInput,APIRequest,StreamResponse,RenderMarkdown,DisplayText,ExportOption,SaveConversation,NewQuery process;
+    class InputMethods,CaptureOptions,FormatOutput decision;
 ```
 
 ## Requirements

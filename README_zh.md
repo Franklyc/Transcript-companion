@@ -48,53 +48,70 @@
 ## 核心工作流程
 ```mermaid
 flowchart TD
-    Start([启动应用程序]) --> MainWindow[初始化主窗口]
-    MainWindow --> UI[设置UI组件]
+    %% 使用更正式的样式
+    classDef process fill:#f5f5f5,stroke:#333,stroke-width:1px,color:black,font-family:Arial;
+    classDef decision fill:white,stroke:#333,stroke-width:1px,color:black,font-family:Arial,font-size:11px;
+    classDef start fill:white,stroke:#333,stroke-width:1.5px,color:black,font-family:Arial;
     
-    subgraph "输入处理"
-        UI --> SelectFolder[选择转录文件夹]
-        UI --> ConfigLLM[配置LLM设置]
-        ConfigLLM --> SelectProvider[选择提供商]
-        ConfigLLM --> SelectModel[选择模型]
-        ConfigLLM --> SetTemperature[设置温度]
+    %% 开始节点和初始化
+    Start([系统初始化]) --> MainWindow[初始化应用程序窗口]
+    MainWindow --> UI[配置用户界面组件]
+    
+    subgraph InputPhase["输入获取阶段"]
+        style InputPhase fill:#f9f9f9,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5
         
-        UI --> InputMethods{输入方式}
-        InputMethods -->|文本| CustomText[添加前缀/后缀]
-        InputMethods -->|图像| ImageInput[图像输入]
+        UI --> SelectFolder[选择源转录目录]
+        UI --> ConfigLLM[配置语言模型参数]
+        ConfigLLM --> SelectProvider[提供商选择]
+        ConfigLLM --> SelectModel[模型指定]
+        ConfigLLM --> SetTemperature[温度参数设置]
         
-        ImageInput --> CaptureOptions{捕获选项}
-        CaptureOptions -->|截图 + OCR| OCRProcess[提取文本]
-        CaptureOptions -->|上传图像| UploadProcess[处理图像]
-        CaptureOptions -->|仅截图| ScreenshotProcess[捕获图像]
+        UI --> InputMethods{输入方式选择}
+        InputMethods -->|基于文本| CustomText[文本修改（前缀/后缀）]
+        InputMethods -->|基于图像| ImageInput[图像输入处理]
         
-        SelectFolder --> GetTranscript[获取最新转录]
-        CustomText --> CombineInput[合并所有输入]
+        ImageInput --> CaptureOptions{图像获取方式}
+        CaptureOptions -->|截图并OCR| OCRProcess[光学字符识别]
+        CaptureOptions -->|文件上传| UploadProcess[图像文件处理]
+        CaptureOptions -->|屏幕区域截图| ScreenshotProcess[屏幕区域获取]
+        
+        SelectFolder --> GetTranscript[获取最新转录数据]
+        CustomText --> CombineInput[输入数据整合]
         OCRProcess --> CombineInput
         UploadProcess --> CombineInput
         ScreenshotProcess --> CombineInput
         GetTranscript --> CombineInput
     end
     
-    subgraph "API处理"
-        CombineInput --> APIRequest[发送到LLM API]
-        SelectProvider --> APIRequest
-        SelectModel --> APIRequest
-        SetTemperature --> APIRequest
-        APIRequest --> StreamResponse[流式响应]
-    end
-    
-    subgraph "输出处理"
-        StreamResponse --> FormatOutput{格式化输出}
-        FormatOutput -->|Markdown| RenderMarkdown[渲染Markdown]
-        FormatOutput -->|纯文本| DisplayText[显示文本]
+    subgraph ModelPhase["模型交互阶段"]
+        style ModelPhase fill:#f9f9f9,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5
         
-        RenderMarkdown --> ExportOption[导出选项]
-        DisplayText --> ExportOption
-        ExportOption --> SaveConversation[保存到历史记录]
+        CombineInput --> APIRequest[API请求形成]
+        SelectProvider -.-> APIRequest
+        SelectModel -.-> APIRequest
+        SetTemperature -.-> APIRequest
+        APIRequest --> StreamResponse[响应流处理]
     end
     
-    SaveConversation --> NewQuery[新查询]
+    subgraph OutputPhase["输出处理阶段"]
+        style OutputPhase fill:#f9f9f9,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5
+        
+        StreamResponse --> FormatOutput{输出格式确定}
+        FormatOutput -->|Markdown内容| RenderMarkdown[Markdown渲染]
+        FormatOutput -->|纯文本内容| DisplayText[文本显示]
+        
+        RenderMarkdown --> ExportOption[导出功能]
+        DisplayText --> ExportOption
+        ExportOption --> SaveConversation[对话持久化]
+    end
+    
+    SaveConversation --> NewQuery[查询重新初始化]
     NewQuery --> InputMethods
+    
+    %% 应用样式类到节点
+    class Start,MainWindow,UI start;
+    class SelectFolder,ConfigLLM,SelectProvider,SelectModel,SetTemperature,CustomText,ImageInput,OCRProcess,UploadProcess,ScreenshotProcess,GetTranscript,CombineInput,APIRequest,StreamResponse,RenderMarkdown,DisplayText,ExportOption,SaveConversation,NewQuery process;
+    class InputMethods,CaptureOptions,FormatOutput decision;
 ```
 
 ## 要求
