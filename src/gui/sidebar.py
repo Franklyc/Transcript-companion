@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPalette, QColor
 from src.gui.lang import STRINGS
 import src.config.config
 
@@ -8,6 +9,9 @@ class Sidebar(QWidget):
         super().__init__(parent)
         self.parent = parent
         self.init_ui()
+        # 显式设置背景填充属性
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setAutoFillBackground(True)
 
     def create_sidebar_button(self, text, object_name, size=(40, 40), callback=None):
         """Create a sidebar button with common properties"""
@@ -55,6 +59,12 @@ class Sidebar(QWidget):
         # 计算稍微深一点的边框颜色
         border_color = theme['input_border']
         
+        # 直接设置背景色
+        palette = self.palette()
+        palette.setColor(QPalette.ColorRole.Window, QColor(theme['sidebar_bg']))
+        self.setPalette(palette)
+        
+        # 设置其他样式
         self.setStyleSheet(f"""
             QWidget#sidebar {{
                 background-color: {theme['sidebar_bg']};

@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
-        self.setFixedSize(650, 700)
+        self.setFixedSize(550, 700)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
