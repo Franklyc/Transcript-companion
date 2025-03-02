@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                            QPushButton, QComboBox, QGridLayout, QFileDialog)
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 import src.config.config
 from src.gui.lang import STRINGS
 
@@ -18,50 +18,62 @@ class SettingsTab(QWidget):
     def init_ui(self):
         """初始化设置选项卡UI"""
         settings_layout = QVBoxLayout(self)
-        settings_layout.setContentsMargins(5, 5, 5, 5)
-        settings_layout.setSpacing(5)
+        padding = int(src.config.config.UI_PADDING_NORMAL.replace("px", ""))
+        settings_layout.setContentsMargins(padding, padding, padding, padding)
+        settings_layout.setSpacing(padding)
         
         # 创建网格布局
         grid_layout = QGridLayout()
-        grid_layout.setVerticalSpacing(8)
-        grid_layout.setHorizontalSpacing(8)
+        grid_layout.setVerticalSpacing(padding)
+        grid_layout.setHorizontalSpacing(padding)
         
         # 文件夹选择
+        self.folder_label = QLabel(STRINGS[self.parent.current_lang]['current_folder'])
+        self.folder_label.setFixedWidth(100)
         self.folder_edit = QLineEdit(src.config.config.DEFAULT_FOLDER_PATH)
         self.folder_edit.setReadOnly(True)
         self.folder_button = QPushButton(STRINGS[self.parent.current_lang]['select_folder'])
         self.folder_button.setObjectName("folderButton")
-        self.folder_button.setFixedHeight(28)
-        self.folder_label = QLabel(STRINGS[self.parent.current_lang]['current_folder'])
-        grid_layout.addWidget(self.folder_label, 0, 0)
+        self.folder_button.setFixedSize(100, 28)
+        
+        grid_layout.addWidget(self.folder_label, 0, 0, Qt.AlignmentFlag.AlignRight)
         grid_layout.addWidget(self.folder_edit, 0, 1)
         grid_layout.addWidget(self.folder_button, 0, 2)
         
         # 提供商选择
+        self.provider_label = QLabel(STRINGS[self.parent.current_lang].get('select_provider', 'Select Provider:'))
+        self.provider_label.setFixedWidth(100)
         self.provider_combo = QComboBox()
         self.provider_combo.addItems(src.config.config.PROVIDERS)
         self.provider_combo.setCurrentText(src.config.config.DEFAULT_PROVIDER)
         self.provider_combo.setFixedHeight(28)
-        self.provider_label = QLabel(STRINGS[self.parent.current_lang].get('select_provider', 'Select Provider:'))
-        grid_layout.addWidget(self.provider_label, 1, 0)
+        
+        grid_layout.addWidget(self.provider_label, 1, 0, Qt.AlignmentFlag.AlignRight)
         grid_layout.addWidget(self.provider_combo, 1, 1, 1, 2)
         
         # 模型选择
+        self.model_label = QLabel(STRINGS[self.parent.current_lang]['select_model'])
+        self.model_label.setFixedWidth(100)
         self.model_combo = QComboBox()
         self.model_combo.setFixedHeight(28)
         self.update_model_list(include_local=False)
-        self.model_label = QLabel(STRINGS[self.parent.current_lang]['select_model'])
-        grid_layout.addWidget(self.model_label, 2, 0)
+        
+        grid_layout.addWidget(self.model_label, 2, 0, Qt.AlignmentFlag.AlignRight)
         grid_layout.addWidget(self.model_combo, 2, 1, 1, 2)
         
         # 温度设置
+        self.temp_label = QLabel(STRINGS[self.parent.current_lang]['set_temperature'])
+        self.temp_label.setFixedWidth(100)
         self.temp_edit = QLineEdit(src.config.config.DEFAULT_TEMPERATURE)
         self.temp_edit.setFixedHeight(28)
-        self.temp_label = QLabel(STRINGS[self.parent.current_lang]['set_temperature'])
-        grid_layout.addWidget(self.temp_label, 3, 0)
+        
+        grid_layout.addWidget(self.temp_label, 3, 0, Qt.AlignmentFlag.AlignRight)
         grid_layout.addWidget(self.temp_edit, 3, 1, 1, 2)
         
+        # 设置列的拉伸因子
+        grid_layout.setColumnStretch(1, 1)
         settings_layout.addLayout(grid_layout)
+        settings_layout.addStretch()
         
         # 连接信号
         self.folder_button.clicked.connect(self.select_folder)
