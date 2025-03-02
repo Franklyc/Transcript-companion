@@ -6,3 +6,4 @@ config.py
 /history
 /temp
 
+src/api/api_test.py

@@ -48,6 +48,8 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
                 "text": prompt
             })
         
+        # 检查是否使用支持视觉的模型并且有图像路径
+        has_image = False
         # Add image content if provided and model supports vision
         if image_path and any(vision_model in model_name for vision_model in ["vision", "VL", "gemini", "claude", "gpt-4"]):
             base64_image = encode_image_to_base64(image_path)
@@ -58,16 +60,21 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
                         "url": f"data:image/jpeg;base64,{base64_image}"
                     }
                 })
+                has_image = True
         
         # If no vision capabilities needed, revert to simpler format
         if not image_path or len(user_message["content"]) == 1 and user_message["content"][0]["type"] == "text":
             user_message = {"role": "user", "content": prompt}
 
+        # 根据是否包含图像来决定是否添加系统消息
+        messages = []
+        if not has_image:
+            messages.append({"role": "system", "content": ""})
+        
+        messages.append(user_message)
+
         params = {
-            "messages": [
-                {"role": "system", "content": ""},
-                user_message
-            ],
+            "messages": messages,
             "stream": True,
             "temperature": float(temperature),
             "top_p": 1
