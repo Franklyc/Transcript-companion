@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcript Companion - Advanced Speech Analysis Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-bg"></div>
+        <nav class="navbar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <span class="icon">🎙️</span>
+                    <div class="logo-glow"></div>
+                </div>
+                <span class="text">Transcript Companion</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#installation" class="nav-link">Installation</a>
+                <a href="#preview" class="nav-link">Preview</a>
+                <a href="https://github.com/Franklyc/Transcript-companion" class="github-link">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </div>
+        </nav>
+        <div class="hero">
+            <div class="hero-content" data-aos="fade-up">
+                <h1>Advanced Speech Analysis</h1>
+                <p class="hero-description">
+                    A sophisticated platform leveraging cutting-edge LLM technologies to transform and analyze speech transcripts with unprecedented precision.
+                </p>
+                <div class="cta-buttons">
+                    <a href="#installation" class="primary-btn">
+                        <span>Get Started</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="https://github.com/Franklyc/Transcript-companion" class="secondary-btn">
+                        <i class="fab fa-github"></i>
+                        <span>View on GitHub</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-backdrop"></div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2 class="section-title" data-aos="fade-up">Core Capabilities</h2>
+        <div class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+            Discover the power of intelligent speech analysis
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card" data-aos="fade-up">
+                <div class="feature-icon">
+                    <i class="fas fa-paint-brush"></i>
+                </div>
+                <h3>Modern Interface</h3>
+                <p>Sophisticated design with customizable themes and efficient workflow organization.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Advanced AI Integration</h3>
+                <p>Seamless integration with cutting-edge LLM providers including Cerebras, Groq, and Google Gemini.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3>Visual Analysis</h3>
+                <p>Comprehensive visual processing with OCR, image analysis, and vision model support.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up">
+                <div class="feature-icon">
+                    <i class="fas fa-stream"></i>
+                </div>
+                <h3>Real-time Processing</h3>
+                <p>Experience AI responses as they unfold with our advanced streaming technology.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-icon">
+                    <i class="fas fa-language"></i>
+                </div>
+                <h3>Global Accessibility</h3>
+                <p>Full multilingual support with seamless switching between Chinese and English interfaces.</p>
+            </div>
+            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-icon">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <h3>Visual Comfort</h3>
+                <p>Meticulously crafted light and dark themes for optimal viewing experience.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="installation">
+        <div class="installation-container">
+            <h2 class="section-title" data-aos="fade-up">Quick Setup</h2>
+            <div class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Get started in minutes with simple installation steps
+            </div>
+            <div class="installation-steps" data-aos="fade-up" data-aos-delay="200">
+                <div class="code-block">
+                    <pre><code>git clone https://github.com/Franklyc/Transcript-companion.git
+cd Transcript-companion
+pip install -r requirements.txt</code></pre>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                        <i class="far fa-copy"></i>
+                    </button>
+                </div>
+                <div class="setup-steps">
+                    <h3>Configuration</h3>
+                    <ol>
+                        <li><code>config.py.example</code> → <code>config.py</code></li>
+                        <li><code>prefix.py.example</code> → <code>prefix.py</code></li>
+                        <li>Configure your API keys in config.py</li>
+                        <li>Launch with: <code>python main.py</code></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="installation-backdrop"></div>
+    </section>
+
+    <!-- Preview Section -->
+    <section id="preview" class="preview">
+        <h2 class="section-title" data-aos="fade-up">Interface Preview</h2>
+        <div class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+            Experience our polished and intuitive user interface
+        </div>
+        <div class="preview-grid">
+            <div class="preview-card" data-aos="fade-right">
+                <div class="preview-image">
+                    <img src="assets/EN/UI_light_1_en.png" alt="Light Theme Preview">
+                    <div class="preview-overlay">
+                        <span>Light Theme</span>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-card" data-aos="fade-left">
+                <div class="preview-image">
+                    <img src="assets/EN/UI_dark_1_en.png" alt="Dark Theme Preview">
+                    <div class="preview-overlay">
+                        <span>Dark Theme</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <p>© 2024 Transcript Companion</p>
+                <p class="license">Released under MIT License</p>
+            </div>
+            <div class="social-links">
+                <a href="https://github.com/Franklyc/Transcript-companion" aria-label="GitHub Repository">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        function copyCode(button) {
+            const codeBlock = button.parentElement.querySelector('code');
+            navigator.clipboard.writeText(codeBlock.textContent);
+            
+            const originalIcon = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            button.classList.add('copied');
+            
+            setTimeout(() => {
+                button.innerHTML = originalIcon;
+                button.classList.remove('copied');
+            }, 2000);
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
