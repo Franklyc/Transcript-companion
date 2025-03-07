@@ -328,60 +328,81 @@ class ContentArea(QWidget):
             for idx, img_path in enumerate(image_paths):
                 image_info.append(f"{idx+1}. {os.path.basename(img_path)}")
         
+        # 获取当前语言
+        current_lang = self.parent.current_lang
+        
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
+                # 使用当前语言的文本
+                heading_conversation = "完整对话历史记录" if current_lang == 'zh' else "Complete Conversation History"
+                heading_system = "系统消息" if current_lang == 'zh' else "System Message"
+                heading_turn = "轮次" if current_lang == 'zh' else "Turn"
+                heading_user = "用户输入" if current_lang == 'zh' else "User Input"
+                heading_assistant = "助手回复" if current_lang == 'zh' else "Assistant Response"
+                heading_related_images = "相关图片" if current_lang == 'zh' else "Related Images"
+                heading_conversation_record = "对话记录" if current_lang == 'zh' else "Conversation Record"
+                heading_export_time = "导出时间" if current_lang == 'zh' else "Export Time"
+                heading_model = "使用的模型" if current_lang == 'zh' else "Model Used"
+                heading_temperature = "温度" if current_lang == 'zh' else "Temperature"
+                heading_transcript_file = "转录文件" if current_lang == 'zh' else "Transcript File"
+                heading_mode = "模式" if current_lang == 'zh' else "Mode"
+                text_continuous = "连续对话" if current_lang == 'zh' else "Continuous Dialogue"
+                text_single = "单次对话" if current_lang == 'zh' else "Single Dialogue"
+                
                 # 如果启用了连续对话，输出完整的对话历史
                 if src.config.config.ENABLE_CONTINUOUS_DIALOGUE and self.dialogue_history:
-                    f.write("# 完整对话历史记录\n\n")
+                    f.write(f"# {heading_conversation}\n\n")
                     
                     # 整理系统消息、用户消息和助手消息
                     current_turn = 0
                     for i, (role, content) in enumerate(self.dialogue_history):
                         if role == "system":
-                            f.write(f"## 系统消息\n{content}\n\n")
+                            f.write(f"## {heading_system}\n{content}\n\n")
                         elif role == "user":
                             current_turn += 1
-                            f.write(f"## 轮次 {current_turn} - 用户输入\n{content}\n\n")
+                            f.write(f"## {heading_turn} {current_turn} - {heading_user}\n{content}\n\n")
                             
                             # 检查此用户消息是否关联了图片
                             if i > 0 and i < len(self.dialogue_history) - 1:
                                 # 简单的图片关联启发式：如果输入很短且包含图片路径关键词
-                                if ("image" in content.lower() or "图片" in content or "截图" in content) and image_info:
-                                    f.write("### 相关图片\n")
+                                image_keywords = ["image", "图片", "截图", "picture", "screenshot", "photo"]
+                                has_image_keyword = any(keyword in content.lower() for keyword in image_keywords)
+                                if has_image_keyword and image_info:
+                                    f.write(f"### {heading_related_images}\n")
                                     for img in image_info:
                                         f.write(f"- {img}\n")
                                     f.write("\n")
                         elif role == "assistant":
-                            f.write(f"## 轮次 {current_turn} - 助手回复\n{content}\n\n")
+                            f.write(f"## {heading_turn} {current_turn} - {heading_assistant}\n{content}\n\n")
                             f.write("---\n\n")  # 分隔符
                 else:
                     # 非连续对话模式下，只导出当前的对话
-                    f.write("# 对话记录\n\n")
+                    f.write(f"# {heading_conversation_record}\n\n")
                     
-                    f.write("## 用户输入\n")
+                    f.write(f"## {heading_user}\n")
                     f.write(f"{current_prompt}\n\n")
                     
                     # 添加图片信息
                     if image_info:
-                        f.write("### 相关图片\n")
+                        f.write(f"### {heading_related_images}\n")
                         for img in image_info:
                             f.write(f"- {img}\n")
                         f.write("\n")
                         
-                    f.write("## 助手回复\n")
+                    f.write(f"## {heading_assistant}\n")
                     f.write(f"{current_output}\n\n")
                     
                 # 添加元数据
                 f.write("---\n\n")
-                f.write(f"导出时间: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"使用的模型: {self.settings_tab.get_selected_model()}\n")
-                f.write(f"温度: {self.settings_tab.get_temperature()}\n")
+                f.write(f"{heading_export_time}: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write(f"{heading_model}: {self.settings_tab.get_selected_model()}\n")
+                f.write(f"{heading_temperature}: {self.settings_tab.get_temperature()}\n")
                 if latest_file:
-                    f.write(f"转录文件: {latest_file}\n")
+                    f.write(f"{heading_transcript_file}: {latest_file}\n")
                 if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
-                    f.write("模式: 连续对话\n")
+                    f.write(f"{heading_mode}: {text_continuous}\n")
                 else:
-                    f.write("模式: 单次对话\n")
+                    f.write(f"{heading_mode}: {text_single}\n")
                     
             self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['export_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{filepath}")
         except Exception as e:
