@@ -31,6 +31,7 @@ class Sidebar(QWidget):
 
         # Sidebar buttons
         sidebar_buttons = [
+            ("📌", "pinButton", self.parent.toggle_stay_on_top),
             ("🀄" if self.parent.current_lang == 'zh' else "🔤", "langButton", self.parent.toggle_language),
             ("🌙" if self.parent.current_theme == "light" else "☀️", "themeButton", self.parent.toggle_theme),
             ("❓", "sidebarButton", self.parent.show_help),
@@ -46,6 +47,9 @@ class Sidebar(QWidget):
                 self.lang_button = button
             elif obj_name == "themeButton":
                 self.theme_button = button
+            elif obj_name == "pinButton":
+                self.pin_button = button
+                self.pin_button.setToolTip("Pin window (keep on top)")
 
         sidebar_layout.addStretch()
 

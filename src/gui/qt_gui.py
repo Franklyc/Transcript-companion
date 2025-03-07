@@ -225,3 +225,20 @@ class MainWindow(QMainWindow):
 
     def update_model_list(self, include_local=False):
         self.content_area.update_model_list(include_local)
+    
+    def toggle_stay_on_top(self):
+        """切换窗口置顶状态"""
+        flags = self.windowFlags()
+        if flags & Qt.WindowType.WindowStaysOnTopHint:
+            # 取消置顶
+            self.setWindowFlags(flags & ~Qt.WindowType.WindowStaysOnTopHint)
+            self.sidebar.pin_button.setText("📌")
+            self.sidebar.pin_button.setToolTip("Pin window (keep on top)")
+        else:
+            # 设置置顶
+            self.setWindowFlags(flags | Qt.WindowType.WindowStaysOnTopHint)
+            self.sidebar.pin_button.setText("📍")
+            self.sidebar.pin_button.setToolTip("Unpin window")
+        
+        # 重新显示窗口以应用更改
+        self.show()
