@@ -62,6 +62,17 @@ STRINGS = {
         'show_source': "显示源文本",
         'remove_image': "移除图片",
         'add_more_images': "添加更多图片",
+        
+        # 连续对话相关文本
+        'enable_continuous_dialogue': "启用连续对话",
+        'continuous_dialogue_enabled': "连续对话已启用",
+        'continuous_dialogue_disabled': "连续对话已禁用",
+        'new_content_detected': "检测到新内容，长度: {0}字符",
+        'resuming_from_position': "从上次位置继续: {0}",
+        'continuous_dialogue_context': "上下文中包含 {0} 条消息",
+        'reset_dialogue_context': "重置对话上下文",
+        'reset_position': "重置文件位置",
+        'reset_position_success': "已重置文件位置，将从文件开头读取",
     },
     'en': {
         'window_title': "Transcript companion",
@@ -126,5 +137,16 @@ Sidebar Features:
         'show_source': "Show Source",
         'remove_image': "Remove",
         'add_more_images': "Add More Images",
+        
+        # 连续对话相关文本
+        'enable_continuous_dialogue': "Enable Continuous Dialogue",
+        'continuous_dialogue_enabled': "Continuous Dialogue Enabled",
+        'continuous_dialogue_disabled': "Continuous Dialogue Disabled",
+        'new_content_detected': "New content detected, length: {0} characters",
+        'resuming_from_position': "Resuming from previous position: {0}",
+        'continuous_dialogue_context': "Context includes {0} messages",
+        'reset_dialogue_context': "Reset Dialogue Context",
+        'reset_position': "Reset File Position",
+        'reset_position_success': "File position reset, will start reading from the beginning",
     }
 }

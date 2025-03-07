@@ -17,6 +17,8 @@ class ContentArea(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        # 初始化对话历史记录
+        self.dialogue_history = []
         self.init_ui()
 
     def init_ui(self):
@@ -113,44 +115,185 @@ class ContentArea(QWidget):
         """选择文件夹"""
         self.settings_tab.select_folder()
 
+    def get_new_transcript_content(self, file_path):
+        """获取新增的转录内容（支持连续对话）
+        
+        返回:
+            (新增内容, 是否有新内容)
+        """
+        try:
+            if not os.path.exists(file_path):
+                return "", False
+                
+            # 读取整个文件内容
+            with open(file_path, 'r', encoding='utf-8') as file:
+                full_content = file.read()
+            
+            # 如果未启用连续对话功能，直接返回全部内容
+            if not src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+                return full_content, True
+                
+            # 检查是否已有记录的文件位置
+            last_position = src.config.config.TRANSCRIPT_POSITION.get(file_path, 0)
+            
+            # 计算新内容
+            if last_position >= len(full_content):
+                return "", False  # 没有新内容
+                
+            new_content = full_content[last_position:]
+            
+            # 更新文件位置
+            src.config.config.TRANSCRIPT_POSITION[file_path] = len(full_content)
+            
+            self.output_area.set_status(
+                STRINGS[self.parent.current_lang]['new_content_detected'].format(len(new_content)) + 
+                "\n" + 
+                STRINGS[self.parent.current_lang]['resuming_from_position'].format(last_position)
+            )
+            
+            return new_content, len(new_content) > 0
+            
+        except Exception as e:
+            self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
+            return "", False
+
     def copy_and_get_answer(self):
         """复制内容并从API获取回答"""
         directory = self.settings_tab.get_folder_path()
         latest_file = src.gui.utils.get_latest_file(directory)
         original_prefix = src.gui.prefix.get_original_prefix() if src.config.config.USE_PREDEFINED_PREFIX else ""
         ocr_text = self.input_tab.get_ocr_text()
+        
+        # 获取用户自定义的前缀和后缀文本
+        prefix_text = self.input_tab.get_prefix_text()
+        suffix_text = self.input_tab.get_suffix_text()
 
-        if latest_file:
-            try:
-                transcript_content = ""
-                if src.config.config.USE_TRANSCRIPT_TEXT:
-                    with open(latest_file, 'r', encoding='utf-8') as file:
-                        transcript_content = file.read()
-
-                combined_content = f"{original_prefix}\n{self.input_tab.get_prefix_text()}\n{transcript_content}\n{self.input_tab.get_suffix_text()}\n{ocr_text}"
+        # 检查是否有文件可用
+        if not latest_file and not src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+            self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+            return
+            
+        try:
+            transcript_content = ""
+            has_new_content = False
+            
+            # 获取转录文本内容 - 无论是否为连续对话模式
+            if src.config.config.USE_TRANSCRIPT_TEXT and latest_file:
+                if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+                    # 连续对话模式：只获取新内容
+                    transcript_content, has_new_content = self.get_new_transcript_content(latest_file)
+                else:
+                    # 普通模式：获取全部内容
+                    try:
+                        with open(latest_file, 'r', encoding='utf-8') as file:
+                            transcript_content = file.read()
+                            has_new_content = bool(transcript_content)
+                    except Exception as e:
+                        self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
+                        return
+            
+            # 确定是否有任何输入内容可用于对话
+            has_input_content = bool(transcript_content) or bool(ocr_text) or bool(prefix_text) or bool(suffix_text)
+            
+            # 处理连续对话的情况
+            if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+                # 即使没有新内容，只要有用户输入或者有历史记录，也可以继续对话
+                if not has_input_content and not self.dialogue_history:
+                    # 真的什么都没有的情况
+                    self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+                    return
+                
+                # 连续对话模式：添加对话上下文提示
+                context_msg = STRINGS[self.parent.current_lang]['continuous_dialogue_context'].format(len(self.dialogue_history))
+                
+                # 构建当前提示内容 - 即使转录内容为空，也需要创建包含前缀、后缀的提示
+                prompt_parts = []
+                
+                # 如果有前缀或后缀，始终添加这部分
+                if prefix_text or transcript_content or suffix_text:
+                    # 构建包含前缀、转录内容、后缀的完整提示
+                    full_text_parts = []
+                    if prefix_text:
+                        full_text_parts.append(prefix_text)
+                    if transcript_content:
+                        full_text_parts.append(transcript_content)
+                    if suffix_text:
+                        full_text_parts.append(suffix_text)
+                    prompt_parts.append("\n".join(full_text_parts))
+                
+                # 添加OCR文本(如果有)
+                if ocr_text:
+                    prompt_parts.append(ocr_text)
+                    
+                combined_content = "\n".join(prompt_parts)
+                
+                # 如果没有任何新增内容但有历史记录，允许用户继续对话
+                if not combined_content and self.dialogue_history:
+                    # 使用一个特殊提示告知模型继续前面的对话
+                    combined_content = "Please continue analyzing based on our previous conversation."
+                
+                # 设置状态并复制到剪贴板
+                status_message = context_msg
+                if latest_file:
+                    status_message += f"\n{STRINGS[self.parent.current_lang]['copied_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{latest_file}"
+                
+                # 只在有内容时复制到剪贴板
+                if combined_content:
+                    src.gui.utils.copy_to_clipboard(combined_content)
+                    self.output_area.set_status(status_message)
+            else:
+                # 非连续对话模式，使用完整提示
+                # 检查没有转录文件内容且未启用预定义前缀的情况
+                if not transcript_content and not src.config.config.USE_PREDEFINED_PREFIX:
+                    if not ocr_text and not prefix_text and not suffix_text:
+                        self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+                        return
+                        
+                combined_content = f"{original_prefix}\n{prefix_text}\n{transcript_content}\n{suffix_text}\n{ocr_text}"
+                combined_content = combined_content.strip()
+                
+                if not combined_content:
+                    self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+                    return
+                    
                 src.gui.utils.copy_to_clipboard(combined_content)
-                self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['copied_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{latest_file}")
+                
+                if latest_file:
+                    self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['copied_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{latest_file}")
+                else:
+                    self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['copied_success']}")
 
-                self.output_area.copy_button.setEnabled(False)
-                
-                # 清空旧内容
-                self.output_area.clear_output()
-                
-                # 使用API获取回答 - 使用多图像功能
+            self.output_area.copy_button.setEnabled(False)
+            
+            # 清空旧内容
+            self.output_area.clear_output()
+            
+            # 使用API获取回答
+            if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+                # 连续对话模式：传递对话历史和新内容
+                src.api.api.fetch_model_response_with_history(
+                    combined_content, 
+                    self.output_area,
+                    self.settings_tab.get_selected_model(), 
+                    self.settings_tab.get_temperature(),
+                    self.dialogue_history,
+                    self.input_tab.get_image_paths()
+                )
+            else:
+                # 传统模式：直接传递完整内容
                 src.api.api.fetch_model_response(
                     combined_content, 
                     self.output_area,
                     self.settings_tab.get_selected_model(), 
                     self.settings_tab.get_temperature(),
-                    self.input_tab.get_image_paths()  # 使用新的获取多图像方法
+                    self.input_tab.get_image_paths()
                 )
-                self.output_area.copy_button.setEnabled(True)
+            
+            self.output_area.copy_button.setEnabled(True)
 
-            except Exception as e:
-                self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
-                self.output_area.copy_button.setEnabled(True)
-        else:
-            self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+        except Exception as e:
+            self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
+            self.output_area.copy_button.setEnabled(True)
 
     def export_conversation(self):
         """导出当前对话"""
@@ -162,6 +305,7 @@ class ContentArea(QWidget):
         filename = f"conversation_{timestamp}.txt"
         filepath = os.path.join(history_dir, filename)
 
+        # 获取当前会话信息（用于非连续对话模式）
         original_prefix = src.gui.prefix.get_original_prefix() if src.config.config.USE_PREDEFINED_PREFIX else ""
         transcript_content = ""
         directory = self.settings_tab.get_folder_path()
@@ -174,20 +318,71 @@ class ContentArea(QWidget):
                 self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
                 return
 
-        prompt = f"{original_prefix}\n{self.input_tab.get_prefix_text()}\n{transcript_content}\n{self.input_tab.get_suffix_text()}\n{self.input_tab.get_ocr_text()}"
-        output = self.output_area.output_text.toPlainText()
+        current_prompt = f"{original_prefix}\n{self.input_tab.get_prefix_text()}\n{transcript_content}\n{self.input_tab.get_suffix_text()}\n{self.input_tab.get_ocr_text()}"
+        current_output = self.output_area.output_text.toPlainText()
         
-        # 更新图片信息导出
-        image_info = ""
+        # 获取图片信息
         image_paths = self.input_tab.get_image_paths()
+        image_info = []
         if image_paths and len(image_paths) > 0:
-            image_info = "\n\nImages included:"
             for idx, img_path in enumerate(image_paths):
-                image_info += f"\n{idx+1}. {img_path}"
-
+                image_info.append(f"{idx+1}. {os.path.basename(img_path)}")
+        
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
-                f.write(f"Prompt:\n{prompt}\n{image_info}\n\nOutput:\n{output}")
+                # 如果启用了连续对话，输出完整的对话历史
+                if src.config.config.ENABLE_CONTINUOUS_DIALOGUE and self.dialogue_history:
+                    f.write("# 完整对话历史记录\n\n")
+                    
+                    # 整理系统消息、用户消息和助手消息
+                    current_turn = 0
+                    for i, (role, content) in enumerate(self.dialogue_history):
+                        if role == "system":
+                            f.write(f"## 系统消息\n{content}\n\n")
+                        elif role == "user":
+                            current_turn += 1
+                            f.write(f"## 轮次 {current_turn} - 用户输入\n{content}\n\n")
+                            
+                            # 检查此用户消息是否关联了图片
+                            if i > 0 and i < len(self.dialogue_history) - 1:
+                                # 简单的图片关联启发式：如果输入很短且包含图片路径关键词
+                                if ("image" in content.lower() or "图片" in content or "截图" in content) and image_info:
+                                    f.write("### 相关图片\n")
+                                    for img in image_info:
+                                        f.write(f"- {img}\n")
+                                    f.write("\n")
+                        elif role == "assistant":
+                            f.write(f"## 轮次 {current_turn} - 助手回复\n{content}\n\n")
+                            f.write("---\n\n")  # 分隔符
+                else:
+                    # 非连续对话模式下，只导出当前的对话
+                    f.write("# 对话记录\n\n")
+                    
+                    f.write("## 用户输入\n")
+                    f.write(f"{current_prompt}\n\n")
+                    
+                    # 添加图片信息
+                    if image_info:
+                        f.write("### 相关图片\n")
+                        for img in image_info:
+                            f.write(f"- {img}\n")
+                        f.write("\n")
+                        
+                    f.write("## 助手回复\n")
+                    f.write(f"{current_output}\n\n")
+                    
+                # 添加元数据
+                f.write("---\n\n")
+                f.write(f"导出时间: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write(f"使用的模型: {self.settings_tab.get_selected_model()}\n")
+                f.write(f"温度: {self.settings_tab.get_temperature()}\n")
+                if latest_file:
+                    f.write(f"转录文件: {latest_file}\n")
+                if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+                    f.write("模式: 连续对话\n")
+                else:
+                    f.write("模式: 单次对话\n")
+                    
             self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['export_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{filepath}")
         except Exception as e:
             self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['export_error']}{e}", True)
