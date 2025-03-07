@@ -18,8 +18,12 @@ class MainWindow(QMainWindow):
         self.old_pos = None  # 用于窗口拖动
         self.current_lang = 'zh'
         self.current_theme = src.config.config.DEFAULT_THEME
+        
+        # 启用窗口透明度
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        
         self.init_ui()
-
+    
     def init_ui(self):
         self.setWindowTitle(STRINGS[self.current_lang]['window_title'])
         self.setFixedSize(550, 700)
@@ -27,8 +31,15 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         horizontal_layout = QHBoxLayout(central_widget)
-        horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        horizontal_layout.setContentsMargins(10, 10, 10, 10)  # 增加边距，创造悬浮效果
         horizontal_layout.setSpacing(0)
+
+        # 创建主窗口容器
+        main_container_wrapper = QWidget()
+        main_container_wrapper.setObjectName("mainContainerWrapper")
+        wrapper_layout = QVBoxLayout(main_container_wrapper)
+        wrapper_layout.setContentsMargins(0, 0, 0, 0)
+        wrapper_layout.setSpacing(0)
 
         # Sidebar
         self.sidebar = Sidebar(self)
@@ -49,7 +60,9 @@ class MainWindow(QMainWindow):
         self.content_area = ContentArea(self)
         main_layout.addWidget(self.content_area)
 
-        horizontal_layout.addWidget(self.main_container)
+        # 将主容器添加到包装器中
+        wrapper_layout.addWidget(self.main_container)
+        horizontal_layout.addWidget(main_container_wrapper)
 
         self.apply_theme()
 
@@ -57,6 +70,7 @@ class MainWindow(QMainWindow):
         theme = src.config.config.THEMES[self.current_theme]
         font_family = src.config.config.UI_FONT_FAMILY
         border_radius = src.config.config.UI_BORDER_RADIUS
+        shadow = src.config.config.UI_SHADOW
         
         # 应用主题到各个组件
         self.title_bar.apply_theme()
@@ -66,26 +80,33 @@ class MainWindow(QMainWindow):
         # 设置主窗口样式
         self.setStyleSheet(f"""
             QMainWindow {{
-                background-color: {theme['window_bg']};
-                border: 1px solid {theme['input_border']};
+                background-color: transparent;
                 font-family: {font_family};
             }}
             
-            #mainContainer {{
+            #mainContainerWrapper {{
                 background-color: {theme['window_bg']};
+                border-radius: {border_radius};
+                border: {src.config.config.UI_BORDER_WIDTH} solid {theme['glass_border']};
+            }}
+            
+            #mainContainer {{
+                background-color: transparent;
                 padding-left: 1px;
             }}
             
             QComboBox QAbstractItemView {{
                 color: {theme['dropdown_text']};
-                background-color: {theme['input_bg']};
+                background-color: {theme['dropdown_bg']};
                 selection-background-color: {theme['button_bg']};
                 selection-color: {theme['button_text']};
+                border: 1px solid {theme['glass_border']};
+                border-radius: {border_radius};
             }}
             
             QScrollBar:vertical {{
                 border: none;
-                background: {theme['window_bg']};
+                background: transparent;
                 width: 8px;
                 margin: 0px;
             }}
@@ -106,7 +127,7 @@ class MainWindow(QMainWindow):
             
             QScrollBar:horizontal {{
                 border: none;
-                background: {theme['window_bg']};
+                background: transparent;
                 height: 8px;
                 margin: 0px;
             }}
@@ -130,7 +151,8 @@ class MainWindow(QMainWindow):
                 background-color: {theme['input_bg']};
                 border: 1px solid {theme['input_border']};
                 border-radius: {border_radius};
-                padding: 2px;
+                padding: 4px;
+                font-family: {font_family};
             }}
         """)
 
@@ -186,10 +208,12 @@ class MainWindow(QMainWindow):
             QMessageBox {{
                 background-color: {theme['dialog_bg']};
                 font-family: {font_family};
+                border: {src.config.config.UI_BORDER_WIDTH} solid {theme['glass_border']};
+                border-radius: {border_radius};
             }}
             QLabel {{
                 color: {theme['text']};
-                background-color: {theme['dialog_bg']};
+                background-color: transparent;
                 font-size: {font_size};
             }}
             QPushButton {{

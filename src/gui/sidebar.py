@@ -8,6 +8,10 @@ class Sidebar(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.setObjectName("sidebar")
+        self.pin_button = None
+        self.lang_button = None
+        self.theme_button = None
         self.init_ui()
         # 显式设置背景填充属性
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -23,34 +27,42 @@ class Sidebar(QWidget):
         return button
 
     def init_ui(self):
-        self.setFixedWidth(50)
-        self.setObjectName("sidebar")
+        self.setFixedWidth(60)  # 稍微增大宽度以提高可用性
+        
         sidebar_layout = QVBoxLayout(self)
-        sidebar_layout.setContentsMargins(5, 5, 5, 5)
-        sidebar_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        sidebar_layout.setContentsMargins(5, 10, 5, 10)  # 增加垂直方向边距
+        sidebar_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter)
+        sidebar_layout.setSpacing(12)  # 增加按钮间距
 
         # Sidebar buttons
         sidebar_buttons = [
-            ("📌", "pinButton", self.parent.toggle_stay_on_top),
-            ("🀄" if self.parent.current_lang == 'zh' else "🔤", "langButton", self.parent.toggle_language),
-            ("🌙" if self.parent.current_theme == "light" else "☀️", "themeButton", self.parent.toggle_theme),
-            ("❓", "sidebarButton", self.parent.show_help),
-            ("⚙️", "sidebarButton", self.parent.show_settings),
-            ("🗑️", "sidebarButton", self.parent.clear_content),
-            ("🔄", "sidebarButton", lambda: self.parent.update_model_list(True)),
+            ("📌", "pinButton", self.parent.toggle_stay_on_top, "固定窗口"),
+            ("🀄" if self.parent.current_lang == 'zh' else "🔤", "langButton", self.parent.toggle_language, "切换语言"),
+            ("🌙" if self.parent.current_theme == "light" else "☀️", "themeButton", self.parent.toggle_theme, "切换主题"),
+            ("❓", "helpButton", self.parent.show_help, "帮助"),
+            ("⚙️", "settingsButton", self.parent.show_settings, "设置"),
+            ("🗑️", "clearButton", self.parent.clear_content, "清除内容"),
+            ("🔄", "refreshButton", lambda: self.parent.update_model_list(True), "刷新模型列表"),
         ]
 
-        for text, obj_name, callback in sidebar_buttons:
-            button = self.create_sidebar_button(text, obj_name, callback=callback)
-            sidebar_layout.addWidget(button)
-            if obj_name == "langButton":
+        for text, obj_name, callback, tooltip in sidebar_buttons:
+            button = QPushButton(text)
+            button.setObjectName(obj_name)
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
+            button.setFixedSize(42, 42)  # 设置统一的按钮大小
+            button.clicked.connect(callback)
+            button.setToolTip(tooltip)
+            
+            # 保存一些重要按钮的引用
+            if obj_name == "pinButton":
+                self.pin_button = button
+            elif obj_name == "langButton":
                 self.lang_button = button
             elif obj_name == "themeButton":
                 self.theme_button = button
-            elif obj_name == "pinButton":
-                self.pin_button = button
-                self.pin_button.setToolTip("Pin window (keep on top)")
-
+            
+            sidebar_layout.addWidget(button)
+            
         sidebar_layout.addStretch()
 
     def apply_theme(self):
@@ -59,31 +71,35 @@ class Sidebar(QWidget):
         font_size_large = src.config.config.UI_FONT_SIZE_LARGE
         border_radius = src.config.config.UI_BORDER_RADIUS
         padding = src.config.config.UI_PADDING_SMALL
+        shadow = src.config.config.UI_SHADOW
         
-        # 计算稍微深一点的边框颜色
-        border_color = theme['input_border']
-        
-        # 直接设置背景色
-        palette = self.palette()
-        palette.setColor(QPalette.ColorRole.Window, QColor(theme['sidebar_bg']))
-        self.setPalette(palette)
-        
-        # 设置其他样式
+        # 设置背景色和边框
         self.setStyleSheet(f"""
             QWidget#sidebar {{
                 background-color: {theme['sidebar_bg']};
-                border-right: 2px solid {border_color};
+                border-top-left-radius: {border_radius};
+                border-bottom-left-radius: {border_radius};
+                border-right: none;
             }}
-            #sidebarButton, #langButton, #themeButton {{
+            #pinButton, #langButton, #themeButton, #helpButton, #settingsButton, #clearButton, #refreshButton {{
                 background-color: transparent;
                 border: none;
                 color: {theme['text']};
-                font-size: {font_size_large};
+                font-size: 16pt;
                 padding: {padding};
                 margin: 2px;
+                border-radius: 12px;
             }}
-            #sidebarButton:hover, #langButton:hover, #themeButton:hover {{
-                background-color: {theme['input_border']};
-                border-radius: {border_radius};
+            #pinButton:hover, #langButton:hover, #themeButton:hover, #helpButton:hover, #settingsButton:hover {{
+                background-color: rgba(255, 255, 255, 0.15);
+                border-radius: 12px;
+            }}
+            #clearButton:hover {{
+                background-color: rgba(232, 17, 35, 0.2);
+                border-radius: 12px;
+            }}
+            #refreshButton:hover {{
+                background-color: rgba(59, 130, 246, 0.2);
+                border-radius: 12px;
             }}
         """)

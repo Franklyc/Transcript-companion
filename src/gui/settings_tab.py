@@ -135,6 +135,7 @@ class SettingsTab(QWidget):
         font_size = src.config.config.UI_FONT_SIZE_NORMAL
         border_radius = src.config.config.UI_BORDER_RADIUS
         padding = src.config.config.UI_PADDING_SMALL
+        shadow = src.config.config.UI_SHADOW
         
         self.setStyleSheet(f"""
             QWidget {{
@@ -147,10 +148,16 @@ class SettingsTab(QWidget):
             QLineEdit, QComboBox {{
                 font-size: {font_size};
                 padding: {padding};
-                border: 1px solid {theme['input_border']};
+                border: 1px solid {theme['glass_border']};
                 border-radius: {border_radius};
                 background-color: {theme['input_bg']};
                 color: {theme['text']};
+                selection-background-color: {theme['button_bg']};
+                selection-color: {theme['button_text']};
+            }}
+            QLineEdit:focus, QComboBox:focus {{
+                border: 1px solid {theme['button_bg']};
+                box-shadow: {shadow};
             }}
             QComboBox::drop-down {{
                 border: none;
@@ -165,16 +172,20 @@ class SettingsTab(QWidget):
                 color: {theme['dropdown_text']};
                 selection-background-color: {theme['button_bg']};
                 selection-color: {theme['button_text']};
+                border-radius: {border_radius};
             }}
             QPushButton {{
                 background-color: {theme['button_bg']};
                 color: {theme['button_text']};
-                padding: {padding};
+                padding: 8px 12px;
                 border-radius: {border_radius};
                 font-size: {font_size};
+                border: none;
             }}
             QPushButton:hover {{
                 background-color: {theme['button_hover']};
+                transform: translateY(-1px);
+                box-shadow: {shadow};
             }}
             #folderButton {{
                 min-width: 100px;

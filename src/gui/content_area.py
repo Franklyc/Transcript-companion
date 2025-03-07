@@ -89,7 +89,7 @@ class ContentArea(QWidget):
             }}
             
             QTabWidget::pane {{
-                border: 1px solid {theme['input_border']};
+                border: 1px solid {theme['glass_border']};
                 background-color: {theme['input_bg']};
                 border-radius: {border_radius};
             }}
@@ -97,9 +97,9 @@ class ContentArea(QWidget):
             QTabBar::tab {{
                 background-color: {theme['tab_bg']};
                 color: {theme['tab_text']};
-                padding: 6px 12px;
-                margin-right: 2px;
-                border: 1px solid {theme['input_border']};
+                padding: 8px 14px;
+                margin-right: 4px;
+                border: 1px solid {theme['glass_border']};
                 border-bottom: none;
                 border-top-left-radius: {border_radius};
                 border-top-right-radius: {border_radius};
@@ -108,6 +108,12 @@ class ContentArea(QWidget):
             QTabBar::tab:selected {{
                 background-color: {theme['tab_active_bg']};
                 border-bottom-color: {theme['tab_active_bg']};
+                border-bottom-width: 2px;
+                border-bottom-style: solid;
+            }}
+            
+            QTabBar::tab:hover:!selected {{
+                background-color: rgba(255, 255, 255, 0.1);
             }}
         """)
 
