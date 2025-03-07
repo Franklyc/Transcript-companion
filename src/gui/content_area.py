@@ -136,13 +136,13 @@ class ContentArea(QWidget):
                 # 清空旧内容
                 self.output_area.clear_output()
                 
-                # 使用API获取回答
+                # 使用API获取回答 - 使用多图像功能
                 src.api.api.fetch_model_response(
                     combined_content, 
                     self.output_area,
                     self.settings_tab.get_selected_model(), 
                     self.settings_tab.get_temperature(),
-                    self.input_tab.get_image_path()
+                    self.input_tab.get_image_paths()  # 使用新的获取多图像方法
                 )
                 self.output_area.copy_button.setEnabled(True)
 
@@ -177,9 +177,13 @@ class ContentArea(QWidget):
         prompt = f"{original_prefix}\n{self.input_tab.get_prefix_text()}\n{transcript_content}\n{self.input_tab.get_suffix_text()}\n{self.input_tab.get_ocr_text()}"
         output = self.output_area.output_text.toPlainText()
         
+        # 更新图片信息导出
         image_info = ""
-        if self.input_tab.get_image_path():
-            image_info = f"\n\nImage was included: {self.input_tab.get_image_path()}"
+        image_paths = self.input_tab.get_image_paths()
+        if image_paths and len(image_paths) > 0:
+            image_info = "\n\nImages included:"
+            for idx, img_path in enumerate(image_paths):
+                image_info += f"\n{idx+1}. {img_path}"
 
         try:
             with open(filepath, 'w', encoding='utf-8') as f:

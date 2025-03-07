@@ -23,7 +23,7 @@ def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
-def fetch_model_response(prompt, content_area, model_name, temperature, image_path=None):
+def fetch_model_response(prompt, content_area, model_name, temperature, image_paths=None):
     """
     从API获取模型的回复
     
@@ -32,7 +32,7 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
     - content_area: ContentArea实例，用于显示回复文本
     - model_name: 使用的模型名称
     - temperature: 温度参数
-    - image_path: 可选的图片路径
+    - image_paths: 可选的图片路径列表
     """
     try:
         # 首先清空输出
@@ -51,19 +51,25 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
         # 检查是否使用支持视觉的模型并且有图像路径
         has_image = False
         # Add image content if provided and model supports vision
-        if image_path and any(vision_model in model_name for vision_model in ["vision", "VL", "gemini", "claude", "gpt-4"]):
-            base64_image = encode_image_to_base64(image_path)
-            if base64_image:
-                user_message["content"].append({
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64,{base64_image}"
-                    }
-                })
-                has_image = True
+        if image_paths and any(vision_model in model_name for vision_model in ["vision", "VL", "gemini", "claude", "gpt-4"]):
+            # 处理图像列表
+            if isinstance(image_paths, str):
+                # 兼容旧代码，如果只是单个字符串路径
+                image_paths = [image_paths]
+                
+            for img_path in image_paths:
+                base64_image = encode_image_to_base64(img_path)
+                if base64_image:
+                    user_message["content"].append({
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"
+                        }
+                    })
+                    has_image = True
         
         # If no vision capabilities needed, revert to simpler format
-        if not image_path or len(user_message["content"]) == 1 and user_message["content"][0]["type"] == "text":
+        if not has_image and len(user_message["content"]) == 1 and user_message["content"][0]["type"] == "text":
             user_message = {"role": "user", "content": prompt}
 
         # 根据是否包含图像来决定是否添加系统消息
