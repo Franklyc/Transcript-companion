@@ -220,8 +220,10 @@ class MainWindow(QMainWindow):
         self.content_area.input_tab.prefix_text.clear()
         self.content_area.input_tab.suffix_text.clear()
         self.content_area.input_tab.ocr_text_edit.clear()
-        self.content_area.input_tab.image_display.clear()
-        self.content_area.input_tab.current_image_path = None
+        
+        # 使用新的清理图像功能代替旧的image_display.clear()
+        from src.gui.image_utils import clear_image
+        clear_image(self.content_area.input_tab)
 
     def update_model_list(self, include_local=False):
         self.content_area.update_model_list(include_local)
