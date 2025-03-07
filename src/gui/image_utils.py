@@ -235,6 +235,12 @@ def take_fullscreen_screenshot(parent, mode="screenshot"):
         image_path = os.path.join(temp_dir, f"fullscreen_{timestamp}.png")
         screenshot.save(image_path)
         
+        # 获取主窗口并恢复显示
+        main_window = parent.parent
+        main_window.showNormal()
+        main_window.activateWindow()
+        main_window.raise_()
+        
         # 根据模式处理图像
         if mode == "ocr":
             process_ocr(parent, image_path)
@@ -243,6 +249,12 @@ def take_fullscreen_screenshot(parent, mode="screenshot"):
         
         return True
     except Exception as e:
+        # 获取主窗口并恢复显示，即使发生错误也要恢复窗口
+        main_window = parent.parent
+        main_window.showNormal()
+        main_window.activateWindow()
+        main_window.raise_()
+        
         # 获取状态组件
         status_component = get_status_component(parent)
         if status_component:
