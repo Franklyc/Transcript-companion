@@ -73,6 +73,11 @@ STRINGS = {
         'reset_dialogue_context': "重置对话上下文",
         'reset_position': "重置文件位置",
         'reset_position_success': "已重置文件位置，将从文件开头读取",
+        
+        # Gemini搜索相关文本
+        'enable_gemini_search': "为Gemini模型启用Google搜索",
+        'gemini_search_enabled': "Gemini Google搜索功能已启用",
+        'gemini_search_disabled': "Gemini Google搜索功能已禁用",
     },
     'en': {
         'window_title': "Transcript companion",
@@ -148,5 +153,10 @@ Sidebar Features:
         'reset_dialogue_context': "Reset Dialogue Context",
         'reset_position': "Reset File Position",
         'reset_position_success': "File position reset, will start reading from the beginning",
+        
+        # Gemini搜索相关文本
+        'enable_gemini_search': "Enable Google Search for Gemini models",
+        'gemini_search_enabled': "Gemini Google Search feature enabled",
+        'gemini_search_disabled': "Gemini Google Search feature disabled",
     }
 }

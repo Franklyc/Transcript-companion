@@ -5,6 +5,8 @@ from src.config.config import get_provider_info
 from PyQt6.QtWidgets import QApplication
 from src.gui.lang import STRINGS
 import src.config.config
+from src.api.gemini_api import fetch_gemini_response, fetch_gemini_response_with_history
+
 
 def _get_openai_client(model_name):
     provider_info = get_provider_info(model_name)
@@ -40,6 +42,19 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
         # 首先清空输出
         content_area.clear_output()
         
+        # 检查是否为Gemini模型
+        if "[Gemini]" in model_name:
+            # 使用Gemini API
+            return fetch_gemini_response(
+                prompt, 
+                content_area, 
+                model_name, 
+                temperature, 
+                image_paths=image_paths, 
+                use_search=src.config.config.ENABLE_GEMINI_SEARCH
+            )
+        
+        # 以下是原始的OpenAI API处理逻辑
         # Prepare base message content
         user_message = {"role": "user", "content": []}
         
@@ -129,6 +144,8 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
                 
             # 更新到内容区域
             content_area.parent.parent.content_area.dialogue_history = dialogue_history
+            
+        return full_response
 
     except Exception as e:
         main_window = QApplication.instance().activeWindow()
@@ -136,6 +153,7 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
         error_message = f"{STRINGS[lang]['model_call_error']}{str(e)}"
         content_area.clear_output()
         content_area.append_text(error_message)
+        return error_message
 
 def fetch_model_response_with_history(prompt, content_area, model_name, temperature, history, image_paths=None):
     """
@@ -153,6 +171,20 @@ def fetch_model_response_with_history(prompt, content_area, model_name, temperat
         # 首先清空输出
         content_area.clear_output()
         
+        # 检查是否为Gemini模型
+        if "[Gemini]" in model_name:
+            # 使用Gemini API
+            return fetch_gemini_response_with_history(
+                prompt, 
+                content_area, 
+                model_name, 
+                temperature, 
+                history,
+                image_paths=image_paths, 
+                use_search=src.config.config.ENABLE_GEMINI_SEARCH
+            )
+        
+        # 以下是原始的OpenAI API处理逻辑
         # 构建消息数组
         messages = []
         
@@ -261,6 +293,8 @@ def fetch_model_response_with_history(prompt, content_area, model_name, temperat
                 else:
                     # 简单地保留最近的消息
                     history[:] = history[-max_history:]
+        
+        return full_response
                 
     except Exception as e:
         main_window = QApplication.instance().activeWindow()
@@ -268,3 +302,4 @@ def fetch_model_response_with_history(prompt, content_area, model_name, temperat
         error_message = f"{STRINGS[lang]['model_call_error']}{str(e)}"
         content_area.clear_output()
         content_area.append_text(error_message)
+        return error_message

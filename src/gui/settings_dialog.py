@@ -58,6 +58,18 @@ class SettingsDialog(QDialog):
         reset_buttons_layout.addWidget(self.reset_position_button)
         
         layout.addLayout(reset_buttons_layout)
+        
+        # 添加分隔线
+        separator_line2 = QLabel()
+        separator_line2.setFixedHeight(1)
+        separator_line2.setStyleSheet("background-color: #cccccc;")
+        layout.addWidget(separator_line2)
+        
+        # Gemini搜索功能部分
+        self.gemini_search_checkbox = QCheckBox(STRINGS[self.parent.current_lang].get('enable_gemini_search', 'Enable Google Search for Gemini models'))
+        self.gemini_search_checkbox.setObjectName("geminiSearchCheckbox")
+        self.gemini_search_checkbox.setChecked(src.config.config.ENABLE_GEMINI_SEARCH)
+        layout.addWidget(self.gemini_search_checkbox)
 
         self.setLayout(layout)
 
@@ -65,6 +77,7 @@ class SettingsDialog(QDialog):
         self.prefix_checkbox.stateChanged.connect(self.update_settings)
         self.transcript_checkbox.stateChanged.connect(self.update_settings)
         self.continuous_dialogue_checkbox.stateChanged.connect(self.update_settings)
+        self.gemini_search_checkbox.stateChanged.connect(self.update_settings)
         self.reset_context_button.clicked.connect(self.reset_dialogue_context)
         self.reset_position_button.clicked.connect(self.reset_file_position)
 
@@ -72,6 +85,7 @@ class SettingsDialog(QDialog):
         src.config.config.USE_PREDEFINED_PREFIX = self.prefix_checkbox.isChecked()
         src.config.config.USE_TRANSCRIPT_TEXT = self.transcript_checkbox.isChecked()
         src.config.config.ENABLE_CONTINUOUS_DIALOGUE = self.continuous_dialogue_checkbox.isChecked()
+        src.config.config.ENABLE_GEMINI_SEARCH = self.gemini_search_checkbox.isChecked()
         
         # 更新按钮状态
         self.reset_context_button.setEnabled(src.config.config.ENABLE_CONTINUOUS_DIALOGUE)
