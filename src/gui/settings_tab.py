@@ -157,7 +157,7 @@ class SettingsTab(QWidget):
             }}
             QLineEdit:focus, QComboBox:focus {{
                 border: 1px solid {theme['button_bg']};
-                box-shadow: {shadow};
+                /* 移除不支持的 box-shadow 属性 */
             }}
             QComboBox::drop-down {{
                 border: none;
@@ -184,8 +184,7 @@ class SettingsTab(QWidget):
             }}
             QPushButton:hover {{
                 background-color: {theme['button_hover']};
-                transform: translateY(-1px);
-                box-shadow: {shadow};
+                /* 移除不支持的 transform 和 box-shadow 属性 */
             }}
             #folderButton {{
                 min-width: 100px;
