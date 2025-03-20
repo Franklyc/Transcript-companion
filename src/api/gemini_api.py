@@ -27,6 +27,16 @@ def get_auxiliary_mode_prompt(mode):
         return src.config.config.CODING_DEBUG_TIME_PROMPT
     elif mode == "coding-debug-space-optimize":
         return src.config.config.CODING_DEBUG_SPACE_PROMPT
+    elif mode == "meeting-summarizer":
+        return src.config.config.MEETING_SUMMARIZER_PROMPT
+    elif mode == "action-item-extractor":
+        return src.config.config.ACTION_ITEM_EXTRACTOR_PROMPT
+    elif mode == "topic-tracker":
+        return src.config.config.TOPIC_TRACKER_PROMPT
+    elif mode == "sentiment-analyzer":
+        return src.config.config.SENTIMENT_ANALYZER_PROMPT
+    elif mode == "question-generator":
+        return src.config.config.QUESTION_GENERATOR_PROMPT
     return ""
 
 def encode_image_to_base64(image_path):

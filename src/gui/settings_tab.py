@@ -84,7 +84,12 @@ class SettingsTab(QWidget):
             "coding-debug-general": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_general'],
             "coding-debug-correction": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_correction'],
             "coding-debug-time-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_time_optimize'],
-            "coding-debug-space-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_space_optimize']
+            "coding-debug-space-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_space_optimize'],
+            "meeting-summarizer": STRINGS[self.parent.current_lang]['auxiliary_mode_meeting_summarizer'],
+            "action-item-extractor": STRINGS[self.parent.current_lang]['auxiliary_mode_action_item_extractor'],
+            "topic-tracker": STRINGS[self.parent.current_lang]['auxiliary_mode_topic_tracker'],
+            "sentiment-analyzer": STRINGS[self.parent.current_lang]['auxiliary_mode_sentiment_analyzer'],
+            "question-generator": STRINGS[self.parent.current_lang]['auxiliary_mode_question_generator']
         }
         
         for mode_key in src.config.config.AUXILIARY_MODES:
@@ -185,7 +190,12 @@ class SettingsTab(QWidget):
             "coding-debug-general": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_general'],
             "coding-debug-correction": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_correction'],
             "coding-debug-time-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_time_optimize'],
-            "coding-debug-space-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_space_optimize']
+            "coding-debug-space-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_space_optimize'],
+            "meeting-summarizer": STRINGS[self.parent.current_lang]['auxiliary_mode_meeting_summarizer'],
+            "action-item-extractor": STRINGS[self.parent.current_lang]['auxiliary_mode_action_item_extractor'],
+            "topic-tracker": STRINGS[self.parent.current_lang]['auxiliary_mode_topic_tracker'],
+            "sentiment-analyzer": STRINGS[self.parent.current_lang]['auxiliary_mode_sentiment_analyzer'],
+            "question-generator": STRINGS[self.parent.current_lang]['auxiliary_mode_question_generator']
         }
         
         for mode_key in src.config.config.AUXILIARY_MODES:

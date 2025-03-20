@@ -87,6 +87,11 @@ STRINGS = {
         'auxiliary_mode_coding_debug_correction': "编码问题-代码改正",
         'auxiliary_mode_coding_debug_time_optimize': "编码问题-时间复杂度优化",
         'auxiliary_mode_coding_debug_space_optimize': "编码问题-空间复杂度优化",
+        'auxiliary_mode_meeting_summarizer': "会议-总结要点",
+        'auxiliary_mode_action_item_extractor': "会议-提取行动项目",
+        'auxiliary_mode_topic_tracker': "会议-主题追踪",
+        'auxiliary_mode_sentiment_analyzer': "会议-情感分析",
+        'auxiliary_mode_question_generator': "会议-问题生成",
         'auxiliary_mode_changed': "附加模式已更改为: {0}",
     },
     'en': {
@@ -177,6 +182,11 @@ Sidebar Features:
         'auxiliary_mode_coding_debug_correction': "Coding Problem - Code Correction",
         'auxiliary_mode_coding_debug_time_optimize': "Coding Problem - Time Complexity Optimization",
         'auxiliary_mode_coding_debug_space_optimize': "Coding Problem - Space Complexity Optimization",
+        'auxiliary_mode_meeting_summarizer': "Meeting - Summarize Key Points",
+        'auxiliary_mode_action_item_extractor': "Meeting - Extract Action Items",
+        'auxiliary_mode_topic_tracker': "Meeting - Topic Tracking",
+        'auxiliary_mode_sentiment_analyzer': "Meeting - Sentiment Analysis",
+        'auxiliary_mode_question_generator': "Meeting - Question Generation",
         'auxiliary_mode_changed': "Auxiliary mode changed to: {0}",
     }
 }
