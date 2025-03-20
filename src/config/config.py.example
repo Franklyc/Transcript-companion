@@ -241,8 +241,16 @@ MAX_TOKEN_PER_REQUEST = 8000
 ENABLE_GEMINI_SEARCH = False  
 
 # Auxiliary mode configuration
-AUXILIARY_MODES = ["none", "coding-solution", "coding-debug-general", "coding-debug-correction", 
-                   "coding-debug-time-optimize", "coding-debug-space-optimize"]
+AUXILIARY_MODES = [
+    "none",
+    "coding-solution", "coding-debug-general", "coding-debug-correction",
+    "coding-debug-time-optimize", "coding-debug-space-optimize",
+    "meeting-summarizer",  
+    "action-item-extractor",  
+    "topic-tracker",  
+    "sentiment-analyzer",  
+    "question-generator",  
+]
 DEFAULT_AUXILIARY_MODE = "none"
 CURRENT_AUXILIARY_MODE = "none"
 
@@ -293,4 +301,53 @@ CODING_DEBUG_SPACE_PROMPT = """
     Provide a detailed analysis explaining your changes and their effect on memory usage. 
     Then, output the *optimized* code. 
     Do *not* include the corrected code within backticks or a code block.
+"""
+
+# Meeting Summarizer Mode
+MEETING_SUMMARIZER_PROMPT = """
+You are a highly efficient meeting summarizer.  Your task is to analyze the provided meeting transcript and produce a concise, informative summary.  The summary should cover the key discussion points, decisions made, and any unresolved issues.  Organize the summary in a clear and easily readable format (e.g., bullet points or short paragraphs). Focus on brevity and clarity.
+"""
+
+# Action Item Extractor Mode
+ACTION_ITEM_EXTRACTOR_PROMPT = """
+You are an action item extraction specialist.  Analyze the following meeting transcript and identify all action items discussed. For each action item, clearly state:
+
+1.  **What** needs to be done.
+2.  **Who** is responsible for the action. (If explicitly stated in the transcript; otherwise, indicate "Unassigned.")
+3.  **When** it is due (if a deadline is mentioned; otherwise, indicate "No deadline specified.").
+4. **Timestamp**.
+Present the action items in a numbered list.
+"""
+
+# Topic Tracker Mode
+TOPIC_TRACKER_PROMPT = """
+You are a meeting topic tracker. Analyze the provided transcript and identify the major topics discussed.  For each topic, provide:
+
+1.  A brief, descriptive title for the topic.
+2.  The start and end timestamps (in the format [HH:MM:SS] - [HH:MM:SS]) where the topic was discussed.
+3. A very short summary (1-2 sentences max) of what was said about it.
+
+Present the topics in chronological order.
+"""
+
+# Sentiment Analyzer Mode
+SENTIMENT_ANALYZER_PROMPT = """
+You are a sentiment analysis expert. Analyze the given meeting transcript and determine the overall sentiment expressed during the meeting. Identify sections with strong positive, negative, or neutral sentiment. Provide:
+
+1.  An overall sentiment score for the entire meeting (e.g., "Slightly Positive," "Very Negative," "Neutral").
+2.  A list of key phrases or sentences, along with their timestamps and associated sentiment (Positive, Negative, Neutral).
+3. A very short summary (1-2 sentences max) of the main emotional trends.
+"""
+
+# Question Generator Mode
+QUESTION_GENERATOR_PROMPT = """
+You are a skilled facilitator. Based on the following meeting transcript, generate a list of insightful questions that could be asked to:
+
+1.  Clarify any ambiguous points.
+2.  Encourage further discussion on important topics.
+3.  Identify potential problems or roadblocks.
+4.  Ensure all participants have a shared understanding.
+5.  Help to reach next step.
+
+The questions should be open-ended and designed to promote deeper thinking and engagement. Do not answer the questions.
 """
