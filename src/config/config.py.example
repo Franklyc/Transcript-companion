@@ -103,17 +103,23 @@ DEFAULT_TEMPERATURE = "1.0"
 
 DEFAULT_THEME = "light"
 
-# 统一设计变量
+# UI design variables
 UI_FONT_FAMILY = "'Inter', 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
 UI_FONT_SIZE_SMALL = "9pt"
 UI_FONT_SIZE_NORMAL = "10pt" 
 UI_FONT_SIZE_LARGE = "12pt"
-UI_BORDER_RADIUS = "4px"
-UI_PADDING_SMALL = "4px"
-UI_PADDING_NORMAL = "8px"
-UI_PADDING_LARGE = "12px"
-UI_SPACING = "5px"
-UI_MARGIN = "10px"
+UI_BORDER_RADIUS = "8px"  
+UI_PADDING_SMALL = "6px"  
+UI_PADDING_NORMAL = "10px"
+UI_PADDING_LARGE = "14px"
+UI_SPACING = "8px"  
+UI_MARGIN = "12px"
+
+# Glassmorphism effect configuration
+UI_GLASS_OPACITY = "0.8"
+UI_BLUR_RADIUS = "10px"
+UI_SHADOW = "0 8px 16px rgba(0, 0, 0, 0.15)"
+UI_BORDER_WIDTH = "1px"
 
 # Primary, Secondary, Success, Danger colors
 PRIMARY_COLOR = "#0078D7"  # Microsoft Blue
@@ -129,30 +135,34 @@ WARNING_COLOR = "#F59E0B"  # Amber
 THEMES = {
     "light": {
         # Base colors
-        "window_bg": "#F5F5F5",   
+        "window_bg": "rgba(245, 245, 245, 0.85)",   
         "text": "#000000",
         "text_secondary": "#555555",
-        "input_bg": "#FFFFFF",
-        "input_border": "#CCCCCC",
+        "input_bg": "rgba(255, 255, 255, 0.7)",  
+        "input_border": "rgba(204, 204, 204, 0.8)",  
         
         # Button colors
-        "button_bg": PRIMARY_COLOR,
-        "button_hover": PRIMARY_HOVER_COLOR,
+        "button_bg": "rgba(0, 120, 215, 0.9)",  
+        "button_hover": "rgba(0, 90, 158, 0.95)",
         "button_text": "#FFFFFF",
-        "button_success_bg": SUCCESS_COLOR,
-        "button_success_hover": SUCCESS_HOVER_COLOR,
-        "button_danger_bg": DANGER_COLOR,
-        "button_danger_hover": DANGER_HOVER_COLOR,
+        "button_success_bg": "rgba(76, 175, 80, 0.9)",
+        "button_success_hover": "rgba(54, 124, 57, 0.95)",
+        "button_danger_bg": "rgba(232, 17, 35, 0.9)",
+        "button_danger_hover": "rgba(196, 16, 25, 0.95)",
         
         # Component specific
         "title_button_hover": DANGER_COLOR,
-        "sidebar_bg": "#EBEBEB",  # Changed to #EBEBEB
-        "dialog_bg": "#F5F5F5",
+        "sidebar_bg": "rgba(235, 235, 235, 0.75)",  
+        "dialog_bg": "rgba(245, 245, 245, 0.85)",  
         "dropdown_text": "#000000",
-        "dropdown_bg": "#FFFFFF",
-        "tab_bg": "#ECECEC",
-        "tab_active_bg": "#FFFFFF",
+        "dropdown_bg": "rgba(255, 255, 255, 0.9)",  
+        "tab_bg": "rgba(236, 236, 236, 0.7)",  
+        "tab_active_bg": "rgba(255, 255, 255, 0.85)",  
         "tab_text": "#000000",
+        
+        # Glass effect
+        "glass_border": "rgba(255, 255, 255, 0.5)",
+        "glass_shadow": "0 8px 32px rgba(0, 0, 0, 0.1)",
         
         # Status colors
         "status_success": SUCCESS_COLOR,
@@ -162,7 +172,7 @@ THEMES = {
 
         # Markdown viewer
         "md_header": INFO_COLOR,
-        "md_code_bg": "#F1F5F9",
+        "md_code_bg": "rgba(241, 245, 249, 0.8)",
         "md_blockquote": "#64748B",
         "md_blockquote_border": "#CBD5E1",
         "md_link": INFO_COLOR,
@@ -171,30 +181,34 @@ THEMES = {
     },
     "dark": {
         # Base colors
-        "window_bg": "#2D2D2D",   
+        "window_bg": "rgba(45, 45, 45, 0.8)",   
         "text": "#FFFFFF",
         "text_secondary": "#BBBBBB",
-        "input_bg": "#3D3D3D",
-        "input_border": "#555555",
+        "input_bg": "rgba(61, 61, 61, 0.7)",  
+        "input_border": "rgba(85, 85, 85, 0.8)",  
         
         # Button colors
-        "button_bg": PRIMARY_COLOR,
-        "button_hover": PRIMARY_HOVER_COLOR,
+        "button_bg": "rgba(0, 120, 215, 0.9)",  
+        "button_hover": "rgba(0, 90, 158, 0.95)",
         "button_text": "#FFFFFF",
-        "button_success_bg": SUCCESS_COLOR, 
-        "button_success_hover": SUCCESS_HOVER_COLOR,
-        "button_danger_bg": DANGER_COLOR,
-        "button_danger_hover": DANGER_HOVER_COLOR,
+        "button_success_bg": "rgba(76, 175, 80, 0.9)", 
+        "button_success_hover": "rgba(54, 124, 57, 0.95)",
+        "button_danger_bg": "rgba(232, 17, 35, 0.9)",
+        "button_danger_hover": "rgba(196, 16, 25, 0.95)",
         
         # Component specific
         "title_button_hover": DANGER_COLOR,
-        "sidebar_bg": "#252525",  # Changed to #252525
-        "dialog_bg": "#2D2D2D",
+        "sidebar_bg": "rgba(37, 37, 37, 0.75)",  
+        "dialog_bg": "rgba(45, 45, 45, 0.85)",  
         "dropdown_text": "#FFFFFF",
-        "dropdown_bg": "#3D3D3D",
-        "tab_bg": "#222222",
-        "tab_active_bg": "#3D3D3D",
+        "dropdown_bg": "rgba(61, 61, 61, 0.9)",  
+        "tab_bg": "rgba(34, 34, 34, 0.7)",  
+        "tab_active_bg": "rgba(61, 61, 61, 0.85)",  
         "tab_text": "#FFFFFF",
+        
+        # Glass effect
+        "glass_border": "rgba(85, 85, 85, 0.5)",
+        "glass_shadow": "0 8px 32px rgba(0, 0, 0, 0.25)",
         
         # Status colors
         "status_success": SUCCESS_COLOR,
@@ -204,7 +218,7 @@ THEMES = {
         
         # Markdown viewer
         "md_header": INFO_COLOR,
-        "md_code_bg": "#1E293B",
+        "md_code_bg": "rgba(30, 41, 59, 0.8)",
         "md_blockquote": "#94A3B8",
         "md_blockquote_border": "#4B5563",
         "md_link": "#60A5FA",
@@ -215,3 +229,68 @@ THEMES = {
 
 USE_PREDEFINED_PREFIX = True
 USE_TRANSCRIPT_TEXT = True
+
+# Continuous dialogue related configuration
+ENABLE_CONTINUOUS_DIALOGUE = False  
+MAX_CONTEXT_MESSAGES = 5  
+SUMMARIZE_CONTEXT = True  
+TRANSCRIPT_POSITION = {}  
+MAX_TOKEN_PER_REQUEST = 8000  
+
+# Gemini model related configuration
+ENABLE_GEMINI_SEARCH = False  
+
+# Auxiliary mode configuration
+AUXILIARY_MODES = ["none", "coding-solution", "coding-debug-general", "coding-debug-correction", 
+                   "coding-debug-time-optimize", "coding-debug-space-optimize"]
+DEFAULT_AUXILIARY_MODE = "none"
+CURRENT_AUXILIARY_MODE = "none"
+
+# Additional prompt for coding solution mode
+CODING_SOLUTION_PROMPT = """
+    You are a highly skilled coding assistant.  
+    Your task is to provide a complete and correct solution to the problem depicted in the image.  
+    Output the code only, without any surrounding text or explanation. 
+    Do not include any comments in your code. 
+    Ensure the code is directly executable and addresses all aspects of the problem presented.
+"""
+
+# Additional prompt for debugging-general mode
+CODING_DEBUG_GENERAL_PROMPT = """
+    You are a highly skilled coding assistant. 
+    Analyze the provided code and the problem description in the image. 
+    Identify and describe any bugs, errors, or inefficiencies.  
+    Provide specific suggestions for improvement, focusing on correctness, efficiency, and best practices.  
+    Output a detailed analysis, and then provide the corrected code block.  
+    Do *not* include the corrected code within backticks or a code block.
+"""
+
+# Additional prompt for debugging-code correction mode
+CODING_DEBUG_CORRECTION_PROMPT = """
+    You are an expert code debugger. 
+    The following code is intended to solve the problem described in the image, but it contains errors.  
+    Identify the errors, and output *only* the corrected code. 
+    Do not include any surrounding text, explanations, or comments. 
+    Do not include the code within backticks or a code block.
+"""
+
+# Additional prompt for debugging-time complexity optimization mode
+CODING_DEBUG_TIME_PROMPT = """
+    You are a performance optimization expert.  
+    Analyze the given code, which is a solution to the problem in the image.  
+    Your goal is to improve its time complexity. 
+    Identify any inefficient parts of the algorithm and suggest specific optimizations.  
+    Output a detailed analysis, explaining the changes and their impact on time complexity.  
+    Then, output the *optimized* code. 
+    Do *not* include the corrected code within backticks or a code block.
+"""
+
+# Additional prompt for debugging-space complexity optimization mode
+CODING_DEBUG_SPACE_PROMPT = """
+    You are a memory optimization expert. 
+    Analyze the given code, which is a solution to the problem in the image, and focus on improving its space complexity. 
+    Identify areas where memory usage can be reduced. 
+    Provide a detailed analysis explaining your changes and their effect on memory usage. 
+    Then, output the *optimized* code. 
+    Do *not* include the corrected code within backticks or a code block.
+"""
