@@ -2,6 +2,32 @@ import os
 import base64
 from google import genai
 from google.genai import types
+import src.config.config
+
+# 辅助函数定义
+def get_auxiliary_mode_prompt(mode):
+    """
+    根据选定的附加模式返回相应的提示词
+    
+    参数:
+    - mode: 附加模式名称
+    
+    返回:
+    - str: 附加模式对应的提示词，如果模式为none则返回空字符串
+    """
+    if mode == "none":
+        return ""
+    elif mode == "coding-solution":
+        return src.config.config.CODING_SOLUTION_PROMPT
+    elif mode == "coding-debug-general":
+        return src.config.config.CODING_DEBUG_GENERAL_PROMPT
+    elif mode == "coding-debug-correction":
+        return src.config.config.CODING_DEBUG_CORRECTION_PROMPT
+    elif mode == "coding-debug-time-optimize":
+        return src.config.config.CODING_DEBUG_TIME_PROMPT
+    elif mode == "coding-debug-space-optimize":
+        return src.config.config.CODING_DEBUG_SPACE_PROMPT
+    return ""
 
 def encode_image_to_base64(image_path):
     """Encode an image file to base64 string"""
@@ -28,6 +54,16 @@ def fetch_gemini_response(prompt, content_area, model_name, temperature,
     try:
         # 首先清空输出
         content_area.clear_output()
+        
+        # 检查是否启用了附加模式
+        aux_mode = src.config.config.CURRENT_AUXILIARY_MODE
+        aux_prompt = get_auxiliary_mode_prompt(aux_mode)
+        
+        # 如果启用了附加模式，将附加提示词添加到prompt后面
+        if aux_prompt and prompt:
+            final_prompt = f"{prompt}\n\n{aux_prompt}"
+        else:
+            final_prompt = prompt
         
         # 设置API客户端
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
@@ -57,8 +93,8 @@ def fetch_gemini_response(prompt, content_area, model_name, temperature,
         user_parts = []
         
         # 添加文本内容
-        if prompt:
-            user_parts.append(types.Part.from_text(text=prompt))
+        if final_prompt:
+            user_parts.append(types.Part.from_text(text=final_prompt))
             
         # 添加图片内容（如果有的话）
         if image_paths and isinstance(image_paths, list):
@@ -143,6 +179,16 @@ def fetch_gemini_response_with_history(prompt, content_area, model_name, tempera
         # 首先清空输出
         content_area.clear_output()
         
+        # 检查是否启用了附加模式
+        aux_mode = src.config.config.CURRENT_AUXILIARY_MODE
+        aux_prompt = get_auxiliary_mode_prompt(aux_mode)
+        
+        # 如果启用了附加模式，将附加提示词添加到prompt后面
+        if aux_prompt and prompt:
+            final_prompt = f"{prompt}\n\n{aux_prompt}"
+        else:
+            final_prompt = prompt
+        
         # 设置API客户端
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
         
@@ -171,8 +217,8 @@ def fetch_gemini_response_with_history(prompt, content_area, model_name, tempera
         user_parts = []
         
         # 添加文本内容
-        if prompt:
-            user_parts.append(types.Part.from_text(text=prompt))
+        if final_prompt:
+            user_parts.append(types.Part.from_text(text=final_prompt))
             
         # 添加图片内容（如果有的话）
         if image_paths and isinstance(image_paths, list):

@@ -9,6 +9,7 @@ class SettingsTab(QWidget):
     
     folder_selected = pyqtSignal(str)
     provider_changed = pyqtSignal(str)
+    auxiliary_mode_changed = pyqtSignal(str)
     
     def __init__(self, parent):
         super().__init__(parent)
@@ -70,6 +71,33 @@ class SettingsTab(QWidget):
         grid_layout.addWidget(self.temp_label, 3, 0, Qt.AlignmentFlag.AlignRight)
         grid_layout.addWidget(self.temp_edit, 3, 1, 1, 2)
         
+        # 附加模式选择
+        self.aux_mode_label = QLabel(STRINGS[self.parent.current_lang]['select_auxiliary_mode'])
+        self.aux_mode_label.setFixedWidth(100)
+        self.aux_mode_combo = QComboBox()
+        self.aux_mode_combo.setFixedHeight(28)
+        
+        # 添加附加模式选项
+        aux_mode_items = {
+            "none": STRINGS[self.parent.current_lang]['auxiliary_mode_none'],
+            "coding-solution": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_solution'],
+            "coding-debug-general": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_general'],
+            "coding-debug-correction": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_correction'],
+            "coding-debug-time-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_time_optimize'],
+            "coding-debug-space-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_space_optimize']
+        }
+        
+        for mode_key in src.config.config.AUXILIARY_MODES:
+            self.aux_mode_combo.addItem(aux_mode_items[mode_key], mode_key)
+        
+        # 设置当前选中的附加模式
+        current_index = self.aux_mode_combo.findData(src.config.config.CURRENT_AUXILIARY_MODE)
+        if current_index >= 0:
+            self.aux_mode_combo.setCurrentIndex(current_index)
+        
+        grid_layout.addWidget(self.aux_mode_label, 4, 0, Qt.AlignmentFlag.AlignRight)
+        grid_layout.addWidget(self.aux_mode_combo, 4, 1, 1, 2)
+        
         # 设置列的拉伸因子
         grid_layout.setColumnStretch(1, 1)
         settings_layout.addLayout(grid_layout)
@@ -78,6 +106,7 @@ class SettingsTab(QWidget):
         # 连接信号
         self.folder_button.clicked.connect(self.select_folder)
         self.provider_combo.currentTextChanged.connect(self.on_provider_changed)
+        self.aux_mode_combo.currentIndexChanged.connect(self.on_auxiliary_mode_changed)
         
     def update_model_list(self, include_local=False):
         """更新模型列表"""
@@ -102,6 +131,17 @@ class SettingsTab(QWidget):
         self.update_model_list(self.provider_combo.currentText() in ["LMstudio", "Kobold", "Ollama"])
         self.provider_changed.emit(provider)
         
+    def on_auxiliary_mode_changed(self, index):
+        """处理附加模式选择变更"""
+        mode_key = self.aux_mode_combo.itemData(index)
+        src.config.config.CURRENT_AUXILIARY_MODE = mode_key
+        self.auxiliary_mode_changed.emit(mode_key)
+        
+        # 显示状态消息
+        mode_display_name = self.aux_mode_combo.itemText(index)
+        status_message = STRINGS[self.parent.current_lang]['auxiliary_mode_changed'].format(mode_display_name)
+        self.parent.content_area.output_area.set_status(status_message)
+        
     def select_folder(self):
         """打开文件夹选择对话框"""
         folder_path = QFileDialog.getExistingDirectory(self)
@@ -121,6 +161,11 @@ class SettingsTab(QWidget):
         """获取当前选择的文件夹路径"""
         return self.folder_edit.text()
     
+    def get_auxiliary_mode(self):
+        """获取当前选择的附加模式"""
+        index = self.aux_mode_combo.currentIndex()
+        return self.aux_mode_combo.itemData(index)
+    
     def update_texts(self):
         """更新界面上的文本为当前语言"""
         self.folder_label.setText(STRINGS[self.parent.current_lang]['current_folder'])
@@ -128,6 +173,28 @@ class SettingsTab(QWidget):
         self.provider_label.setText(STRINGS[self.parent.current_lang]['select_provider'])
         self.model_label.setText(STRINGS[self.parent.current_lang]['select_model'])
         self.temp_label.setText(STRINGS[self.parent.current_lang]['set_temperature'])
+        self.aux_mode_label.setText(STRINGS[self.parent.current_lang]['select_auxiliary_mode'])
+        
+        # 更新附加模式下拉菜单的文本
+        current_data = self.aux_mode_combo.currentData()
+        self.aux_mode_combo.clear()
+        
+        aux_mode_items = {
+            "none": STRINGS[self.parent.current_lang]['auxiliary_mode_none'],
+            "coding-solution": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_solution'],
+            "coding-debug-general": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_general'],
+            "coding-debug-correction": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_correction'],
+            "coding-debug-time-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_time_optimize'],
+            "coding-debug-space-optimize": STRINGS[self.parent.current_lang]['auxiliary_mode_coding_debug_space_optimize']
+        }
+        
+        for mode_key in src.config.config.AUXILIARY_MODES:
+            self.aux_mode_combo.addItem(aux_mode_items[mode_key], mode_key)
+            
+        # 恢复选中项
+        index = self.aux_mode_combo.findData(current_data)
+        if index >= 0:
+            self.aux_mode_combo.setCurrentIndex(index)
     
     def apply_theme(self, theme):
         """应用主题样式"""

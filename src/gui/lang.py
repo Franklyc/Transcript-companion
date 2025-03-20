@@ -78,6 +78,16 @@ STRINGS = {
         'enable_gemini_search': "为Gemini模型启用Google搜索",
         'gemini_search_enabled': "Gemini Google搜索功能已启用",
         'gemini_search_disabled': "Gemini Google搜索功能已禁用",
+        
+        # 附加模式相关文本
+        'select_auxiliary_mode': "选择附加模式:",
+        'auxiliary_mode_none': "无",
+        'auxiliary_mode_coding_solution': "编码问题-初步解法",
+        'auxiliary_mode_coding_debug_general': "编码问题-通用调试",
+        'auxiliary_mode_coding_debug_correction': "编码问题-代码改正",
+        'auxiliary_mode_coding_debug_time_optimize': "编码问题-时间复杂度优化",
+        'auxiliary_mode_coding_debug_space_optimize': "编码问题-空间复杂度优化",
+        'auxiliary_mode_changed': "附加模式已更改为: {0}",
     },
     'en': {
         'window_title': "Transcript companion",
@@ -158,5 +168,15 @@ Sidebar Features:
         'enable_gemini_search': "Enable Google Search for Gemini models",
         'gemini_search_enabled': "Gemini Google Search feature enabled",
         'gemini_search_disabled': "Gemini Google Search feature disabled",
+        
+        # 附加模式相关文本
+        'select_auxiliary_mode': "Select Auxiliary Mode:",
+        'auxiliary_mode_none': "None",
+        'auxiliary_mode_coding_solution': "Coding Problem - Solution",
+        'auxiliary_mode_coding_debug_general': "Coding Problem - General Debug",
+        'auxiliary_mode_coding_debug_correction': "Coding Problem - Code Correction",
+        'auxiliary_mode_coding_debug_time_optimize': "Coding Problem - Time Complexity Optimization",
+        'auxiliary_mode_coding_debug_space_optimize': "Coding Problem - Space Complexity Optimization",
+        'auxiliary_mode_changed': "Auxiliary mode changed to: {0}",
     }
 }

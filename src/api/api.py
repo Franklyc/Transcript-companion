@@ -5,7 +5,7 @@ from src.config.config import get_provider_info
 from PyQt6.QtWidgets import QApplication
 from src.gui.lang import STRINGS
 import src.config.config
-from src.api.gemini_api import fetch_gemini_response, fetch_gemini_response_with_history
+from src.api.gemini_api import fetch_gemini_response, fetch_gemini_response_with_history, get_auxiliary_mode_prompt
 
 
 def _get_openai_client(model_name):
@@ -42,11 +42,21 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
         # 首先清空输出
         content_area.clear_output()
         
+        # 检查是否启用了附加模式
+        aux_mode = src.config.config.CURRENT_AUXILIARY_MODE
+        aux_prompt = get_auxiliary_mode_prompt(aux_mode)
+        
+        # 如果启用了附加模式，将附加提示词添加到prompt后面
+        if aux_prompt and prompt:
+            final_prompt = f"{prompt}\n\n{aux_prompt}"
+        else:
+            final_prompt = prompt
+        
         # 检查是否为Gemini模型
         if "[Gemini]" in model_name:
             # 使用Gemini API
             return fetch_gemini_response(
-                prompt, 
+                final_prompt, 
                 content_area, 
                 model_name, 
                 temperature, 
@@ -59,10 +69,10 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
         user_message = {"role": "user", "content": []}
         
         # Add text content
-        if prompt:
+        if final_prompt:
             user_message["content"].append({
                 "type": "text", 
-                "text": prompt
+                "text": final_prompt
             })
         
         # 检查是否使用支持视觉的模型并且有图像路径
@@ -87,7 +97,7 @@ def fetch_model_response(prompt, content_area, model_name, temperature, image_pa
         
         # If no vision capabilities needed, revert to simpler format
         if not has_image and len(user_message["content"]) == 1 and user_message["content"][0]["type"] == "text":
-            user_message = {"role": "user", "content": prompt}
+            user_message = {"role": "user", "content": final_prompt}
 
         # 根据是否包含图像来决定是否添加系统消息
         messages = []
@@ -171,11 +181,21 @@ def fetch_model_response_with_history(prompt, content_area, model_name, temperat
         # 首先清空输出
         content_area.clear_output()
         
+        # 检查是否启用了附加模式
+        aux_mode = src.config.config.CURRENT_AUXILIARY_MODE
+        aux_prompt = get_auxiliary_mode_prompt(aux_mode)
+        
+        # 如果启用了附加模式，将附加提示词添加到prompt后面
+        if aux_prompt and prompt:
+            final_prompt = f"{prompt}\n\n{aux_prompt}"
+        else:
+            final_prompt = prompt
+        
         # 检查是否为Gemini模型
         if "[Gemini]" in model_name:
             # 使用Gemini API
             return fetch_gemini_response_with_history(
-                prompt, 
+                final_prompt, 
                 content_area, 
                 model_name, 
                 temperature, 
@@ -198,15 +218,15 @@ def fetch_model_response_with_history(prompt, content_area, model_name, temperat
                 messages.append({"role": role, "content": content})
         
         # 添加当前用户消息（支持图像）
-        if prompt:
+        if final_prompt:
             # 创建用户消息
             user_message = {"role": "user", "content": []}
             
             # 添加文本内容
-            if prompt:
+            if final_prompt:
                 user_message["content"].append({
                     "type": "text", 
-                    "text": prompt
+                    "text": final_prompt
                 })
             
             # 添加图片内容
@@ -228,7 +248,7 @@ def fetch_model_response_with_history(prompt, content_area, model_name, temperat
             
             # 如果没有图片，使用简单格式
             if not has_image and len(user_message["content"]) == 1 and user_message["content"][0]["type"] == "text":
-                user_message = {"role": "user", "content": prompt}
+                user_message = {"role": "user", "content": final_prompt}
                 
             messages.append(user_message)
         
@@ -260,7 +280,7 @@ def fetch_model_response_with_history(prompt, content_area, model_name, temperat
         # 更新对话历史
         if history is not None:
             # 添加用户消息（如果有）
-            if prompt:
+            if prompt:  # 注意这里保存原始的prompt，不包含附加提示词
                 history.append(("user", prompt))
                 
             # 添加助手消息
