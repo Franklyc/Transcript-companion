@@ -24,7 +24,7 @@
 * **Multi-LLM Support:** Seamlessly integrate with various LLM providers:
     * **Cerebras** (llama3.1-70b, llama3.1-8b) :sparkles: **FASTEST:** Best choice for quick response times
     * **Groq** (mixtral-8x7b-32768, llama-3.1/3.3 models) 
-    * **Google Gemini** (gemini-1.5-flash models) :books: **LARGEST CONTEXT:** Ideal for long transcripts
+    * **Google Gemini** (gemini-2/2.5 models) :books: **LARGEST CONTEXT:** Ideal for long transcripts
     * **Sambanova** (llama-3.1 models, including llama3.1-405B, Qwen2.5 models)
     * **Zhipu** (glm-4-flash)
     * **GLHF** (Llama-3.3-70B)
@@ -38,6 +38,9 @@
     * **Direct Screenshot:** Capture a region of your screen without OCR processing
     * **Image Preview:** View the currently selected image within the application
     * **Vision Models Support:** Use compatible models to analyze both text and images together
+* **Gemini Model Enhancements:**
+    * **Google Search Integration:** Enable Google Search for Gemini models to retrieve the latest information
+    * **Thinking Budget Control:** Set thinking budget (0-24576) for gemini-2.5-flash-preview-04-17 model to optimize thinking process and response quality for complex tasks
 * **Real-time Streaming:** View LLM responses in real-time as they are generated, providing immediate feedback and a dynamic interaction with the model.
 * **Clipboard Integration:** Easily copy the processed transcript content to the clipboard for use in other applications.
 * **Bilingual Support (Chinese/English):** The GUI now supports both Chinese and English. You can switch between languages within the application.
