@@ -73,11 +73,16 @@ STRINGS = {
         'reset_dialogue_context': "重置对话上下文",
         'reset_position': "重置文件位置",
         'reset_position_success': "已重置文件位置，将从文件开头读取",
-        
-        # Gemini搜索相关文本
+          # Gemini搜索相关文本
         'enable_gemini_search': "为Gemini模型启用Google搜索",
         'gemini_search_enabled': "Gemini Google搜索功能已启用",
         'gemini_search_disabled': "Gemini Google搜索功能已禁用",
+        
+        # Gemini思考预算相关文本
+        'gemini_thinking_budget_title': "Gemini思考预算设置",
+        'gemini_thinking_budget_label': "思考预算 (0-24576):",
+        'gemini_thinking_budget_description': "仅支持gemini-2.5-flash-preview-04-17模型",
+        'gemini_thinking_budget_saved': "Gemini思考预算已更新为: {0}",
         
         # 附加模式相关文本
         'select_auxiliary_mode': "选择附加模式:",
@@ -168,11 +173,16 @@ Sidebar Features:
         'reset_dialogue_context': "Reset Dialogue Context",
         'reset_position': "Reset File Position",
         'reset_position_success': "File position reset, will start reading from the beginning",
-        
-        # Gemini搜索相关文本
+          # Gemini搜索相关文本
         'enable_gemini_search': "Enable Google Search for Gemini models",
         'gemini_search_enabled': "Gemini Google Search feature enabled",
         'gemini_search_disabled': "Gemini Google Search feature disabled",
+        
+        # Gemini思考预算相关文本
+        'gemini_thinking_budget_title': "Gemini Thinking Budget Settings",
+        'gemini_thinking_budget_label': "Thinking Budget (0-24576):",
+        'gemini_thinking_budget_description': "Only supported for gemini-2.5-flash-preview-04-17 model",
+        'gemini_thinking_budget_saved': "Gemini thinking budget updated to: {0}",
         
         # 附加模式相关文本
         'select_auxiliary_mode': "Select Auxiliary Mode:",

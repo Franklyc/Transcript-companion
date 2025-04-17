@@ -240,7 +240,8 @@ TRANSCRIPT_POSITION = {}
 MAX_TOKEN_PER_REQUEST = 8000  
 
 # Gemini model related configuration
-ENABLE_GEMINI_SEARCH = False  
+ENABLE_GEMINI_SEARCH = False
+GEMINI_THINKING_BUDGET = 0  
 
 # Auxiliary mode configuration
 AUXILIARY_MODES = [

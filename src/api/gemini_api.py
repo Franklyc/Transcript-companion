@@ -156,6 +156,12 @@ def fetch_gemini_response(prompt, content_area, model_name, temperature,
             ],
         )
         
+        # 如果是gemini-2.5-flash-preview-04-17模型，添加thinking_config
+        if clean_model_name == "gemini-2.5-flash-preview-04-17" and src.config.config.GEMINI_THINKING_BUDGET >= 0:
+            generate_content_config.thinking_config = types.ThinkingConfig(
+                thinking_budget=src.config.config.GEMINI_THINKING_BUDGET
+            )
+        
         # 如果启用了搜索功能，添加搜索工具
         if use_search:
             generate_content_config.tools = [types.Tool(google_search=types.GoogleSearch())]
@@ -295,6 +301,12 @@ def fetch_gemini_response_with_history(prompt, content_area, model_name, tempera
                 types.Part.from_text(text=system_instruction if system_instruction else "你是一个专业的助手，分析会议或对话记录")
             ],
         )
+        
+        # 如果是gemini-2.5-flash-preview-04-17模型，添加thinking_config
+        if clean_model_name == "gemini-2.5-flash-preview-04-17" and src.config.config.GEMINI_THINKING_BUDGET >= 0:
+            generate_content_config.thinking_config = types.ThinkingConfig(
+                thinking_budget=src.config.config.GEMINI_THINKING_BUDGET
+            )
         
         # 如果启用了搜索功能，添加搜索工具
         if use_search:
