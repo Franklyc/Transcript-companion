@@ -38,6 +38,8 @@ AVAILABLE_MODELS = [
     "[Gemini] gemini-2.0-flash-exp",
     "[Gemini] gemini-2.0-pro-exp-02-05",
     "[Gemini] gemini-2.0-flash-thinking-exp-01-21",
+    "[Gemini] gemini-2.5-pro-exp-03-25",
+    "[Gemini] gemini-2.5-flash-preview-04-17",
     "[SambaNova] Meta-Llama-3.1-8B-Instruct",
     "[SambaNova] Meta-Llama-3.1-70B-Instruct",
     "[SambaNova] Meta-Llama-3.1-405B-Instruct",

@@ -62,6 +62,16 @@ def fetch_gemini_response(prompt, content_area, model_name, temperature,
     - system_instruction: 系统指令
     """
     try:
+        search_reminder_text = "注意：搜索工具已启用，必须结合搜索获取的最新信息来回答。"
+        search_command_prefix = "请务必使用 Google 搜索工具查找最新信息来回答以下问题：\n\n"
+        # 如果启用了搜索功能，自动在system_instruction中加入提示
+        if use_search:
+            if system_instruction:
+                # 避免重复添加
+                if search_reminder_text not in system_instruction:
+                    system_instruction = f"{system_instruction}\n{search_reminder_text}"
+            else:
+                system_instruction = search_reminder_text
         # 首先清空输出
         content_area.clear_output()
         
@@ -71,9 +81,16 @@ def fetch_gemini_response(prompt, content_area, model_name, temperature,
         
         # 如果启用了附加模式，将附加提示词添加到prompt后面
         if aux_prompt and prompt:
-            final_prompt = f"{prompt}\n\n{aux_prompt}"
+            base_user_prompt  = f"{prompt}\n\n{aux_prompt}"
         else:
-            final_prompt = prompt
+            base_user_prompt  = prompt
+        
+        # If search is enabled, ALSO append the reminder to the end of the user's prompt text
+        if use_search and base_user_prompt : # Check final_prompt to avoid adding to empty prompts
+            final_prompt = search_command_prefix + base_user_prompt
+            final_prompt += f"\n\n{search_reminder_text}"
+        else:
+            final_prompt = base_user_prompt
         
         # 设置API客户端
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
@@ -186,6 +203,14 @@ def fetch_gemini_response_with_history(prompt, content_area, model_name, tempera
     - system_instruction: 系统指令
     """
     try:
+        search_reminder_text = "注意：搜索工具已启用，必须结合搜索获取的最新信息来回答。"
+        search_command_prefix = "请务必使用 Google 搜索工具查找最新信息来回答以下问题：\n\n"
+        if use_search:
+            if system_instruction:
+                if search_reminder_text not in system_instruction:
+                    system_instruction = f"{system_instruction}\n{search_reminder_text}"
+            else:
+                system_instruction = search_reminder_text
         # 首先清空输出
         content_area.clear_output()
         
@@ -195,9 +220,17 @@ def fetch_gemini_response_with_history(prompt, content_area, model_name, tempera
         
         # 如果启用了附加模式，将附加提示词添加到prompt后面
         if aux_prompt and prompt:
-            final_prompt = f"{prompt}\n\n{aux_prompt}"
+            base_user_prompt = f"{prompt}\n\n{aux_prompt}"
         else:
-            final_prompt = prompt
+            base_user_prompt = prompt
+        
+        if use_search and base_user_prompt:
+            final_prompt = search_command_prefix + base_user_prompt
+            # Optional reminder suffix
+            # final_prompt += f"\n\n{search_reminder_text}"
+        else:
+            final_prompt = base_user_prompt
+
         
         # 设置API客户端
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
