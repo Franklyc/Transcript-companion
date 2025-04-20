@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTextEdi
 from PyQt6.QtCore import Qt, QTimer
 import src.config.config
 from src.gui.lang import STRINGS
-from src.gui.image_utils import (upload_image, clear_image, start_screenshot_dialog, take_fullscreen_screenshot)
+from src.gui.image_utils import (upload_image, clear_image, start_screenshot_dialog, take_fullscreen_screenshot, update_image_previews) # Import update_image_previews
 
 class InputTab(QWidget):
     """输入选项卡，用于管理自定义前缀后缀、图像处理等"""
@@ -237,6 +237,8 @@ class InputTab(QWidget):
         self.fullscreen_button.setText(STRINGS[self.parent.current_lang]['fullscreen_capture'])
         self.clear_image_button.setText(STRINGS[self.parent.current_lang]['clear_all_images'])
         self.image_preview_label.setText(STRINGS[self.parent.current_lang]['image_preview'])
+        # Call update_image_previews to update the placeholder label in the scroll area
+        update_image_previews(self)
     
     def apply_theme(self, theme):
         """应用主题样式"""
