@@ -78,10 +78,15 @@ class ScreenshotDialog(QDialog):
             self.reject()
             return
             
+        # Hide the dialog before taking the screenshot
+        self.hide()
+        # Ensure the hide event is processed before grabbing the screen
+        QGuiApplication.processEvents()
+
         screen = QGuiApplication.primaryScreen()
-        screenshot = screen.grabWindow(0, self.selection_rect.x(), self.selection_rect.y(), 
+        screenshot = screen.grabWindow(0, self.selection_rect.x(), self.selection_rect.y(),
                                       self.selection_rect.width(), self.selection_rect.height())
-        
+
         # Create temp directory if needed
         temp_dir = os.path.join(os.getcwd(), "temp")
         if not os.path.exists(temp_dir):
