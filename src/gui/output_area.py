@@ -70,26 +70,20 @@ class OutputArea(QWidget):
         buttons_layout = QHBoxLayout()
         spacing = int(src.config.config.UI_SPACING.replace("px", ""))
         buttons_layout.setSpacing(spacing)
-
-        # 复制/获取回答按钮
+        
+        # 复制按钮
         self.copy_button = QPushButton(STRINGS[self.parent.current_lang]['copy_and_get_answer'])
         self.copy_button.setObjectName("copyButton")
         buttons_layout.addWidget(self.copy_button)
-
-        # 停止按钮 (初始隐藏)
-        self.stop_button = QPushButton(STRINGS[self.parent.current_lang]['stop_generating']) # Add 'stop_generating' to STRINGS
-        self.stop_button.setObjectName("stopButton")
-        self.stop_button.setVisible(False) # Initially hidden
-        buttons_layout.addWidget(self.stop_button)
-
+        
         # 导出按钮
         self.export_button = QPushButton(STRINGS[self.parent.current_lang]['export_conversation'])
         self.export_button.setObjectName("exportButton")
         self.export_button.clicked.connect(self.export_conversation)
         buttons_layout.addWidget(self.export_button)
-
+        
         return buttons_layout
-
+    
     def append_text(self, text):
         """API调用将使用此方法来添加文本"""
         self.raw_output_text = append_markdown_text(
@@ -132,9 +126,8 @@ class OutputArea(QWidget):
         """更新界面上的文本为当前语言"""
         self.output_label.setText(STRINGS[self.parent.current_lang]['output_result'])
         self.copy_button.setText(STRINGS[self.parent.current_lang]['copy_and_get_answer'])
-        self.stop_button.setText(STRINGS[self.parent.current_lang]['stop_generating'])
         self.export_button.setText(STRINGS[self.parent.current_lang]['export_conversation'])
-
+        
         # 更新Markdown切换按钮文本
         if not self.toggle_markdown_button.isChecked():
             self.toggle_markdown_button.setText(STRINGS[self.parent.current_lang]['show_source'])
@@ -179,7 +172,7 @@ class OutputArea(QWidget):
             #markdownToggleButton:hover {{
                 background-color: {theme['button_hover']};
             }}
-            #copyButton, #exportButton, #stopButton {{
+            #copyButton, #exportButton {{
                 background-color: {theme['button_bg']};
                 color: {theme['button_text']};
                 padding: {padding_normal};
@@ -187,14 +180,8 @@ class OutputArea(QWidget):
                 font-size: {font_size_large};
                 min-height: 36px;
             }}
-            #copyButton:hover, #exportButton:hover, #stopButton:hover {{
+            #copyButton:hover, #exportButton:hover {{
                 background-color: {theme['button_hover']};
-            }}
-            #stopButton {{
-                 background-color: {theme['button_danger_bg']}; /* Use a danger color */
-            }}
-             #stopButton:hover {{
-                 background-color: {theme['button_danger_hover']};
             }}
             #exportButton {{
                 background-color: {theme['button_success_bg']};

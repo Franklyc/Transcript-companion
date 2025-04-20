@@ -98,9 +98,6 @@ STRINGS = {
         'auxiliary_mode_sentiment_analyzer': "会议-情感分析",
         'auxiliary_mode_question_generator': "会议-问题生成",
         'auxiliary_mode_changed': "附加模式已更改为: {0}",
-        'stop_generating': "停止生成", # Added
-        'fetching_response': "正在获取回答...", # Added
-        'response_received': "回答已接收", # Added
     },
     'en': {
         'window_title': "Transcript companion",
@@ -201,8 +198,5 @@ Sidebar Features:
         'auxiliary_mode_sentiment_analyzer': "Meeting - Sentiment Analysis",
         'auxiliary_mode_question_generator': "Meeting - Question Generation",
         'auxiliary_mode_changed': "Auxiliary mode changed to: {0}",
-        'stop_generating': "Stop Generating", # Added
-        'fetching_response': "Fetching response...", # Added
-        'response_received': "Response received", # Added
     }
 }

@@ -1,12 +1,11 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QSplitter, QTabWidget)
-from PyQt6.QtCore import Qt, QThread, pyqtSlot
+from PyQt6.QtCore import Qt
 import os
 import datetime
 import src.config.config
 from src.gui.lang import STRINGS
 import src.gui.utils
-# import src.api.api # No longer needed directly for fetching
-from src.api.worker import ApiWorker # Import the worker
+import src.api.api
 import src.gui.prefix
 from src.gui.settings_tab import SettingsTab
 from src.gui.input_tab import InputTab
@@ -14,16 +13,12 @@ from src.gui.output_area import OutputArea
 
 class ContentArea(QWidget):
     """内容区域，负责整合设置选项卡、输入选项卡和输出区域"""
-
+    
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
         # 初始化对话历史记录
         self.dialogue_history = []
-        self.api_thread = None
-        self.api_worker = None
-        # Store the prompt that was sent for history update later
-        self._current_prompt_for_history = ""
         self.init_ui()
 
     def init_ui(self):
@@ -70,10 +65,9 @@ class ContentArea(QWidget):
         main_layout.addWidget(splitter)
         
         # 连接信号
-        self.output_area.copy_button.clicked.connect(self.start_api_request) # Connect to the new start method
-        self.output_area.stop_button.clicked.connect(self.stop_api_request) # Connect stop button
+        self.output_area.copy_button.clicked.connect(self.copy_and_get_answer)
         self.output_area.export_requested.connect(self.export_conversation)
-
+        
     def apply_theme(self):
         """应用主题样式"""
         theme = src.config.config.THEMES[self.parent.current_theme]
@@ -169,215 +163,143 @@ class ContentArea(QWidget):
             self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
             return "", False
 
-    def start_api_request(self):
-        """准备并启动后台 API 请求"""
-        if self.api_thread is not None and self.api_thread.isRunning():
-            # Optionally: Stop the previous request or show a message
-            print("API request already in progress.")
-            # self.stop_api_request() # Or implement stopping logic
-            return
-
+    def copy_and_get_answer(self):
+        """复制内容并从API获取回答"""
         directory = self.settings_tab.get_folder_path()
         latest_file = src.gui.utils.get_latest_file(directory)
         original_prefix = src.gui.prefix.get_original_prefix() if src.config.config.USE_PREDEFINED_PREFIX else ""
         ocr_text = self.input_tab.get_ocr_text()
+        
+        # 获取用户自定义的前缀和后缀文本
         prefix_text = self.input_tab.get_prefix_text()
         suffix_text = self.input_tab.get_suffix_text()
-        image_paths = self.input_tab.get_image_paths() # Get image paths
-        model_name = self.settings_tab.get_selected_model()
-        temperature = self.settings_tab.get_temperature()
-        use_history_mode = src.config.config.ENABLE_CONTINUOUS_DIALOGUE
 
-        # --- Logic to prepare combined_content (similar to original) ---
-        transcript_content = ""
-        if src.config.config.USE_TRANSCRIPT_TEXT and latest_file:
-            try:
-                if use_history_mode:
-                    transcript_content, _ = self.get_new_transcript_content(latest_file)
+        # 检查是否有文件可用
+        if not latest_file and not src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+            self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+            return
+            
+        try:
+            transcript_content = ""
+            has_new_content = False
+            
+            # 获取转录文本内容 - 无论是否为连续对话模式
+            if src.config.config.USE_TRANSCRIPT_TEXT and latest_file:
+                if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+                    # 连续对话模式：只获取新内容
+                    transcript_content, has_new_content = self.get_new_transcript_content(latest_file)
                 else:
-                    with open(latest_file, 'r', encoding='utf-8') as file:
-                        transcript_content = file.read()
-            except Exception as e:
-                self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
-                return
-
-        # Determine combined content based on mode
-        if use_history_mode:
-            prompt_parts = []
-            if prefix_text or transcript_content or suffix_text:
-                full_text_parts = [part for part in [prefix_text, transcript_content, suffix_text] if part]
-                prompt_parts.append("\n".join(full_text_parts))
-            if ocr_text:
-                prompt_parts.append(ocr_text)
-            combined_content = "\n".join(prompt_parts)
-
-            # Handle case where only history exists for continuous dialogue
-            if not combined_content and self.dialogue_history:
-                combined_content = "Please continue analyzing based on our previous conversation." # Special prompt
-
-            # Check if there's anything to send
-            if not combined_content and not self.dialogue_history:
-                 self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
-                 return
-
-            # Set status message for continuous mode
-            context_msg = STRINGS[self.parent.current_lang]['continuous_dialogue_context'].format(len(self.dialogue_history))
-            status_message = context_msg
-            if latest_file:
-                 status_message += f"\n{STRINGS[self.parent.current_lang]['copied_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{latest_file}"
-            if combined_content: # Only copy if there's new content
-                 src.gui.utils.copy_to_clipboard(combined_content)
-            self.output_area.set_status(status_message)
-
-        else: # Not continuous dialogue mode
-            combined_content = f"{original_prefix}\n{prefix_text}\n{transcript_content}\n{suffix_text}\n{ocr_text}"
-            combined_content = combined_content.strip()
-
-            if not combined_content and not image_paths: # Check if there's any input at all
-                self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
-                return
-
-            src.gui.utils.copy_to_clipboard(combined_content) # Copy combined text
-            if latest_file:
-                self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['copied_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{latest_file}")
+                    # 普通模式：获取全部内容
+                    try:
+                        with open(latest_file, 'r', encoding='utf-8') as file:
+                            transcript_content = file.read()
+                            has_new_content = bool(transcript_content)
+                    except Exception as e:
+                        self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
+                        return
+            
+            # 确定是否有任何输入内容可用于对话
+            has_input_content = bool(transcript_content) or bool(ocr_text) or bool(prefix_text) or bool(suffix_text)
+            
+            # 处理连续对话的情况
+            if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+                # 即使没有新内容，只要有用户输入或者有历史记录，也可以继续对话
+                if not has_input_content and not self.dialogue_history:
+                    # 真的什么都没有的情况
+                    self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+                    return
+                
+                # 连续对话模式：添加对话上下文提示
+                context_msg = STRINGS[self.parent.current_lang]['continuous_dialogue_context'].format(len(self.dialogue_history))
+                
+                # 构建当前提示内容 - 即使转录内容为空，也需要创建包含前缀、后缀的提示
+                prompt_parts = []
+                
+                # 如果有前缀或后缀，始终添加这部分
+                if prefix_text or transcript_content or suffix_text:
+                    # 构建包含前缀、转录内容、后缀的完整提示
+                    full_text_parts = []
+                    if prefix_text:
+                        full_text_parts.append(prefix_text)
+                    if transcript_content:
+                        full_text_parts.append(transcript_content)
+                    if suffix_text:
+                        full_text_parts.append(suffix_text)
+                    prompt_parts.append("\n".join(full_text_parts))
+                
+                # 添加OCR文本(如果有)
+                if ocr_text:
+                    prompt_parts.append(ocr_text)
+                    
+                combined_content = "\n".join(prompt_parts)
+                
+                # 如果没有任何新增内容但有历史记录，允许用户继续对话
+                if not combined_content and self.dialogue_history:
+                    # 使用一个特殊提示告知模型继续前面的对话
+                    combined_content = "Please continue analyzing based on our previous conversation."
+                
+                # 设置状态并复制到剪贴板
+                status_message = context_msg
+                if latest_file:
+                    status_message += f"\n{STRINGS[self.parent.current_lang]['copied_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{latest_file}"
+                
+                # 只在有内容时复制到剪贴板
+                if combined_content:
+                    src.gui.utils.copy_to_clipboard(combined_content)
+                    self.output_area.set_status(status_message)
             else:
-                self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['copied_success']}")
-
-        # --- Start Background Task ---
-        self.output_area.copy_button.setVisible(False) # Hide copy button
-        self.output_area.stop_button.setVisible(True)  # Show stop button
-        self.output_area.stop_button.setEnabled(True)
-        self.output_area.clear_output()
-        self.output_area.set_status(STRINGS[self.parent.current_lang]['fetching_response']) # Indicate fetching
-
-        # Store the prompt used for this turn to update history later
-        self._current_prompt_for_history = combined_content
-
-        # Create worker and thread
-        self.api_thread = QThread()
-        self.api_worker = ApiWorker(
-            model_name=model_name,
-            temperature=temperature,
-            prompt=combined_content, # Pass the final combined content
-            history=self.dialogue_history if use_history_mode else None,
-            image_paths=image_paths,
-            use_history=use_history_mode
-        )
-
-        # Move worker to thread
-        self.api_worker.moveToThread(self.api_thread)
-
-        # Connect signals
-        self.api_worker.new_chunk_received.connect(self.handle_new_chunk)
-        self.api_worker.request_finished.connect(self.handle_request_finished)
-        self.api_worker.request_error.connect(self.handle_request_error)
-        self.api_thread.started.connect(self.api_worker.run_request)
-        self.api_thread.finished.connect(self.cleanup_api_thread) # Connect thread finished to cleanup
-
-        # Start the thread
-        self.api_thread.start()
-
-    # --- Slot Methods for Worker Signals ---
-    @pyqtSlot(str)
-    def handle_new_chunk(self, chunk):
-        """Append received text chunk to the output area."""
-        self.output_area.append_text(chunk)
-
-    @pyqtSlot(str)
-    def handle_request_finished(self, full_response):
-        """Handle successful API request completion."""
-        self.output_area.set_status(STRINGS[self.parent.current_lang]['response_received'])
-        # Reset buttons immediately upon finishing successfully
-        self.output_area.stop_button.setVisible(False)
-        self.output_area.stop_button.setEnabled(False)
-        self.output_area.copy_button.setVisible(True)
-        self.output_area.copy_button.setEnabled(True)
-
-        # Update dialogue history if in continuous mode
-        if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
-            # Add user message (the prompt we sent)
-            if self._current_prompt_for_history:
-                 # Ensure system prompt exists if history was empty
-                 if not self.dialogue_history:
-                     self.dialogue_history.append(("system", "You are a helpful assistant analyzing transcripts from meetings or conversations."))
-                 self.dialogue_history.append(("user", self._current_prompt_for_history))
-
-            # Add assistant message
-            if full_response:
-                self.dialogue_history.append(("assistant", full_response))
-
-            # Truncate history if needed (logic moved from api.py)
-            max_history = src.config.config.MAX_CONTEXT_MESSAGES
-            if len(self.dialogue_history) > max_history:
-                if src.config.config.SUMMARIZE_CONTEXT:
-                    # (Keep summarization logic if needed, similar to api.py)
-                    # For simplicity, just truncate for now
-                    print(f"History truncated from {len(self.dialogue_history)} to {max_history}")
-                    self.dialogue_history = self.dialogue_history[-max_history:]
+                # 非连续对话模式，使用完整提示
+                # 检查没有转录文件内容且未启用预定义前缀的情况
+                if not transcript_content and not src.config.config.USE_PREDEFINED_PREFIX:
+                    if not ocr_text and not prefix_text and not suffix_text:
+                        self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+                        return
+                        
+                combined_content = f"{original_prefix}\n{prefix_text}\n{transcript_content}\n{suffix_text}\n{ocr_text}"
+                combined_content = combined_content.strip()
+                
+                if not combined_content:
+                    self.output_area.set_status(STRINGS[self.parent.current_lang]['no_files_available'], True)
+                    return
+                    
+                src.gui.utils.copy_to_clipboard(combined_content)
+                
+                if latest_file:
+                    self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['copied_success']}\n{STRINGS[self.parent.current_lang]['file_path']}{latest_file}")
                 else:
-                    print(f"History truncated from {len(self.dialogue_history)} to {max_history}")
-                    self.dialogue_history = self.dialogue_history[-max_history:]
+                    self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['copied_success']}")
 
-        self._current_prompt_for_history = "" # Clear the stored prompt
+            self.output_area.copy_button.setEnabled(False)
+            
+            # 清空旧内容
+            self.output_area.clear_output()
+            
+            # 使用API获取回答
+            if src.config.config.ENABLE_CONTINUOUS_DIALOGUE:
+                # 连续对话模式：传递对话历史和新内容
+                src.api.api.fetch_model_response_with_history(
+                    combined_content, 
+                    self.output_area,
+                    self.settings_tab.get_selected_model(), 
+                    self.settings_tab.get_temperature(),
+                    self.dialogue_history,
+                    self.input_tab.get_image_paths()
+                )
+            else:
+                # 传统模式：直接传递完整内容
+                src.api.api.fetch_model_response(
+                    combined_content, 
+                    self.output_area,
+                    self.settings_tab.get_selected_model(), 
+                    self.settings_tab.get_temperature(),
+                    self.input_tab.get_image_paths()
+                )
+            
+            self.output_area.copy_button.setEnabled(True)
 
-        # No need to call cleanup here, it's connected to thread.finished
-
-    @pyqtSlot(str)
-    def handle_request_error(self, error_message):
-        """Handle API request errors."""
-        self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['model_call_error']}{error_message}", is_error=True)
-        # Reset buttons immediately upon error
-        self.output_area.stop_button.setVisible(False)
-        self.output_area.stop_button.setEnabled(False)
-        self.output_area.copy_button.setVisible(True)
-        self.output_area.copy_button.setEnabled(True)
-        self._current_prompt_for_history = "" # Clear the stored prompt
-
-    def cleanup_api_thread(self):
-        """Clean up thread and worker objects after thread finishes."""
-        print("Cleaning up API thread...")
-        # It's safer to check if the widgets still exist before accessing them,
-        # especially if the window could be closed during the request.
-        if hasattr(self, 'output_area') and self.output_area:
-            # Reset button states after thread finishes (success, error, or stopped)
-            self.output_area.stop_button.setVisible(False)
-            self.output_area.stop_button.setEnabled(False)
-            self.output_area.copy_button.setVisible(True)
-            self.output_area.copy_button.setEnabled(True) # Ensure copy button is re-enabled
-
-        # Clean up thread and worker objects
-        if self.api_worker:
-            self.api_worker.deleteLater()
-        if self.api_thread:
-            # Disconnect signals before deleting to avoid potential issues
-            try:
-                 self.api_thread.started.disconnect(self.api_worker.run_request)
-                 self.api_thread.finished.disconnect(self.cleanup_api_thread)
-                 self.api_worker.new_chunk_received.disconnect(self.handle_new_chunk)
-                 self.api_worker.request_finished.disconnect(self.handle_request_finished)
-                 self.api_worker.request_error.disconnect(self.handle_request_error)
-            except TypeError: # Signals might already be disconnected
-                 pass
-            self.api_thread.deleteLater()
-
-        self.api_thread = None
-        self.api_worker = None
-
-
-    def stop_api_request(self):
-         """Request the worker to stop and wait for the thread to finish."""
-         if self.api_worker:
-             print("Requesting API worker stop...")
-             self.api_worker.stop()
-         if self.api_thread and self.api_thread.isRunning():
-             print("Waiting for API thread to finish...")
-             self.api_thread.quit()
-             self.api_thread.wait() # Wait for thread to finish cleanly
-             print("API thread finished.")
-         else:
-             # If thread wasn't running, ensure cleanup happens
-             self.cleanup_api_thread()
-
+        except Exception as e:
+            self.output_area.set_status(f"{STRINGS[self.parent.current_lang]['read_file_error']}{e}", True)
+            self.output_area.copy_button.setEnabled(True)
 
     def export_conversation(self):
         """导出当前对话"""
@@ -510,8 +432,3 @@ class ContentArea(QWidget):
     def on_provider_changed(self, provider):
         """处理提供商选择变更"""
         self.settings_tab.on_provider_changed(provider)
-
-    # Ensure worker is stopped if the widget is closed/destroyed
-    def closeEvent(self, event):
-        self.stop_api_request()
-        super().closeEvent(event)
