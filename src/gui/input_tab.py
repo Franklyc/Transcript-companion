@@ -151,6 +151,7 @@ class InputTab(QWidget):
         
         # 创建图像容器
         self.images_container = QWidget()
+        self.images_container.setObjectName("imagesContainer") # 添加 objectName
         self.images_layout = QVBoxLayout(self.images_container)
         self.images_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.images_layout.setSpacing(10)
@@ -279,6 +280,9 @@ class InputTab(QWidget):
             QScrollArea {{
                 border: 1px solid {theme['input_border']};
                 border-radius: {border_radius};
+                background-color: {theme['input_bg']};
+            }}
+            #imagesContainer {{ /* 为图像容器设置背景色 */
                 background-color: {theme['input_bg']};
             }}
         """)
