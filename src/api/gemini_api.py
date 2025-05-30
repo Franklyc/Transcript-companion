@@ -302,8 +302,8 @@ def fetch_gemini_response_with_history(prompt, content_area, model_name, tempera
             ],
         )
         
-        # 如果是gemini-2.5-flash-preview-04-17模型，添加thinking_config
-        if clean_model_name == "gemini-2.5-flash-preview-04-17" and src.config.config.GEMINI_THINKING_BUDGET >= 0:
+        # 如果是gemini-2.5-flash-preview模型，添加thinking_config
+        if clean_model_name.startswith("gemini-2.5-flash-preview") and src.config.config.GEMINI_THINKING_BUDGET >= 0:
             generate_content_config.thinking_config = types.ThinkingConfig(
                 thinking_budget=src.config.config.GEMINI_THINKING_BUDGET
             )

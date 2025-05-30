@@ -81,7 +81,7 @@ STRINGS = {
         # Gemini思考预算相关文本
         'gemini_thinking_budget_title': "Gemini思考预算设置",
         'gemini_thinking_budget_label': "思考预算 (0-24576):",
-        'gemini_thinking_budget_description': "仅支持gemini-2.5-flash-preview-04-17模型",
+        'gemini_thinking_budget_description': "仅支持gemini-2.5-flash-preview模型",
         'gemini_thinking_budget_saved': "Gemini思考预算已更新为: {0}",
         
         # 附加模式相关文本
@@ -181,7 +181,7 @@ Sidebar Features:
         # Gemini思考预算相关文本
         'gemini_thinking_budget_title': "Gemini Thinking Budget Settings",
         'gemini_thinking_budget_label': "Thinking Budget (0-24576):",
-        'gemini_thinking_budget_description': "Only supported for gemini-2.5-flash-preview-04-17 model",
+        'gemini_thinking_budget_description': "Only supported for gemini-2.5-flash-preview model",
         'gemini_thinking_budget_saved': "Gemini thinking budget updated to: {0}",
         
         # 附加模式相关文本
