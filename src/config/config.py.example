@@ -26,6 +26,9 @@ DEFAULT_PROVIDER = "All"
 
 # Available models with their respective providers
 AVAILABLE_MODELS = [
+    "[Gemini] gemini-2.5-flash-preview-04-17",
+    "[Gemini] gemini-2.5-flash-preview-05-20",
+    "[Gemini] gemini-2.5-pro-exp-03-25",
     "[Cerebras] llama3.3-70b",
     "[Cerebras] llama3.1-8b",
     "[Groq] qwen-2.5-32b",
@@ -34,12 +37,6 @@ AVAILABLE_MODELS = [
     "[Groq] llama-3.2-90b-vision-preview",
     "[Groq] llama-3.3-70b-versatile",
     "[Groq] llama-3.3-70b-specdec",
-    "[Gemini] gemini-2.0-flash-lite-preview-02-05",
-    "[Gemini] gemini-2.0-flash-exp",
-    "[Gemini] gemini-2.0-pro-exp-02-05",
-    "[Gemini] gemini-2.0-flash-thinking-exp-01-21",
-    "[Gemini] gemini-2.5-pro-exp-03-25",
-    "[Gemini] gemini-2.5-flash-preview-04-17",
     "[SambaNova] Meta-Llama-3.1-8B-Instruct",
     "[SambaNova] Meta-Llama-3.1-70B-Instruct",
     "[SambaNova] Meta-Llama-3.1-405B-Instruct",
@@ -180,6 +177,11 @@ THEMES = {
         "md_link": INFO_COLOR,
         "md_table_border": "#E2E8F0",
         "md_table_header_bg": "#F1F5F9",
+
+        # Screenshot Dialog colors
+        "screenshot_overlay_bg": "rgba(0, 0, 0, 30)",
+        "screenshot_selection_border": "rgba(0, 162, 232, 255)", # Blue border
+        "screenshot_selection_fill": "rgba(0, 162, 232, 30)",   # Semi-transparent blue fill
     },
     "dark": {
         # Base colors
@@ -226,6 +228,11 @@ THEMES = {
         "md_link": "#60A5FA",
         "md_table_border": "#4B5563",
         "md_table_header_bg": "#1E293B",
+
+        # Screenshot Dialog colors
+        "screenshot_overlay_bg": "rgba(0, 0, 0, 50)",        # Darker overlay for dark mode
+        "screenshot_selection_border": "rgba(59, 130, 246, 255)", # Lighter blue border for contrast
+        "screenshot_selection_fill": "rgba(59, 130, 246, 40)",   # Semi-transparent light blue fill
     }
 }
 
