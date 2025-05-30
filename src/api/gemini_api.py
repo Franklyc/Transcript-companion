@@ -63,7 +63,7 @@ def fetch_gemini_response(prompt, content_area, model_name, temperature,
     """
     try:
         search_reminder_text = "注意：搜索工具已启用，必须结合搜索获取的最新信息来回答。"
-        search_command_prefix = "请务必使用 Google 搜索工具查找最新信息来回答以下问题：\n\n"
+        search_command_prefix = "请务必使用 Google 搜索工具查找相关的最新信息来回答以下问题：\n\n"
         # 如果启用了搜索功能，自动在system_instruction中加入提示
         if use_search:
             if system_instruction:
